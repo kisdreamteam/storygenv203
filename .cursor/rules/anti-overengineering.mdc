@@ -1,0 +1,27 @@
+---
+description: V1 simplicity guardrails — no future-proofing or scope creep
+alwaysApply: true
+---
+
+# Anti-Overengineering
+
+V1 exists for workflow validation and learning — not scaling, enterprise readiness, or future-proofing.
+
+## MUST
+
+- Choose the simpler option when uncertain.
+- Build only what V1 specs and `docs/phase-b-architecture-map.md` require.
+- Prefer small, understandable systems over clever abstractions.
+- Use acceptable V1 shortcuts (mocks, fixtures, manual flows) when the core workflow stays valid.
+
+## MUST NOT
+
+- Add features because they seem useful, interesting, or "might be needed later."
+- Introduce extra tables, services, libraries, or patterns not required by specs.
+- Future-proof V1 for scale, multi-series, enterprise, analytics, or payments.
+- Add configuration, flexibility, or customization beyond the four required inputs + optional fields.
+- Optimize for performance or architecture elegance before the core workflow works.
+
+## Feature test
+
+If it does not reduce time-to-first-story or validate the core workflow — exclude it.

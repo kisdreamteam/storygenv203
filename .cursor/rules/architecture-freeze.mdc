@@ -1,0 +1,39 @@
+---
+description: Frozen V1 architecture — follow phase-b map unless docs are revised
+alwaysApply: true
+---
+
+# Architecture Freeze
+
+`docs/phase-b-architecture-map.md` is the frozen V1 architecture plan. Follow it unless documentation is explicitly revised first.
+
+## Frozen decisions
+
+| Area | Frozen value |
+|------|--------------|
+| Routes | `/login`, `/`, `/stories/new`, `/stories/[id]` only |
+| Auth | Supabase Auth; teachers only; redirect unauthenticated to `/login` |
+| Persistence | Supabase; not localStorage as primary |
+| Tables | `stories`, `story_pages`, `story_vocabulary`, `series_memory` (5 tables total) |
+| Series Memory | Global shared singleton; updates on **save only** — not draft, not failed generation |
+| Illustrations | Prompts only; one per page; copy button; no in-app image generation |
+| Story shape | 12 pages; ~30–40 words per page |
+| Edit scope | Text per page + regenerate from inputs |
+
+## MUST
+
+- Follow the architecture map for routes, data model, pipeline, and folder structure.
+- Update `docs/phase-b-architecture-map.md` and affected source docs before changing frozen areas.
+- Log architectural revisions in `drift-log.md`.
+
+## MUST NOT
+
+- Add routes (settings, export, student mode, image preview, etc.).
+- Add tables or split the data model without a documentation update.
+- Change Series Memory update timing, scope (global shared), or load strategy.
+- Switch auth model, persistence layer, or illustration model without explicit doc revision.
+- Implement features listed in architecture map section 9 (Explicit Non-Goals).
+
+## Revision path
+
+Document change → update `drift-log.md` → update architecture map and source docs → then implement.

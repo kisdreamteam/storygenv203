@@ -1,0 +1,33 @@
+---
+description: Documentation-first change control and drift prevention
+alwaysApply: true
+---
+
+# Documentation Discipline
+
+## MUST
+
+- Update documentation **before** changing scope, workflow, inputs, outputs, success metrics, or Series Memory behavior.
+- Log unresolved decisions in `drift-log.md` using its entry template.
+- Document proposed changes (what, why, documents affected) before implementing them.
+- Keep `drift-log.md` current when validation reveals a needed spec change.
+
+## MUST NOT
+
+- Silently change product direction, workflow, audience, or outputs.
+- Silently add scope or redesign flows in code.
+- Fix spec conflicts only in implementation — update the authoritative doc first.
+- Skip documentation because a change "seems small."
+
+## Stop and update docs first if changes affect
+
+- User workflow
+- Required inputs or outputs
+- Product philosophy or goals
+- Scope boundaries or success metrics
+- Series Memory behavior
+- Domain ownership
+
+## Order
+
+Documentation changes first. Implementation changes second.

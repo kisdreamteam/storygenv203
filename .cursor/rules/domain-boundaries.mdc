@@ -1,0 +1,34 @@
+---
+description: Domain ownership — stay in scope, document cross-domain changes
+alwaysApply: true
+---
+
+# Domain Boundaries
+
+## Domain ownership
+
+| Domain | Owner documents | Owns |
+|--------|-----------------|------|
+| Product / workflow | `product-spec.md`, `source-of-truth.md`, `v1-scope.md` | Goals, workflow, inputs, outputs, V1 scope |
+| Characters / continuity | `character-bible.md` | Nina & Nino, tiers, voice, appearance, age guardrails |
+| Illustration prompts | `illustration-guide.md` | Prompt format, style, consistency rules |
+| Architecture | `docs/phase-b-architecture-map.md` | Routes, data model, pipeline, folder structure |
+| Drift / decisions | `drift-log.md` | Unresolved and accepted change decisions |
+
+## MUST
+
+- Change only the domain you are working in.
+- Read the owning document before modifying behavior in that domain.
+- Document cross-domain changes in `drift-log.md` before implementing.
+- Extend lower-authority docs; do not contradict higher-authority docs.
+
+## MUST NOT
+
+- Change character rules while editing architecture, or vice versa, without documenting the cross-domain impact.
+- Modify unrelated files "while you're there."
+- Move domain knowledge into code comments instead of the owning document.
+- Duplicate full spec content into rules, code, or new docs.
+
+## Cross-domain change
+
+If a change touches two or more domains: add a `drift-log.md` entry, update each affected document, then implement.

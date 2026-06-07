@@ -1,0 +1,26 @@
+---
+description: Minimal file creation — edit existing files when possible
+alwaysApply: true
+---
+
+# File Creation
+
+## MUST
+
+- Prefer editing an existing file over creating a new one.
+- Give every new file a single clear purpose stated in the request or docs.
+- Place files according to `docs/phase-b-architecture-map.md` folder structure when adding app code.
+- Reuse existing functions, components, and types before adding new ones.
+
+## MUST NOT
+
+- Create files the user did not ask for (including extra READMEs, summaries, or scratch docs).
+- Add duplicate helpers, components, types, or utility wrappers for one-off use.
+- Split logic across unnecessary layers (e.g. extra abstraction files for a single call site).
+- Create parallel docs that repeat content already in source documents.
+
+## New file checklist
+
+1. Is an existing file the right home? If yes — edit it.
+2. Is the file required by specs or architecture map? If no — do not create it.
+3. Will it duplicate something that already exists? If yes — reuse instead.
