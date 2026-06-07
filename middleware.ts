@@ -13,14 +13,6 @@ export async function middleware(request: NextRequest) {
   const isApiRoute = pathname.startsWith("/api/");
   const hasSession = hasSupabaseAuthCookie(request);
 
-  // #region agent log
-  console.info("[StoryGen:middleware] session check", {
-    path: pathname,
-    hasSession,
-    isLoginPage,
-  });
-  // #endregion
-
   if (!hasSession && !isLoginPage) {
     if (isApiRoute) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
