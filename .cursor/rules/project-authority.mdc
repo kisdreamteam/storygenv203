@@ -35,3 +35,5 @@ When making product or implementation decisions, follow this authority order (hi
 2. Lower authority must be updated.
 3. Unresolved decisions go in `drift-log.md`.
 4. Do not implement until the conflict is documented and resolved.
+
+d
