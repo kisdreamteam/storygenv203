@@ -53,11 +53,7 @@ export function SaveButton({ storyId }: SaveButtonProps) {
   }
 
   return (
-    <div className="flex flex-col items-end gap-1">
-      <p className="max-w-xs text-right text-xs text-gray-500">
-        Saved stories appear on your home page and help Nina &amp; Nino remember
-        past adventures.
-      </p>
+    <div className="flex flex-col items-end gap-3">
       <button
         type="button"
         onClick={handleSave}

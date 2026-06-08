@@ -4,7 +4,7 @@ import { StoryInputForm } from "@/components/create/StoryInputForm";
 export default function NewStoryPage() {
   return (
     <main className="mx-auto min-h-screen max-w-3xl p-8">
-      <div className="mb-8">
+      <div className="mb-8 ">
         <Link href="/" className="text-sm text-gray-600 hover:text-gray-900">
           ← Back to stories
         </Link>

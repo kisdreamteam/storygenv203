@@ -81,6 +81,10 @@ Story updates Series Memory
 
 Teacher reopens story later
 
+↓
+
+Teacher may archive a saved story from the home list (removes it from the list; soft delete via `is_archived`)
+
 If this workflow fails:
 
 V1 fails
@@ -222,7 +226,6 @@ Do NOT build:
 * Public launch
 * localStorage-as-primary persistence
 * Parent / non-teacher user flows
-* Story deletion
 
 Question every feature:
 

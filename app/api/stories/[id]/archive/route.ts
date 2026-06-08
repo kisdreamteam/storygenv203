@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { updateSeriesMemoryOnSave } from "@/lib/series-memory/update";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -21,7 +20,7 @@ export async function POST(_request: Request, context: RouteContext) {
 
   const { data: story, error: storyError } = await supabase
     .from("stories")
-    .select("id, title, theme, main_events, setting")
+    .select("id")
     .eq("id", storyId)
     .eq("created_by", user.id)
     .eq("is_archived", false)
@@ -31,38 +30,19 @@ export async function POST(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Story not found" }, { status: 404 });
   }
 
-  const { data: vocabulary } = await supabase
-    .from("story_vocabulary")
-    .select("word")
-    .eq("story_id", storyId)
-    .order("sort_order", { ascending: true });
-
-  const vocabularyWords = (vocabulary ?? []).map((item) => item.word);
-
   const now = new Date().toISOString();
 
   const { error: updateError } = await supabase
     .from("stories")
     .update({
-      status: "saved",
-      saved_at: now,
+      is_archived: true,
       updated_at: now,
     })
     .eq("id", storyId);
 
   if (updateError) {
-    return NextResponse.json({ error: "Failed to save story" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to archive story" }, { status: 500 });
   }
 
-  const { warning } = await updateSeriesMemoryOnSave(
-    {
-      title: story.title,
-      theme: story.theme,
-      main_events: story.main_events,
-      setting: story.setting,
-    },
-    vocabularyWords
-  );
-
-  return NextResponse.json({ success: true, warning });
+  return NextResponse.json({ success: true });
 }

@@ -119,7 +119,7 @@ export function StoryInputForm() {
   const labelClass = "mb-1 block text-sm font-medium text-gray-700";
 
   return (
-    <form onSubmit={handleSubmit} className="flex max-w-xl flex-col gap-5">
+    <form onSubmit={handleSubmit} className="flex max-w-xl flex-col gap-5 rounded-md border border-gray-200 p-5">
       <div>
         <label htmlFor="theme" className={labelClass}>
           Theme / Topic <span className="text-red-600">*</span>

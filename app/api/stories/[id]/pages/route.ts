@@ -41,6 +41,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     .select("id")
     .eq("id", storyId)
     .eq("created_by", user.id)
+    .eq("is_archived", false)
     .single();
 
   if (!story) {

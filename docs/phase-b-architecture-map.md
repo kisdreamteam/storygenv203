@@ -101,9 +101,10 @@ Keep routes minimal. Only what V1 requires.
 
 **Story list behavior (locked):**
 
-* `/` lists teacher's own `saved` stories only
+* `/` lists teacher's own `saved` stories only (`status = saved` and `is_archived = false`)
 * `draft` stories are not shown on the home list
 * After generate, teacher is redirected to `/stories/[id]` to access the draft
+* Teachers can archive a saved story from the home list (X on story card); sets `is_archived = true`; story hidden from home; Series Memory does not update on archive
 
 ---
 
@@ -134,6 +135,7 @@ Story metadata and teacher inputs.
 | `created_at` | timestamptz | |
 | `updated_at` | timestamptz | |
 | `saved_at` | timestamptz | Nullable; set when status becomes `saved` |
+| `is_archived` | boolean | Default `false`; `true` hides story from home list (soft delete) |
 
 ## `story_pages`
 
@@ -454,7 +456,7 @@ Do not build these in V1. Sourced from [v1-scope.md](../v1-scope.md) and locked 
 * Mobile-first optimization
 * localStorage as primary persistence
 * Loading full text of every previous story into generation calls
-* Story deletion (no delete UI in V1)
+* Unarchive / trash view for archived stories
 
 ---
 

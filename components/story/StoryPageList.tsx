@@ -15,11 +15,11 @@ type StoryPageListProps = {
 
 export function StoryPageList({ storyId, pages }: StoryPageListProps) {
   return (
-    <ol className="flex flex-col gap-6">
+    <ol className="flex flex-col gap-6 border border-gray-300 rounded-2xl drop-shadow-lg p-5">
       {pages.map((page) => (
         <li
           key={page.id}
-          className="rounded border border-gray-200 bg-white p-5"
+          className="rounded-2xl border border-gray-400 bg-white p-5 drop-shadow-lg"
         >
           <h3 className="text-sm font-semibold text-gray-500">
             Page {page.page_number}
@@ -29,7 +29,7 @@ export function StoryPageList({ storyId, pages }: StoryPageListProps) {
             pageId={page.id}
             initialText={page.text}
           />
-          <div className="mt-4 rounded bg-gray-50 p-4">
+          <div className="mt-4 rounded border border-gray-300 bg-gray-50 p-4">
             <div className="flex items-start justify-between gap-3">
               <p className="text-xs font-medium text-gray-500">Illustration prompt</p>
               <PromptCopyButton text={page.illustration_prompt} />

@@ -11,6 +11,7 @@ export default async function Home() {
     .from("stories")
     .select("id, title, theme, saved_at")
     .eq("status", "saved")
+    .eq("is_archived", false)
     .order("saved_at", { ascending: false });
 
   if (error) {
@@ -36,8 +37,9 @@ export default async function Home() {
           <SignOutButton />
         </div>
       </header>
-
-      <StoryList stories={savedStories} />
+      <div className="p-2 text-xs text-gray-500 rounded-2xl border border-gray-400 drop-shadow-lg">
+        <StoryList stories={savedStories} />
+      </div>
     </main>
   );
 }

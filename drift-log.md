@@ -251,6 +251,30 @@ Status: Accepted
 
 ---
 
+Date: 2026-06-08
+
+Domain: Story list / workflow
+
+Problem: Teachers need to remove clutter from the home story list (test stories, unwanted saves). Story deletion was previously excluded from V1.
+
+What changed:
+
+* Story archive (soft delete) added to V1: `is_archived` column on `stories`
+* Home list shows `saved` stories where `is_archived = false` only
+* Archive UI: X button on home story card; confirm dialog; `POST /api/stories/[id]/archive`
+* Series Memory does not update on archive (per source-of-truth)
+* No unarchive UI, no hard-delete UI, no archive from story editor
+
+Why change is needed: Reduces home-list clutter without expanding scope to trash/restore flows; supports teacher pilot validation.
+
+Documents affected: drift-log.md, v1-scope.md, docs/phase-b-architecture-map.md, docs/teacher-pilot-test-plan.md
+
+Decision: Soft delete via `is_archived` accepted for V1.
+
+Status: Accepted
+
+---
+
 # 9. Current Open Decisions
 
 Use this section for unresolved items.

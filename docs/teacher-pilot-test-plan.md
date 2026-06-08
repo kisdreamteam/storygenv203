@@ -122,7 +122,6 @@ After the pilot:
 - Real LLM generation (architecture step 10)
 - In-app image generation
 - Export (PDF, print, download)
-- Story deletion UI
 - Student or parent mode
 - Analytics, payments, activities, worksheets
 
@@ -132,7 +131,7 @@ After the pilot:
 |----------|----------|
 | Stories sound repetitive / template-like | Expected with mock pipeline; not a workflow failure |
 | Add images in the app | V1 exclusion — prompts + external tools only |
-| Delete old stories | V1 exclusion — no delete UI |
+| Delete old stories | Use X on home story card to archive (removes from list) |
 | Edit vocabulary inline | V1 read-only; regenerate for new vocab |
 | Show drafts on home | Locked default — Save adds to home list |
 

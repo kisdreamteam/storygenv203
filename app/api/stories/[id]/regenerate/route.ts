@@ -27,6 +27,7 @@ export async function POST(_request: Request, context: RouteContext) {
     )
     .eq("id", storyId)
     .eq("created_by", user.id)
+    .eq("is_archived", false)
     .single();
 
   if (storyError || !story) {

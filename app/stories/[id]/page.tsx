@@ -36,6 +36,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
     .from("stories")
     .select("id, title, theme, status, saved_at")
     .eq("id", id)
+    .eq("is_archived", false)
     .single();
 
   if (storyError || !story) {
@@ -67,14 +68,14 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
   return (
     <main className="mx-auto min-h-screen max-w-3xl p-8">
       <PilotWorkflowStoryView storyId={story.id} status={story.status} />
-      <header className="mb-8 flex items-start justify-between gap-4">
+      <header className="mb-10 flex items-start justify-between gap-2">
         <div>
           <Link href="/" className="text-sm text-gray-600 hover:text-gray-900">
             ← Back to home
           </Link>
           <h1 className="mt-4 text-2xl font-semibold">{story.title}</h1>
           <p className="mt-1 text-sm text-gray-600">{story.theme}</p>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
+          <div className="mt-3 flex flex-wrap items-center gap-2 mb-3">
             <span
               className={`rounded px-2 py-0.5 text-xs font-medium ${
                 story.status === "saved"
@@ -88,12 +89,15 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
               <span className="text-xs text-gray-500">Saved {savedDate}</span>
             )}
           </div>
-        </div>
-        <div className="flex shrink-0 flex-col items-end gap-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mb-3">
             <RegenerateButton storyId={story.id} />
+          </div>
+          <div className="flex items-center gap-3">
             <SaveButton storyId={story.id} />
           </div>
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-3">
+
           <div className="flex items-center gap-3">
             <Link
               href="/stories/new"
