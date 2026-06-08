@@ -12,12 +12,14 @@ import type { StoryPage } from "./StoryPageList";
 type StoryPagesSectionProps = {
   storyId: string;
   storyTitle: string;
+  storySetting?: string | null;
   pages: StoryPage[];
 };
 
 export function StoryPagesSection({
   storyId,
   storyTitle,
+  storySetting,
   pages,
 }: StoryPagesSectionProps) {
   const [livePages, setLivePages] = useState<StoryPage[]>(pages);
@@ -41,8 +43,8 @@ export function StoryPagesSection({
   );
 
   const getIllustrationsCopyText = useCallback(
-    () => formatIllustrationsForCopy(storyTitle, livePages),
-    [storyTitle, livePages]
+    () => formatIllustrationsForCopy(storyTitle, livePages, storySetting),
+    [storyTitle, livePages, storySetting]
   );
 
   return (
@@ -63,6 +65,7 @@ export function StoryPagesSection({
             key={page.id}
             storyId={storyId}
             page={page}
+            storySetting={storySetting}
             onLiveChange={updateLivePage}
           />
         ))}

@@ -1,3 +1,5 @@
+import { resolveProductionIllustrationPrompt } from "./resolve-production-prompt";
+
 type StoryPageText = {
   page_number: number;
   text: string;
@@ -5,6 +7,7 @@ type StoryPageText = {
 
 type StoryPagePrompt = {
   page_number: number;
+  text: string;
   illustration_prompt: string;
 };
 
@@ -23,14 +26,20 @@ export function formatStoryForCopy(title: string, pages: StoryPageText[]): strin
 
 export function formatIllustrationsForCopy(
   title: string,
-  pages: StoryPagePrompt[]
+  pages: StoryPagePrompt[],
+  setting?: string | null
 ): string {
   const sorted = sortByPageNumber(pages);
   const body = sorted
-    .map(
-      (page) =>
-        `Page ${page.page_number}\n${page.illustration_prompt.trim()}`
-    )
+    .map((page) => {
+      const prompt = resolveProductionIllustrationPrompt({
+        pageText: page.text,
+        pageNumber: page.page_number,
+        setting,
+        storedPrompt: page.illustration_prompt,
+      });
+      return `Page ${page.page_number}\n${prompt}`;
+    })
     .join("\n\n");
 
   return `Illustration prompts — ${title.trim()}\n\n${body}`;

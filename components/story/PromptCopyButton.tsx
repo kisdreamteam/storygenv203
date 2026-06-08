@@ -3,9 +3,9 @@
 import { CopyTextButton } from "./CopyTextButton";
 
 type PromptCopyButtonProps = {
-  text: string;
+  getText: () => string;
 };
 
-export function PromptCopyButton({ text }: PromptCopyButtonProps) {
-  return <CopyTextButton label="Copy prompt" text={text} />;
+export function PromptCopyButton({ getText }: PromptCopyButtonProps) {
+  return <CopyTextButton label="Copy prompt" getText={getText} />;
 }

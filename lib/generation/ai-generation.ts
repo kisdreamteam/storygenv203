@@ -1,3 +1,5 @@
+import { injectIllustrationContinuityIntoPages } from "./character-continuity";
+import { DEFAULT_ILLUSTRATION_SETTING } from "./illustration-prompt";
 import { buildSystemPrompt, buildUserPrompt } from "./prompts";
 import type { MockGenerationResult, SeriesMemorySummary, StoryInputs } from "./types";
 import { validateGenerationOutput } from "./validate-output";
@@ -90,7 +92,16 @@ export async function tryAiGeneration(
       return { ok: false, reason: `validation failed: ${validated.reason}` };
     }
 
-    return { ok: true, result: validated.result };
+    const setting = inputs.setting?.trim() || DEFAULT_ILLUSTRATION_SETTING;
+    const pages = injectIllustrationContinuityIntoPages(validated.result.pages, setting);
+
+    return {
+      ok: true,
+      result: {
+        ...validated.result,
+        pages,
+      },
+    };
   } catch (err) {
     if (err instanceof Error && err.name === "AbortError") {
       return { ok: false, reason: "request timed out" };

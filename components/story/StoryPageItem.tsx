@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { resolveProductionIllustrationPrompt } from "@/lib/story/resolve-production-prompt";
 import { PageEditor } from "./PageEditor";
 import { PromptCopyButton } from "./PromptCopyButton";
 import { PromptEditButton, PromptEditor } from "./PromptEditor";
@@ -10,6 +11,7 @@ import type { StoryPage } from "./StoryPageList";
 type StoryPageItemProps = {
   storyId: string;
   page: StoryPage;
+  storySetting?: string | null;
   onLiveChange?: (
     id: string,
     data: { text: string; illustration_prompt: string }
@@ -22,6 +24,7 @@ const actionButtonClass =
 export function StoryPageItem({
   storyId,
   page,
+  storySetting,
   onLiveChange,
 }: StoryPageItemProps) {
   const { markDirty } = useStoryEditor();
@@ -106,7 +109,16 @@ export function StoryPageItem({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <p className="text-xs font-medium text-gray-500">Illustration prompt</p>
           <div className="flex flex-wrap items-center gap-2">
-            <PromptCopyButton text={prompt} />
+            <PromptCopyButton
+              getText={() =>
+                resolveProductionIllustrationPrompt({
+                  pageText: currentText,
+                  pageNumber: page.page_number,
+                  setting: storySetting,
+                  storedPrompt: prompt,
+                })
+              }
+            />
             <button
               type="button"
               onClick={handleRegeneratePrompt}

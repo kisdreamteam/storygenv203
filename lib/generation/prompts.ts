@@ -28,9 +28,9 @@ Output rules (strict):
 - Exactly 12 pages with page_number 1 through 12.
 - Each page text: ~30–40 words, simple sentences, ages 4–6 readability.
 - Exactly 5–7 vocabulary items from the teacher's vocabulary focus.
-- One illustration_prompt per page depicting that page's primary visual moment.
-- Include locked character descriptors only for official characters present on that page.
-- Every illustration_prompt must end with the full locked continuity suffix.
+- One illustration_prompt per page (server rebuilds with locked continuity; still follow format below).
+- illustration_prompt must use LOCKED CHARACTER CONTINUITY / SCENE / STYLE sections verbatim.
+- Copy full continuity blocks for official characters on that page — never paraphrase.
 - Educational usefulness over flashy creativity. Classroom-safe tone.
 - If Series Memory has recent_stories, page 1 may open with a brief warm callback to the prior theme (optional, subtle).
 - Teacher inputs override Series Memory when they conflict.

@@ -125,6 +125,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
         <StoryPagesSection
           storyId={story.id}
           storyTitle={story.title}
+          storySetting={story.setting}
           pages={pages ?? []}
         />
       </StoryEditorShell>
