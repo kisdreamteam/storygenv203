@@ -155,31 +155,50 @@ Continuity should guide generation.
 
 Continuity should not block generation.
 
+## V1 Character Continuity (Locked)
+
+V1 locks official Nina & Nino character appearances in [character-bible.md](character-bible.md).
+
+Rules:
+
+* Official locked characters: Nina, Nino, Mom, Dad, Grandpa, Ms. Lee
+* Teachers cannot edit character profiles in V1
+* Locked clothing, hair, and facial appearance remain the same across all stories
+* Mom always wears the yellow áo dài
+* Teacher-introduced characters (friends, classmates, visitors) may appear in stories but are not persisted as character profiles
+* Future character editing may be added later — explicitly out of V1 scope
+
 Character priority:
 
-Tier 1:
+Tier 1 (locked official):
 
 * Nina
 * Nino
-* Core family members
+* Mom
+* Dad
+* Grandpa
+* Ms. Lee
 
-Tier 2:
+Tier 2 (recurring, not locked):
 
-* Recurring supporting characters
+* Supporting characters such as Sam and Biscuit — suggested descriptors only
 
-Tier 3:
+Tier 3 (story-specific):
 
-* Story-specific characters
+* Teacher-introduced or one-story characters — generated when needed; not persisted as profiles
 
 Series Memory updates when:
 
-* Story is saved
+* Generate completes successfully (story auto-saved)
+* Regenerate completes successfully (story auto-saved)
+* Teacher commits later edits via Save story (page text, illustration prompts, or setup changes that were applied)
 
 Series Memory does NOT update when:
 
-* Draft exists
-* Generation fails
-* Story is deleted
+* Generation or regeneration fails
+* Story is deleted or archived
+* Teacher edits page text or prompts but has not clicked Save story yet
+* Teacher edits story setup inputs only (pages unchanged until Regenerate)
 
 Teachers may intentionally override continuity.
 
@@ -206,6 +225,9 @@ Educational usefulness is prioritized over creativity alone.
 * Illustration prompts only
 * No in-app image generation in V1
 * One illustration prompt per story page
+* Every prompt includes the locked V1 illustration continuity suffix (see [illustration-guide.md](illustration-guide.md))
+* Official V1 illustration framing: 16:9 landscape, zoomed-out composition, full-body characters visible, extra empty space for educational text overlays, no text/speech bubbles/labels/watermarks in image
+* Locked character descriptors from [character-bible.md](character-bible.md) on every official character appearance
 
 ## V1 Persistence (Locked)
 
@@ -221,7 +243,10 @@ Educational usefulness is prioritized over creativity alone.
 ## V1 Edit Scope (Locked)
 
 * Edit story text per page
-* Regenerate story from edited inputs
+* Edit illustration prompts per page
+* Edit story setup inputs (theme, learning goal, vocabulary focus, main events, optional fields)
+* Regenerate story from stored setup inputs (replaces pages, prompts, and vocabulary; auto-saves)
+* Save story — commit later edits only; not required after first generation
 
 ---
 
@@ -236,6 +261,8 @@ These must NOT drift accidentally:
 * Small scope philosophy
 * English-first generation
 * Nina & Nino continuity
+* Locked official character appearances (Nina, Nino, Mom, Dad, Grandpa, Ms. Lee)
+* V1 illustration continuity suffix and 16:9 framing standard
 * Series Memory continuity
 * V1 illustration prompts only (no in-app image generation)
 * Supabase persistence for stories and Series Memory

@@ -1,41 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateStory } from "@/lib/generation/pipeline";
-import type { StoryInputs } from "@/lib/generation/types";
-
-function optionalField(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  return trimmed === "" ? null : trimmed;
-}
-
-function validateInputs(body: Record<string, unknown>): StoryInputs | { error: string } {
-  const theme = typeof body.theme === "string" ? body.theme.trim() : "";
-  const learning_goal =
-    typeof body.learning_goal === "string" ? body.learning_goal.trim() : "";
-  const vocabulary_focus =
-    typeof body.vocabulary_focus === "string" ? body.vocabulary_focus.trim() : "";
-  const main_events =
-    typeof body.main_events === "string" ? body.main_events.trim() : "";
-
-  if (!theme || !learning_goal || !vocabulary_focus || !main_events) {
-    return {
-      error:
-        "Missing required fields: theme, learning_goal, vocabulary_focus, and main_events are required.",
-    };
-  }
-
-  return {
-    theme,
-    learning_goal,
-    vocabulary_focus,
-    main_events,
-    setting: optionalField(body.setting) ?? undefined,
-    tone: optionalField(body.tone) ?? undefined,
-    words_to_avoid: optionalField(body.words_to_avoid) ?? undefined,
-    notes: optionalField(body.notes) ?? undefined,
-  };
-}
+import { combineWarnings, commitStorySave } from "@/lib/story/commit-save";
+import { validateStoryInputs } from "@/lib/story/validate-inputs";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -56,7 +23,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const validated = validateInputs(body);
+  const validated = validateStoryInputs(body);
   if ("error" in validated) {
     return NextResponse.json({ error: validated.error }, { status: 400 });
   }
@@ -70,7 +37,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Generation failed" }, { status: 500 });
   }
 
-  const { result, warning } = generation;
+  const { result, warning: generationWarning } = generation;
 
   const { data: story, error: storyError } = await supabase
     .from("stories")
@@ -123,8 +90,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Failed to save vocabulary" }, { status: 500 });
   }
 
+  const saveResult = await commitStorySave(supabase, story.id, user.id);
+  if (!saveResult.ok) {
+    return NextResponse.json({ error: saveResult.error }, { status: 500 });
+  }
+
   return NextResponse.json({
     storyId: story.id,
-    warning,
+    warning: combineWarnings(generationWarning, saveResult.warning),
   });
 }

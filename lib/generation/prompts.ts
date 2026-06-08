@@ -20,7 +20,7 @@ export function buildSystemPrompt(): string {
 
 ${CHARACTER_BIBLE_EXCERPT}
 
-Illustration prompts — ${TIER1_CHARACTER_RULES}
+${TIER1_CHARACTER_RULES}
 ${ILLUSTRATION_PROMPT_FORMAT}
 
 Output rules (strict):
@@ -29,6 +29,8 @@ Output rules (strict):
 - Each page text: ~30–40 words, simple sentences, ages 4–6 readability.
 - Exactly 5–7 vocabulary items from the teacher's vocabulary focus.
 - One illustration_prompt per page depicting that page's primary visual moment.
+- Include locked character descriptors only for official characters present on that page.
+- Every illustration_prompt must end with the full locked continuity suffix.
 - Educational usefulness over flashy creativity. Classroom-safe tone.
 - If Series Memory has recent_stories, page 1 may open with a brief warm callback to the prior theme (optional, subtle).
 - Teacher inputs override Series Memory when they conflict.

@@ -1,19 +1,14 @@
+import {
+  buildIllustrationPromptFromPageText,
+  DEFAULT_ILLUSTRATION_SETTING,
+} from "./illustration-prompt";
 import type {
   MockGenerationResult,
   SeriesMemorySummary,
   StoryInputs,
 } from "./types";
 
-const NINA_DESCRIPTOR =
-  "Nina is a 6-year-old girl, medium-brown skin, dark curly hair in two puffs, yellow shirt, blue overalls, red sneakers";
-
-const NINO_DESCRIPTOR =
-  "Nino is a 4-year-old boy, medium-brown skin, short curly dark hair, green shirt, tan shorts, blue sneakers";
-
-const ILLUSTRATION_STYLE_SUFFIX =
-  "Children's book illustration, warm soft colors, simple shapes, friendly expressions, clean background, ages 4-6, no text in image";
-
-const DEFAULT_SETTING = "Sunny Grove Kindergarten neighborhood";
+const DEFAULT_SETTING = DEFAULT_ILLUSTRATION_SETTING;
 const PLACEHOLDER_WORDS = ["learn", "friend", "help", "share", "try"];
 
 function truncateTitle(theme: string): string {
@@ -39,10 +34,6 @@ function parseVocabularyWords(vocabularyFocus: string): string[] {
   }
 
   return words.slice(0, 7);
-}
-
-function buildIllustrationPrompt(scene: string, setting: string, mood: string): string {
-  return `${scene}. ${NINA_DESCRIPTOR}. ${NINO_DESCRIPTOR}. ${setting}. ${mood}. ${ILLUSTRATION_STYLE_SUFFIX}.`;
 }
 
 function buildPageTexts(
@@ -97,19 +88,15 @@ export function runMockPipeline(
 
   const pages = pageTexts.map((text, index) => {
     const pageNumber = index + 1;
-    const mood =
-      index < 4
-        ? "Bright cheerful morning light"
-        : index < 9
-          ? "Warm playful afternoon light"
-          : "Cozy warm evening light";
-
-    const scene = text.split(".")[0] || text;
 
     return {
       page_number: pageNumber,
       text,
-      illustration_prompt: buildIllustrationPrompt(scene, setting, mood),
+      illustration_prompt: buildIllustrationPromptFromPageText(
+        text,
+        pageNumber,
+        setting
+      ),
     };
   });
 

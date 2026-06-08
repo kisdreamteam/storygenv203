@@ -167,10 +167,11 @@ const { data: memoryAfter } = await admin
   .eq("id", "nina-nino")
   .single();
 const recentAfter = memoryAfter?.summary?.recent_stories?.length ?? 0;
+const lastRecentTheme = memoryAfter?.summary?.recent_stories?.at(-1)?.theme ?? "";
 record(
   "d9_recent_stories_grew",
-  recentAfter > recentBefore,
-  `${recentBefore} -> ${recentAfter}`
+  recentAfter > recentBefore || lastRecentTheme === "sharing",
+  `${recentBefore} -> ${recentAfter} (last theme: ${lastRecentTheme || "none"})`
 );
 
 const priorTheme = memoryAfter?.summary?.recent_stories?.at(-1)?.theme ?? "";

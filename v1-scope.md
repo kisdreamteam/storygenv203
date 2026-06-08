@@ -63,19 +63,21 @@ Teacher clicks Generate
 
 ↓
 
-Teacher receives story output
+System auto-saves story output (pages, prompts, vocabulary)
+
+Story appears on home / recent stories list
+
+Series Memory updates
 
 ↓
 
-Teacher optionally edits (text per page; may regenerate from edited inputs)
+Teacher optionally edits page text, illustration prompts, or story setup inputs
 
 ↓
 
-Teacher saves story
+If edited, teacher clicks Save story to commit changes (updates Series Memory)
 
-↓
-
-Story updates Series Memory
+Regenerate replaces content from stored setup inputs and auto-saves
 
 ↓
 
@@ -158,10 +160,11 @@ Generation flow
 Loading states
 Error handling
 Story Management
-Save stories
+Auto-save on generate and regenerate
+Save story (commit later edits only)
 Reopen stories
-Edit stories (text per page + regenerate from edited inputs)
-Story persistence (Supabase — save, reopen, edit across sessions)
+Edit stories (page text, illustration prompts, setup inputs + regenerate)
+Story persistence (Supabase — persist, reopen, edit across sessions)
 Illustration Prompts
 Prompt generation per page
 Copy-friendly prompt display
@@ -242,9 +245,10 @@ If not:
 V1 is complete when:
 
 Teachers create stories quickly
-Teachers save stories
+Generated stories appear on home automatically
+Teachers commit later edits via Save story when needed
 Teachers reopen stories
-Teachers edit stories (text per page and regenerate from inputs)
+Teachers edit stories (page text, prompts, setup inputs; regenerate from stored inputs)
 Illustration prompt workflow works sufficiently
 Continuity remains acceptable
 Story repetition remains acceptable

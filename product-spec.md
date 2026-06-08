@@ -94,23 +94,27 @@ Teacher clicks Generate
 
 ↓
 
-Teacher receives:
+System creates and saves the story automatically:
 
 Story (12 pages, ~30–40 words per page)
 Illustration prompts (one per page in V1)
 Vocabulary support
 
+Story appears on the home / recent stories list
+
+Series Memory updates
+
 ↓
 
-Teacher optionally edits (text per page; may regenerate from edited inputs)
+Teacher optionally edits page text, illustration prompts, or story setup inputs
+
+↓
+
+If the teacher made edits, they click Save story to commit those changes (updates Series Memory again)
 
 ↓
 
 Teacher uses story in class
-
-↓
-
-Saved story updates Series Memory
 
 The workflow should feel:
 

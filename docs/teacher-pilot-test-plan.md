@@ -14,9 +14,9 @@ This pilot validates whether the **existing V1 teacher workflow** feels fast, un
 
 **In scope**
 
-- Workflow clarity: sign in → create → generate → review → edit → save → reopen
+- Workflow clarity: sign in → create → generate → review → edit → save edits → reopen
 - Speed to first draft (clicks, typing, hesitation)
-- Save and reopen understanding (draft vs saved; home list behavior)
+- Save and reopen understanding (auto-save on generate; Save story for edits; home list behavior)
 - Create form simplicity (four required fields visible; optional fields behind “More options”)
 
 **Out of scope for this pilot**
@@ -36,7 +36,7 @@ Copy and send this to teachers before the session (or read aloud at the start):
 
 Welcome to the StoryGen early prototype.
 
-This is a **private, invite-only** test of how fast and clear the story-creation workflow feels. You will sign in, enter a few details, generate a Nina & Nino story, lightly edit one page, save it, and try a second story.
+This is a **private, invite-only** test of how fast and clear the story-creation workflow feels. You will sign in, enter a few details, generate a Nina & Nino story (it saves automatically), lightly edit one page, save your edit, and try a second story.
 
 **Please know:**
 
@@ -58,15 +58,15 @@ Facilitator: observe quietly; help only if the teacher is blocked (login failure
 | 1 | Sign in with invited account | Lands on home (saved stories list) |
 | 2 | Click **New Story** | Create form with four required fields |
 | 3 | Fill **Theme**, **Learning Goal**, **Vocabulary Focus**, **Main Events** | Optional fields are under **More options** — not required |
-| 4 | Click **Generate** | Redirect to story page with 12 pages, vocabulary, illustration prompts |
+| 4 | Click **Generate** | Redirect to story page with 12 pages, vocabulary, illustration prompts; story already saved and on home list |
 | 5 | Scroll and review output | Prototype note visible; wording may feel repetitive |
-| 6 | Edit **page 1** text; click/tab away | Page saves on blur (“Saved” feedback) |
-| 7 | Click **Save story** | Returns to home; story appears in list |
-| 8 | Click the saved story card | Reopens same story with edited page 1 text |
+| 6 | Edit **page 1** text; click/tab away | Page saves on blur (“Saved” feedback); **Save story** becomes enabled |
+| 7 | Click **Save story** | Commits your edit; returns to home |
+| 8 | Click the story card on home | Reopens same story with edited page 1 text |
 | 9 | Click **New Story** again | New create form |
 | 10 | Create a **second story** with a different theme; Generate | Page 1 should reference the prior story (e.g. “Nina and Nino remember…”) |
 
-**Observer note:** Only **saved** stories appear on home. Unsaved drafts stay on the story page URL but not on the home list until Save.
+**Observer note:** Generated stories appear on home immediately after Generate. **Save story** is only needed after the teacher edits page text, prompts, or setup inputs.
 
 ---
 
@@ -78,12 +78,12 @@ Ask after the scenario (conversation or short written form). Do **not** ask teac
 2. Where did you pause or feel unsure?
 3. Did the create form feel short or long?
 4. Were the field labels clear?
-5. Did **Save** make sense?
-6. Could you imagine using this draft after light editing?
+5. Did **Save story** make sense as a way to commit your edits (not as a first step after Generate)?
+6. Could you imagine using this story after light editing?
 7. Were **vocabulary** and **illustration prompts** useful?
 8. Did the **second story** feel connected enough?
 9. What **one thing** would make this faster?
-10. (Optional) Was anything confusing about **draft** vs **saved**?
+10. (Optional) Was anything confusing about when **Save story** is needed?
 
 ---
 
@@ -93,8 +93,8 @@ Session: _______________  Teacher: _______________  Facilitator: _______________
 
 - [ ] Teacher generated without help
 - [ ] Teacher hesitated on required fields (note which: _______________)
-- [ ] Teacher found Save
-- [ ] Teacher understood saved stories appear on home
+- [ ] Teacher understood story appears on home after Generate
+- [ ] Teacher found Save story after editing
 - [ ] Teacher reopened story successfully
 - [ ] Teacher edited one page successfully
 - [ ] Teacher noticed prototype/mock limitation
@@ -133,7 +133,7 @@ After the pilot:
 | Add images in the app | V1 exclusion — prompts + external tools only |
 | Delete old stories | Use X on home story card to archive (removes from list) |
 | Edit vocabulary inline | V1 read-only; regenerate for new vocab |
-| Show drafts on home | Locked default — Save adds to home list |
+| Show drafts on home | Not needed — Generate auto-saves to home list |
 
 ---
 
@@ -144,7 +144,7 @@ After the pilot:
 | Login | `/login` — facilitator provides invited email/password (do not share in this repo) |
 | Home | `/` — saved stories only |
 | New story | `/stories/new` — four required fields |
-| Story viewer | `/stories/[id]` — edit pages, Save, Regenerate, New Story |
+| Story viewer | `/stories/[id]` — edit pages, Edit Story Setup, Regenerate, Save story (edits only) |
 | Characters | Nina & Nino series ([character-bible.md](../character-bible.md)) |
 | Illustrations | Prompts only ([illustration-guide.md](../illustration-guide.md)) |
 | Pilot success | Full scenario completed without facilitator rescue |

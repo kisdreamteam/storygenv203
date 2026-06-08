@@ -275,6 +275,56 @@ Status: Accepted
 
 ---
 
+Date: 2026-06-08
+
+Domain: Save workflow
+
+Problem: Requiring teachers to click Save story after first generation added an unnecessary step. Draft-vs-saved confusion on the home list. Regenerate demoted saved stories back to draft.
+
+What changed:
+
+* Generate auto-saves: creates story, pages, vocabulary, illustration prompts; sets `status = saved`; updates Series Memory
+* Regenerate auto-saves: replaces pages, prompts, vocabulary from stored setup inputs; no draft demotion
+* Save story is an edit-commit action only — enabled after teacher changes page text, illustration prompts, or story setup inputs
+* Edit Story Setup updates stored inputs only; pages unchanged until teacher clicks Regenerate
+* Draft status applies only before first successful generation (schema may retain `draft`; generate/regenerate write `saved`)
+* Home list shows auto-saved generated stories immediately
+
+Why change is needed: Simplifies first-generation workflow; aligns Series Memory with successful generation; keeps Save for meaningful teacher edits.
+
+Documents affected: product-spec.md, source-of-truth.md, v1-scope.md, drift-log.md, docs/phase-b-architecture-map.md, docs/teacher-pilot-test-plan.md
+
+Decision: Save workflow simplification accepted for V1.
+
+Status: Accepted
+
+---
+
+Date: 2026-06-08
+
+Domain: Character Continuity / Illustrations
+
+Problem: Character appearances and illustration framing were documented with inconsistent clothing descriptors and no standardized prompt suffix. Earlier stories used a distinct Nina & Nino visual identity that needed to be preserved and locked for V1.
+
+What changed:
+
+* V1 locks official character appearances: Nina, Nino, Mom, Dad, Grandpa, Ms. Lee
+* Teachers cannot edit character profiles in V1
+* Mom always wears yellow áo dài
+* Teacher-introduced characters may appear in stories but are not persisted as character profiles
+* Official V1 illustration continuity suffix: 16:9 landscape, zoomed-out view, full-body characters, reserved space for educational text overlays, no text/bubbles/labels/watermarks, consistent character appearance
+* Future character editing UI explicitly deferred (Edit Characters button, character modal, profile persistence)
+
+Why change is needed: Production-quality character continuity across stories and illustration prompts; preserves original Nina & Nino appearance; supports future customization without implementing it now.
+
+Documents affected: character-bible.md, illustration-guide.md, source-of-truth.md, drift-log.md
+
+Decision: V1 locks official Nina & Nino character appearances and introduces a standardized illustration continuity system including 16:9 framing, zoomed-out compositions, full-body visibility, and reserved space for educational text overlays.
+
+Status: Accepted
+
+---
+
 # 9. Current Open Decisions
 
 Use this section for unresolved items.

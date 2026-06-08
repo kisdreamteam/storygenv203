@@ -1,18 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type PageEditorProps = {
   storyId: string;
   pageId: string;
   initialText: string;
+  onTextChange?: (text: string) => void;
+  onSaved?: (text: string) => void;
+  onManualEdit?: () => void;
 };
 
-export function PageEditor({ storyId, pageId, initialText }: PageEditorProps) {
+export function PageEditor({
+  storyId,
+  pageId,
+  initialText,
+  onTextChange,
+  onSaved,
+  onManualEdit,
+}: PageEditorProps) {
   const [text, setText] = useState(initialText);
   const [savedText, setSavedText] = useState(initialText);
+  const [committedBaseline, setCommittedBaseline] = useState(initialText);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setText(initialText);
+    setSavedText(initialText);
+    setCommittedBaseline(initialText);
+    onTextChange?.(initialText);
+  }, [initialText, onTextChange]);
 
   async function savePage(value: string) {
     const trimmed = value.trim();
@@ -50,6 +68,10 @@ export function PageEditor({ storyId, pageId, initialText }: PageEditorProps) {
 
       setText(trimmed);
       setSavedText(trimmed);
+      onSaved?.(trimmed);
+      if (trimmed !== committedBaseline) {
+        onManualEdit?.();
+      }
       setStatus("saved");
       setTimeout(() => setStatus("idle"), 2000);
     } catch {
@@ -69,6 +91,7 @@ export function PageEditor({ storyId, pageId, initialText }: PageEditorProps) {
         value={text}
         onChange={(e) => {
           setText(e.target.value);
+          onTextChange?.(e.target.value);
           if (error) setError(null);
         }}
         onBlur={handleBlur}

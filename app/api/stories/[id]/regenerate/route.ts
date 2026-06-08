@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateStory } from "@/lib/generation/pipeline";
 import type { StoryInputs } from "@/lib/generation/types";
+import { combineWarnings, commitStorySave } from "@/lib/story/commit-save";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -52,7 +53,7 @@ export async function POST(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Regeneration failed" }, { status: 500 });
   }
 
-  const { result, warning } = generation;
+  const { result, warning: generationWarning } = generation;
 
   const { error: deleteVocabError } = await supabase
     .from("story_vocabulary")
@@ -99,29 +100,25 @@ export async function POST(_request: Request, context: RouteContext) {
   }
 
   const now = new Date().toISOString();
-  const storyUpdate: {
-    title: string;
-    updated_at: string;
-    status?: "draft";
-    saved_at?: null;
-  } = {
-    title: result.story.title,
-    updated_at: now,
-  };
-
-  if (story.status === "saved") {
-    storyUpdate.status = "draft";
-    storyUpdate.saved_at = null;
-  }
-
   const { error: updateError } = await supabase
     .from("stories")
-    .update(storyUpdate)
+    .update({
+      title: result.story.title,
+      updated_at: now,
+    })
     .eq("id", storyId);
 
   if (updateError) {
     return NextResponse.json({ error: "Failed to update story" }, { status: 500 });
   }
 
-  return NextResponse.json({ success: true, warning });
+  const saveResult = await commitStorySave(supabase, storyId, user.id);
+  if (!saveResult.ok) {
+    return NextResponse.json({ error: saveResult.error }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    success: true,
+    warning: combineWarnings(generationWarning, saveResult.warning),
+  });
 }

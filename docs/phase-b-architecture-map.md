@@ -23,9 +23,9 @@ Planning only. No production code.
 * Global shared Series Memory — all teachers contribute to the same Nina & Nino continuity
 * Framework-agnostic frontend structure — specs do not mandate a tech stack
 
-**Spec conflict resolved:**
+**Spec alignment:**
 
-[product-spec.md](../product-spec.md) states "Generated story updates Series Memory." [source-of-truth.md](../source-of-truth.md) locked rule wins: **Series Memory updates on save only** — not on draft, not on failed generation, not on delete.
+Generate and Regenerate auto-save (`status = saved`). Series Memory updates on successful auto-save and when the teacher commits later edits via Save story. Memory does not update on failed generation or archive.
 
 ---
 
@@ -57,27 +57,35 @@ This workflow must work end-to-end. If any step fails, V1 fails.
 2. System loads global Nina & Nino Series Memory
 3. Teacher enters minimal inputs (4 required, optional fields as needed)
 4. Teacher clicks Generate
-5. Teacher receives:
+5. System auto-saves and teacher receives:
    * 12 story pages
    * 12 illustration prompts (one per page)
    * Vocabulary support / flashcards
-6. Teacher optionally edits text per page and/or regenerates from edited inputs
-7. Teacher saves the story
-8. Saved story updates global Series Memory
+   * Story on home / recent stories list
+   * Series Memory updated
+6. Teacher optionally edits page text, illustration prompts, or story setup inputs
+7. If edited, teacher clicks **Save story** to commit changes (updates Series Memory)
+8. Teacher may **Regenerate** from stored setup inputs (replaces content; auto-saves)
 9. Teacher reopens the story later
 
-**Important:** Generation creates a draft. Series Memory does **not** update until the teacher saves.
+**Important:** **Save story** is not part of first-generation workflow. It is enabled only after the teacher makes edits (dirty state).
 
 ```mermaid
 flowchart TD
     openApp[Teacher opens app] --> loadMemory[Load global Series Memory]
     loadMemory --> enterInputs[Enter 4 required inputs]
     enterInputs --> generate[Click Generate]
-    generate --> receiveOutput[Receive 12 pages + prompts + vocabulary]
-    receiveOutput --> optionalEdit[Optional: edit text per page or regenerate]
-    optionalEdit --> saveStory[Save story]
-    saveStory --> updateMemory[Update global Series Memory]
-    updateMemory --> reopenLater[Reopen story later]
+    generate --> autoSave1[Auto-save + update Series Memory]
+    autoSave1 --> receiveOutput[Story on home + editor]
+    receiveOutput --> optionalEdit[Optional: edit pages prompts or setup]
+    optionalEdit --> hasEdits{Teacher made edits?}
+    hasEdits -->|Yes| saveStory[Save story commits edits]
+    saveStory --> updateMemory[Update Series Memory]
+    hasEdits -->|Regenerate| regen[Regenerate from setup]
+    regen --> autoSave2[Auto-save + update Series Memory]
+    receiveOutput --> reopenLater[Reopen story later]
+    updateMemory --> reopenLater
+    autoSave2 --> reopenLater
 ```
 
 ---
@@ -91,7 +99,7 @@ Keep routes minimal. Only what V1 requires.
 | `/login` | Supabase Auth sign-in for teachers |
 | `/` | Story list (teacher's own saved stories) + "New Story" action |
 | `/stories/new` | Input form (4 required + optional fields) + Generate |
-| `/stories/[id]` | Story viewer/editor: 12 pages, illustration prompts with copy button, vocabulary, Save, Regenerate |
+| `/stories/[id]` | Story viewer/editor: 12 pages, illustration prompts with copy button, vocabulary, Edit Story Setup, Regenerate, Save story (edits only) |
 
 **Auth behavior:**
 
@@ -102,8 +110,8 @@ Keep routes minimal. Only what V1 requires.
 **Story list behavior (locked):**
 
 * `/` lists teacher's own `saved` stories only (`status = saved` and `is_archived = false`)
-* `draft` stories are not shown on the home list
-* After generate, teacher is redirected to `/stories/[id]` to access the draft
+* `draft` status is not used after successful generate (schema may retain the value; generate/regenerate write `saved`)
+* After generate, teacher is redirected to `/stories/[id]`; story is auto-saved and appears on home immediately
 * Teachers can archive a saved story from the home list (X on story card); sets `is_archived = true`; story hidden from home; Series Memory does not update on archive
 
 ---
@@ -112,7 +120,7 @@ Keep routes minimal. Only what V1 requires.
 
 Supabase tables for V1. Five tables — no over-engineering.
 
-Tier 1 character definitions (Nina, Nino, Mom, Dad) come from static [character-bible.md](../character-bible.md) at generation time. They are not duplicated in the database for V1.
+Locked official character definitions (Nina, Nino, Mom, Dad, Grandpa, Ms. Lee) come from static [character-bible.md](../character-bible.md) at generation time. They are not duplicated in the database for V1; teachers cannot edit profiles in V1.
 
 ## `stories`
 
@@ -227,17 +235,19 @@ Per [source-of-truth.md](../source-of-truth.md), Series Memory tracks:
 * Vocabulary history
 * Repetition patterns
 
-Tier 1 characters (Nina, Nino, Mom, Dad) are always injected from [character-bible.md](../character-bible.md) at generation time.
+Locked official characters (Nina, Nino, Mom, Dad, Grandpa, Ms. Lee) are always injected from [character-bible.md](../character-bible.md) at generation time.
 
 ## When memory updates
 
 | Event | Updates memory? |
 |-------|-----------------|
-| Story saved (`status` → `saved`) | Yes |
-| Draft exists | No |
-| Generation fails | No |
-| Story deleted | No |
-| Regenerate (before save) | No |
+| Generate succeeds (auto-save) | Yes |
+| Regenerate succeeds (auto-save) | Yes |
+| Teacher commits edits via Save story | Yes |
+| Generation or regeneration fails | No |
+| Story archived | No |
+| Edit Story Setup only (no Regenerate) | No |
+| Page/prompt edits not yet saved via Save story | No |
 
 ## What loads during generation
 
@@ -271,7 +281,7 @@ Continuity guides generation. Continuity does not block generation.
 
 ## On save — memory merge (server-side)
 
-When a story is saved:
+When a story is auto-saved (generate/regenerate) or manually saved (teacher commits edits):
 
 1. Generate a short summary from the saved story (plot, theme, vocab, characters, setting)
 2. Append to `recent_stories` (enforce cap)
@@ -296,13 +306,15 @@ flowchart LR
     pipeline --> storyGen[Story: 12 pages]
     pipeline --> promptGen[Illustration prompts: 1 per page]
     pipeline --> vocabGen[Vocabulary support]
-    storyGen --> draft[Draft in DB]
-    promptGen --> draft
-    vocabGen --> draft
-    draft --> display[Display to teacher]
-    display --> saveAction[Teacher saves]
-    saveAction --> persist[Persist to Supabase]
-    saveAction --> memoryUpdate[Update Series Memory]
+    storyGen --> persist[Persist to Supabase]
+    promptGen --> persist
+    vocabGen --> persist
+    persist --> autoSave[Auto-save status saved]
+    autoSave --> memoryUpdate[Update Series Memory]
+    autoSave --> display[Display to teacher]
+    display --> editAction[Optional teacher edits]
+    editAction --> manualSave[Save story if dirty]
+    manualSave --> memoryUpdate
 ```
 
 ## Inputs
@@ -328,7 +340,7 @@ flowchart LR
 | Teacher inputs | Story direction; overrides continuity |
 | Series Memory | Compressed history, vocab taught, themes, characters, repetition notes |
 | Character Bible | Tier 1 characters, voice rules, age guardrails, educational tone |
-| Illustration Guide | Prompt template, style suffix, character consistency rules |
+| Illustration Guide | Prompt template, locked continuity suffix (16:9 framing), character consistency rules |
 
 ## Outputs
 
@@ -340,23 +352,22 @@ flowchart LR
 
 ## Save behavior
 
-* Generation writes a `draft` story with pages and vocabulary to Supabase
-* Teacher reviews and optionally edits page text
-* Save transitions `status` to `saved`, sets `saved_at`, triggers Series Memory merge
-* Series Memory does not update until save
+* Generate and Regenerate auto-save: `status = saved`, `saved_at` set, Series Memory merged
+* Teacher can edit story setup (inputs only) via **Edit Story Setup**; pages unchanged until Regenerate
+* Teacher can edit page text or illustration prompts; changes persist on blur
+* Manual **Save story** commits saved state + Series Memory when the teacher has unsaved edits (dirty state)
 
 ## Regenerate behavior
 
-* Teacher edits inputs and/or page text, then clicks Regenerate
-* Pipeline re-runs with updated inputs + current Series Memory
-* Replaces draft pages, prompts, and vocabulary
-* Does not update Series Memory until the teacher saves again
+* Teacher may edit setup inputs first, then clicks Regenerate
+* Pipeline re-runs with stored inputs + current Series Memory
+* Replaces pages, prompts, and vocabulary; auto-saves (no draft demotion)
 
-## Draft behavior (locked)
+## Draft behavior
 
-* Successful generate writes a `draft` story to Supabase immediately
-* Draft survives page refresh
-* Story title auto-generated from theme (truncated short label)
+* `draft` applies only before first successful generation (in-progress create flow)
+* Successful generate and regenerate write `saved` immediately
+* Story title auto-generated from theme (truncated short label); Edit Story Setup may update title from theme before Regenerate
 * Illustration prompts: read-only + copy button; regenerate for new prompts
 * Vocabulary items: read-only; regenerate to change
 
@@ -366,7 +377,7 @@ flowchart LR
 |---------|----------|
 | Generation fails | Show error message + retry; no Series Memory update; do not save partial story |
 | Series Memory load fails | Proceed with empty memory + static character bible; show non-blocking warning |
-| Save fails | Show error; remain on editor; draft data preserved; memory not updated |
+| Save fails (edit commit) | Show error; remain on editor; page edits preserved in DB; memory not updated until Save succeeds |
 
 ## V1 shortcut
 
@@ -425,9 +436,9 @@ Each step is independently understandable and validates one part of the core wor
 | 4 | Create route + input form — 4 required + optional fields | Minimal inputs |
 | 5 | Generation pipeline (mock) — fixture 12-page story with prompts + vocab | Generate flow |
 | 6 | Story display route — pages, prompts with copy button, vocabulary | Output display |
-| 7 | Save flow — persist draft as `saved`, write pages + vocabulary | Save stories |
+| 7 | Auto-save on generate/regenerate + Save story for edit commits | Save stories |
 | 8 | Series Memory load — read singleton on app open / before generate | Memory load |
-| 9 | Series Memory update — server-side merge on save | Memory update on save |
+| 9 | Series Memory update — server-side merge on auto-save and edit Save | Memory update |
 | 10 | Real LLM generation — replace mock pipeline | Real story quality |
 | 11 | Edit + regenerate — inline page text edit, re-run pipeline from inputs | Edit scope |
 | 12 | Loading and error states — generation, save, reopen failures | Error handling |
@@ -470,7 +481,9 @@ Genuine blockers or risks only. No invented complexity.
 | **Shared memory across teachers** | Global memory means Teacher A's saved story affects Teacher B's next generation. | Accepted — intentional for V1 validation. Monitor during teacher testing. |
 | **Generation latency** | Soft target, not SLA. Long LLM calls need clear loading UX. | Accepted — loading states in step 12. |
 
-**Resolved in Phase C (see drift-log.md):** invite-only auth, saved-only story list, draft persistence on generate, error behavior defaults, no story deletion in V1.
+**Resolved in Phase C (see drift-log.md):** invite-only auth, saved-only story list, error behavior defaults, no story deletion in V1.
+
+**Resolved 2026-06-08 (see drift-log.md):** generate/regenerate auto-save; Save story for edit commits only; Edit Story Setup without auto-regenerate.
 
 No unresolved spec conflicts.
 

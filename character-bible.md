@@ -1,18 +1,36 @@
 # Character Bible
 
-Version: 1.0
+Version: 1.1
 
 Purpose:
 
 This document defines the Nina & Nino series characters, relationships, appearance rules, and continuity constraints.
 
-Generation and illustration prompts must align with this bible unless a teacher explicitly overrides.
+Generation and illustration prompts must align with this bible unless a teacher explicitly overrides story content via inputs or Notes.
 
 Authority: Below [v1-scope.md](v1-scope.md), above [illustration-guide.md](illustration-guide.md).
 
 ---
 
-# 1. Series Overview
+# 1. V1 Character Lock (Locked)
+
+V1 uses **locked character definitions** for official series characters.
+
+Rules:
+
+* Teachers **cannot** edit character profiles in V1
+* Official character appearances are fixed in this document and injected at generation time
+* Illustration prompts must use the locked visual descriptors for every official character on the page
+* Unknown characters introduced by teachers (friends, classmates, visitors, etc.) may appear in stories when the plot requires them, but are **not** persisted as character profiles in V1
+* Future versions may allow teachers to edit and save character profiles — explicitly out of V1 scope (see section 14)
+
+When uncertain:
+
+> Use the locked official appearance. Do not invent new permanent visual traits for official characters.
+
+---
+
+# 2. Series Overview
 
 The Nina & Nino series follows two siblings — Nina and Nino — through simple, educational adventures suited to ages 4–6.
 
@@ -20,93 +38,174 @@ Stories are designed for kindergarten, preschool, ESL/EFL, and early literacy cl
 
 Core pattern:
 
-* Nina (older sibling) models curiosity and helpfulness
-* Nino (younger sibling) models discovery and gentle mistakes
+* Nina (older sister) models curiosity and helpfulness
+* Nino (younger brother) models discovery and gentle mistakes
 * Learning happens through action, dialogue, and repetition
 * Tone stays warm, positive, and classroom-safe
 
 ---
 
-# 2. Character Tiers
+# 3. Official V1 Characters (Locked Appearances)
+
+These six characters have **locked** visual definitions. Clothing, hair, and facial appearance remain the same across all stories unless a teacher Note explicitly requests a one-story exception.
+
+## Nina
+
+**Role:** Older sister
+
+**Locked appearance:**
+
+* Approximately 6 years old
+* Medium skin tone
+* Dark brown hair
+* Two neat pigtails
+* Bright red t-shirt
+* Dark red shorts
+* White socks
+* Red sneakers
+* Brown eyes
+* Warm friendly smile
+
+**Continuity requirements:**
+
+* Clothing remains the same across stories
+* Hair remains the same across stories
+* Facial appearance remains the same across stories
+
+**Personality / voice:** Curious, patient, encouraging; short clear sentences; praises Nino's efforts
+
+## Nino
+
+**Role:** Younger brother
+
+**Locked appearance:**
+
+* Approximately 4 years old
+* Medium skin tone
+* Short messy warm-brown hair
+* Light green t-shirt
+* Dark green shorts
+* White socks
+* Green sneakers
+* Brown eyes
+* Curious cheerful expression
+
+**Continuity requirements:**
+
+* Clothing remains the same across stories
+* Hair remains the same across stories
+* Facial appearance remains the same across stories
+
+**Personality / voice:** Playful, eager, sometimes impulsive; simple phrases; repeats new words
+
+## Mom
+
+**Role:** Mother
+
+**Locked appearance:**
+
+* Medium skin tone
+* Dark hair
+* Warm smile
+* Yellow áo dài
+
+**Critical rule:** Mom **ALWAYS** wears the yellow áo dài.
+
+**Personality / voice:** Calm, warm, practical, supportive; reassuring simple explanations
+
+## Dad
+
+**Role:** Father
+
+**Locked appearance:**
+
+* Medium skin tone
+* Short dark hair
+* Friendly face
+* Casual neutral clothing (consistent shirt and pants colors across stories)
+* Consistent appearance across stories
+
+**Personality / voice:** Friendly, playful, dependable; encouraging; models helpful actions
+
+## Grandpa
+
+**Role:** Grandfather
+
+**Locked appearance:**
+
+* White beard
+* Brown cap
+* Denim overalls
+* Warm smile
+* Friendly grandfather appearance
+* Consistent appearance across stories
+
+**Personality / voice:** Warm, patient, gentle humor; shares simple wisdom with Nina and Nino
+
+## Ms. Lee
+
+**Role:** Teacher
+
+**Locked appearance:**
+
+* Adult female teacher
+* Medium skin tone
+* Dark hair
+* Friendly expression
+* Consistent teacher clothing (same outfit style and colors across stories)
+* Recognizable across stories
+
+**Default setting:** Sunny Grove Kindergarten classroom
+
+**Personality / voice:** Kind, organized, enthusiastic about learning
+
+---
+
+# 4. Character Tiers
 
 ## Tier 1 — Core Characters (always prioritized)
 
-These characters appear most often and anchor Series Memory continuity.
+Official locked characters: **Nina, Nino, Mom, Dad, Grandpa, Ms. Lee**
 
-### Nina
+These characters anchor Series Memory continuity and must use locked appearances in all illustration prompts.
 
-* Role: Older sibling, age 6
-* Personality: Curious, patient, encouraging, likes to explain things simply
-* Voice: Short clear sentences; asks gentle questions; praises Nino's efforts
-* Appearance: Medium-brown skin; dark curly hair in two puffs; warm brown eyes; yellow t-shirt; blue denim overalls; red sneakers
-* Default behavior: Notices details; suggests kind solutions; shares vocabulary naturally
+## Tier 2 — Recurring Supporting Characters (not locked)
 
-### Nino
-
-* Role: Younger sibling, age 4
-* Personality: Playful, eager, sometimes impulsive, quick to laugh
-* Voice: Simple phrases; repeats new words; asks "What is that?" and "Can I try?"
-* Appearance: Medium-brown skin; short curly dark hair; warm brown eyes; green t-shirt; tan shorts; blue sneakers
-* Default behavior: Explores first; learns by doing; makes small mistakes that get resolved kindly
-
-### Mom (Elena)
-
-* Role: Primary caregiver at home
-* Personality: Calm, warm, practical, supportive
-* Voice: Reassuring; uses simple explanations; encourages teamwork between siblings
-* Appearance: Medium-brown skin; dark hair in a low bun; soft smile; lavender cardigan; white blouse; dark jeans; flat shoes
-* Default behavior: Sets gentle routines; praises effort; helps children reflect on what they learned
-
-### Dad (Marco)
-
-* Role: Primary caregiver at home
-* Personality: Friendly, playful, dependable
-* Voice: Encouraging; uses humor lightly; models helpful actions
-* Appearance: Medium-brown skin; short dark hair; neat beard; teal polo shirt; khaki pants; brown shoes
-* Default behavior: Joins activities; fixes small problems; supports Mom's guidance
-
-## Tier 2 — Recurring Supporting Characters
-
-May appear across multiple stories. Series Memory should remember their roles and stable traits.
-
-### Ms. Lee
-
-* Role: Kindergarten teacher
-* Personality: Kind, organized, enthusiastic about learning
-* Appearance: East Asian woman; black hair in a neat bob; glasses; yellow cardigan; navy skirt; comfortable flats
-* Default setting: Sunny Grove Kindergarten classroom
+May appear across multiple stories. Use stable descriptors within a story arc, but these are **not** official locked profiles and are **not** persisted as character profiles in V1.
 
 ### Sam
 
 * Role: Class friend and peer
-* Personality: Friendly, cooperative, slightly shy at first
-* Appearance: Light skin; sandy blond short hair; orange hoodie; gray pants; white sneakers
+* Suggested appearance: Light skin; sandy blond short hair; orange hoodie; gray pants; white sneakers
 * Default behavior: Joins group activities; learns alongside Nina and Nino
 
 ### Biscuit
 
 * Role: Family dog
-* Personality: Gentle, playful, loyal
-* Appearance: Small golden-brown dog; floppy ears; red collar with a round tag
-* Default behavior: Appears in home and park stories; never creates danger or fear
+* Suggested appearance: Small golden-brown dog; floppy ears; red collar with a round tag
+* Default behavior: Appears in home and park stories when mentioned; never creates danger or fear
 
 ## Tier 3 — Story-Specific Characters
 
-* Introduced for a single story or short arc
-* Must not contradict Tier 1 or Tier 2 characters
-* Should have a clear educational purpose (e.g., shopkeeper teaching counting, librarian teaching book care)
-* Series Memory may retain them if they recur, promoting them to Tier 2
+* Introduced for a single story or short arc (e.g., shopkeeper, librarian, visitor named in Main Events)
+* Generated normally when teachers include them in story inputs
+* **Not** persisted as character profiles in V1
+* Must not contradict Tier 1 locked appearances
+* Should have a clear educational purpose
+* Series Memory may note that a type of character appeared, but does not store a full editable profile
 
 ---
 
-# 3. Relationship Map
+# 5. Relationship Map
 
 ```
-Mom (Elena) ──┬── Nina (6)
-              └── Nino (4)
+Mom ──┬── Nina (6)
+      └── Nino (4)
 
-Dad (Marco) ──┬── Nina
-              └── Nino
+Dad ──┬── Nina
+      └── Nino
+
+Grandpa ── grandfather of ── Nina and Nino
 
 Nina ── older sister of ── Nino
 Nino ── younger brother of ── Nina
@@ -119,29 +218,28 @@ Family ── owns ── Biscuit
 Family dynamics:
 
 * Nina and Nino cooperate more often than they compete
-* Disagreements resolve through talking, sharing, or asking a parent/teacher
-* Parents and Ms. Lee guide rather than punish
+* Disagreements resolve through talking, sharing, or asking a parent, teacher, or Grandpa
+* Parents, Ms. Lee, and Grandpa guide rather than punish
 * No character is mocked for mistakes
 
 ---
 
-# 4. Appearance Rules
+# 6. Appearance Rules
 
-These descriptors must stay consistent across stories and illustration prompts unless a story explicitly changes them (e.g., "rainy day — Nina wears a raincoat").
+## Locked official characters
 
-## Consistency requirements
+For Nina, Nino, Mom, Dad, Grandpa, and Ms. Lee:
 
-* Skin tones, hair, and distinguishing features remain stable
-* Default clothing colors remain stable within a story arc
-* Ages do not change (Nina stays 6, Nino stays 4)
-* Biscuit stays a small golden-brown dog with a red collar
-* Characters are always depicted as children/adults appropriate to their role — never aged up or down
+* Skin tone, hair, clothing, and distinguishing features remain **fixed** across all stories
+* Ages do not change (Nina stays ~6, Nino stays ~4)
+* Mom always wears the yellow áo dài
+* Do not substitute different outfits, hairstyles, or skin tones in illustration prompts
+* Teacher Notes may request a one-story exception; if so, story text and prompts must both reflect it once
 
-## Clothing change rules
+## Non-locked characters
 
-* Clothing may change when the setting requires it (rain, bedtime, swimming, school event)
-* If clothing changes, the story text must mention it once
-* Illustration prompts must reflect the story's stated clothing for that page
+* Tier 2 and Tier 3 characters use consistent descriptors within a story
+* Clothing may vary for story-specific characters when the setting requires it, if the story text mentions it
 
 ## Visual tone
 
@@ -151,7 +249,7 @@ These descriptors must stay consistent across stories and illustration prompts u
 
 ---
 
-# 5. Personality and Voice Guidelines
+# 7. Personality and Voice Guidelines
 
 ## Dialogue patterns
 
@@ -175,12 +273,12 @@ These descriptors must stay consistent across stories and illustration prompts u
 
 ---
 
-# 6. Continuity Rules
+# 8. Continuity Rules
 
 ## What Series Memory must preserve
 
-* Tier 1 character identities and relationships
-* Recurring Tier 2 characters and their roles
+* Tier 1 locked character identities and relationships
+* Recurring Tier 2 character roles (not full editable profiles)
 * Established settings (home layout, classroom name, park bench spot, etc.)
 * Major events from saved stories (trips, celebrations, lessons learned)
 * Vocabulary already taught in prior stories (for variation, not exact repetition)
@@ -190,11 +288,11 @@ These descriptors must stay consistent across stories and illustration prompts u
 
 * Setting and theme for a new story
 * Tone and vocabulary focus via inputs
-* Whether a Tier 2 character appears
+* Whether a Tier 2 or Tier 3 character appears (via Main Events or Notes)
 * Continuity details via Notes field
 * Main events and learning goals
 
-Rule: **Teacher instructions override continuity rules. Continuity guides generation; it does not block generation.**
+Rule: **Teacher story inputs override continuity suggestions. Locked character appearances do not change unless a teacher Note explicitly requests a one-story exception.**
 
 ## Repetition guidance
 
@@ -204,7 +302,7 @@ Rule: **Teacher instructions override continuity rules. Continuity guides genera
 
 ---
 
-# 7. Story Structure Alignment
+# 9. Story Structure Alignment
 
 Per locked product decisions:
 
@@ -224,7 +322,7 @@ Typical page rhythm:
 
 ---
 
-# 8. Educational Tone
+# 10. Educational Tone
 
 Prioritize:
 
@@ -243,7 +341,7 @@ Avoid:
 
 ---
 
-# 9. Age Guardrails
+# 11. Age Guardrails
 
 Do not include:
 
@@ -263,20 +361,20 @@ Acceptable tension:
 
 ---
 
-# 10. Default Settings
+# 12. Default Settings
 
 Use these unless teacher inputs specify otherwise:
 
 | Setting | Description |
 |---------|-------------|
 | Home | Cozy two-story house; sunny kitchen; small backyard with a lemon tree |
-| Sunny Grove Kindergarten | Bright classroom; reading corner; cubby hooks; Ms. Lee's yellow bulletin board |
+| Sunny Grove Kindergarten | Bright classroom; reading corner; cubby hooks; Ms. Lee's bulletin board |
 | Neighborhood Park | Green grass; wooden bench; small pond with ducks; paved walking path |
 | Market Street | Friendly fruit stall; baker with bread display; colorful awning |
 
 ---
 
-# 11. Vocabulary Integration
+# 13. Vocabulary Integration
 
 When a teacher provides Vocabulary Focus:
 
@@ -288,25 +386,46 @@ When a teacher provides Vocabulary Focus:
 
 ---
 
-# 12. Character Quick Reference (for prompts)
+# 14. Character Quick Reference (for prompts)
 
-Use these compact descriptors in illustration prompts:
+Use these compact descriptors in every illustration prompt that includes the character:
 
-* **Nina:** 6-year-old girl, medium-brown skin, dark curly hair in two puffs, yellow shirt, blue overalls, red sneakers
-* **Nino:** 4-year-old boy, medium-brown skin, short curly dark hair, green shirt, tan shorts, blue sneakers
-* **Mom (Elena):** woman, medium-brown skin, dark hair in low bun, lavender cardigan, white blouse
-* **Dad (Marco):** man, medium-brown skin, short dark hair, neat beard, teal polo, khaki pants
-* **Ms. Lee:** East Asian woman, black bob hair, glasses, yellow cardigan, navy skirt
-* **Sam:** light-skinned boy, sandy blond hair, orange hoodie, gray pants
+* **Nina:** 6-year-old girl, medium skin tone, dark brown hair in two neat pigtails, bright red t-shirt, dark red shorts, white socks, red sneakers, brown eyes, warm friendly smile
+* **Nino:** 4-year-old boy, medium skin tone, short messy warm-brown hair, light green t-shirt, dark green shorts, white socks, green sneakers, brown eyes, curious cheerful expression
+* **Mom:** woman, medium skin tone, dark hair, warm smile, yellow áo dài (always)
+* **Dad:** man, medium skin tone, short dark hair, friendly face, casual neutral clothing
+* **Grandpa:** grandfather, white beard, brown cap, denim overalls, warm smile
+* **Ms. Lee:** adult female teacher, medium skin tone, dark hair, friendly expression, consistent teacher clothing
+
+**Tier 2 (when present, not locked):**
+
+* **Sam:** boy, light skin, sandy blond short hair, orange hoodie, gray pants
 * **Biscuit:** small golden-brown dog, floppy ears, red collar
 
 ---
 
-# 13. Final Rule
+# 15. Future Scope (Not V1)
+
+The following are explicitly out of V1 scope:
+
+* Teacher-editable character profiles
+* "Edit Characters" button or character management modal
+* Character profile persistence in the database
+* Per-teacher character customization
+
+If added later, update this bible, [illustration-guide.md](illustration-guide.md), and [source-of-truth.md](source-of-truth.md) first.
+
+---
+
+# 16. Final Rule
 
 When uncertain about a character decision:
 
 > Choose the simpler, warmer, more classroom-friendly option.
+
+For official locked characters:
+
+> Use the locked appearance from section 3. Do not drift from the original Nina & Nino visual identity.
 
 If a character change would affect workflow, inputs, outputs, or Series Memory behavior:
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useStoryEditor } from "./StoryEditorContext";
 
 type RegenerateButtonProps = {
   storyId: string;
@@ -9,6 +10,7 @@ type RegenerateButtonProps = {
 
 export function RegenerateButton({ storyId }: RegenerateButtonProps) {
   const router = useRouter();
+  const { clearDirty } = useStoryEditor();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
@@ -39,6 +41,7 @@ export function RegenerateButton({ storyId }: RegenerateButtonProps) {
         setWarning(data.warning);
       }
 
+      clearDirty();
       router.refresh();
     } catch {
       setError("Failed to regenerate story.");
@@ -48,7 +51,7 @@ export function RegenerateButton({ storyId }: RegenerateButtonProps) {
   }
 
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="flex flex-col items-start gap-1">
       <button
         type="button"
         onClick={handleRegenerate}
@@ -58,7 +61,7 @@ export function RegenerateButton({ storyId }: RegenerateButtonProps) {
         {loading ? "Regenerating…" : "Regenerate"}
       </button>
       {warning && (
-        <p className="max-w-xs text-right text-xs text-amber-700" role="status">
+        <p className="max-w-xs text-xs text-amber-700" role="status">
           {warning}
         </p>
       )}
