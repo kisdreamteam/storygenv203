@@ -1,105 +1,20 @@
 /** Single source of truth for V1 illustration character continuity (docs/before-coding/character-bible.md + docs/before-coding/illustration-guide.md). */
 
-export type OfficialCharacterId =
-  | "nina"
-  | "nino"
-  | "mom"
-  | "dad"
-  | "grandpa"
-  | "ms_lee";
+import type { CharacterProfileMap, OfficialCharacterId } from "@/lib/character-profiles/types";
+import { buildCharacterContinuityMap } from "@/lib/character-profiles/format-for-illustration-continuity";
+import { getFactoryCharacterProfiles } from "@/lib/character-profiles/factory-defaults";
 
-export const CHARACTER_CONTINUITY: Record<OfficialCharacterId, string> = {
-  nina: `Nina must ALWAYS appear as:
-- older sister (~6 years old)
-- medium skin tone
-- dark brown hair in two neat pigtails
-- bright red t-shirt
-- dark red shorts
-- white socks
-- red sneakers
-- brown eyes
-- warm friendly smile
+export type { OfficialCharacterId };
 
-DO NOT:
-- change clothing
-- change hairstyle
-- substitute colors
-- change shoes`,
+/** Factory-default continuity blocks — aligned with migration seed / Character Bible. */
+export const CHARACTER_CONTINUITY: Record<OfficialCharacterId, string> =
+  buildCharacterContinuityMap(getFactoryCharacterProfiles());
 
-  nino: `Nino must ALWAYS appear as:
-- younger brother (~4 years old)
-- medium skin tone
-- short messy warm-brown hair
-- light green t-shirt
-- dark green shorts
-- white socks
-- green sneakers
-- brown eyes
-- curious cheerful expression
-
-DO NOT:
-- change clothing
-- change hairstyle
-- substitute colors
-- change shoes`,
-
-  mom: `Mom must ALWAYS appear as:
-- mother
-- medium skin tone
-- dark hair
-- warm smile
-- yellow áo dài
-
-DO NOT:
-- change clothing
-- remove the yellow áo dài
-- substitute outfit colors
-- change hairstyle`,
-
-  dad: `Dad must ALWAYS appear as:
-- father
-- medium skin tone
-- short dark hair
-- friendly face
-- light navy polo shirt
-- khaki pants
-- brown casual shoes
-- warm smile
-
-DO NOT:
-- change clothing
-- change hairstyle
-- substitute colors
-- change shoes`,
-
-  grandpa: `Grandpa must ALWAYS appear as:
-- grandfather
-- white beard
-- brown cap
-- denim overalls
-- warm smile
-- friendly grandfather appearance
-
-DO NOT:
-- change clothing
-- remove beard or cap
-- substitute outfit colors`,
-
-  ms_lee: `Ms. Lee must ALWAYS appear as:
-- adult female teacher
-- medium skin tone
-- dark hair
-- friendly expression
-- light blue blouse
-- dark navy slacks
-- black flat shoes
-
-DO NOT:
-- change clothing
-- change hairstyle
-- substitute colors
-- change shoes`,
-};
+function resolveContinuityMap(
+  profiles?: CharacterProfileMap
+): Record<OfficialCharacterId, string> {
+  return profiles ? buildCharacterContinuityMap(profiles) : CHARACTER_CONTINUITY;
+}
 
 /** Compact quick-reference descriptors from docs/before-coding/character-bible.md §14. */
 export const NINA_DESCRIPTOR = CHARACTER_CONTINUITY.nina;
@@ -161,12 +76,16 @@ export function appendGlobalIllustrationSuffix(prompt: string): string {
 }
 
 /** Verbatim continuity blocks for characters on the page only. Never paraphrased or compressed. */
-export function getCharacterContinuityText(pageText: string): string {
+export function getCharacterContinuityText(
+  pageText: string,
+  profiles?: CharacterProfileMap
+): string {
+  const continuityMap = resolveContinuityMap(profiles);
   const present = detectOfficialCharactersInText(pageText);
   if (present.length === 0) {
     return "";
   }
-  return present.map((id) => CHARACTER_CONTINUITY[id].trim()).join("\n\n");
+  return present.map((id) => continuityMap[id].trim()).join("\n\n");
 }
 
 export type BuildIllustrationPromptInput = {
@@ -175,6 +94,7 @@ export type BuildIllustrationPromptInput = {
   setting?: string;
   mood?: string;
   scene?: string;
+  profiles?: CharacterProfileMap;
 };
 
 export function sceneFromPageText(pageText: string): string {
@@ -204,7 +124,7 @@ export function moodForPageNumber(pageNumber: number): string {
  * Structure: LOCKED CHARACTER CONTINUITY → SCENE → STYLE
  */
 export function buildIllustrationPrompt(input: BuildIllustrationPromptInput): string {
-  const continuity = getCharacterContinuityText(input.pageText);
+  const continuity = getCharacterContinuityText(input.pageText, input.profiles);
   const scene = input.scene?.trim() || sceneFromPageText(input.pageText);
   const mood =
     input.mood?.trim() ||
@@ -245,21 +165,25 @@ export function hasLockedIllustrationPromptStructure(prompt: string): boolean {
 /** Rebuild illustration prompts for every page using locked continuity injection. */
 export function injectIllustrationContinuityIntoPages<
   T extends { page_number: number; text: string; illustration_prompt: string },
->(pages: T[], setting: string): T[] {
+>(pages: T[], setting: string, profiles?: CharacterProfileMap): T[] {
   return pages.map((page) => ({
     ...page,
     illustration_prompt: buildIllustrationPrompt({
       pageText: page.text,
       pageNumber: page.page_number,
       setting,
+      profiles,
     }),
   }));
 }
 
 /** Full locked rules for AI system prompts — verbatim blocks, never paraphrased. */
-export function formatOfficialCharacterRulesForAi(): string {
-  const allBlocks = OFFICIAL_CHARACTER_DETECTION_ORDER.map(
-    (id) => CHARACTER_CONTINUITY[id].trim()
+export function formatOfficialCharacterRulesForAi(
+  profiles?: CharacterProfileMap
+): string {
+  const continuityMap = resolveContinuityMap(profiles);
+  const allBlocks = OFFICIAL_CHARACTER_DETECTION_ORDER.map((id) =>
+    continuityMap[id].trim()
   ).join("\n\n");
 
   return `Every illustration_prompt MUST use this exact three-section structure:

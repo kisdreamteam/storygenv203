@@ -16,6 +16,14 @@ When making product or implementation decisions, follow this authority order (hi
 7. `.cursor/rules/`
 8. Implementation code
 
+**Post-V1 supporting docs:**
+
+- `docs/product-roadmap.md`
+- `docs/roadmap-todo.md`
+- `docs/project-changelog.md`
+
+These are planning/support documents. They do not override authority docs.
+
 ## MUST
 
 - Treat documentation as higher authority than code.

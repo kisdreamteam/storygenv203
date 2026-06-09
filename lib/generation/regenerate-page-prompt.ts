@@ -1,3 +1,5 @@
+import { loadCharacterProfiles } from "@/lib/character-profiles";
+import { createClient } from "@/lib/supabase/server";
 import { buildIllustrationPrompt } from "./character-continuity";
 import { DEFAULT_ILLUSTRATION_SETTING } from "./illustration-prompt";
 
@@ -18,11 +20,15 @@ export async function regeneratePageIllustrationPrompt(
 ): Promise<RegeneratePagePromptResult> {
   const setting = input.setting?.trim() || DEFAULT_ILLUSTRATION_SETTING;
 
+  const supabase = await createClient();
+  const { profiles, warning: profileWarning } = await loadCharacterProfiles(supabase);
+
   const illustration_prompt = buildIllustrationPrompt({
     pageText: input.pageText,
     pageNumber: input.pageNumber,
     setting,
+    profiles,
   });
 
-  return { illustration_prompt, warning: null };
+  return { illustration_prompt, warning: profileWarning };
 }

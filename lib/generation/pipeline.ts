@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { loadCharacterProfiles, type CharacterProfileMap } from "@/lib/character-profiles";
 import { injectIllustrationContinuityIntoPages } from "./character-continuity";
 import { DEFAULT_ILLUSTRATION_SETTING } from "./illustration-prompt";
 import { tryAiGeneration } from "./ai-generation";
@@ -18,12 +19,13 @@ function combineWarnings(...parts: Array<string | null | undefined>): string | n
 
 function enforceIllustrationContinuity(
   result: MockGenerationResult,
-  inputs: StoryInputs
+  inputs: StoryInputs,
+  profiles: CharacterProfileMap
 ): MockGenerationResult {
   const setting = inputs.setting?.trim() || DEFAULT_ILLUSTRATION_SETTING;
   return {
     ...result,
-    pages: injectIllustrationContinuityIntoPages(result.pages, setting),
+    pages: injectIllustrationContinuityIntoPages(result.pages, setting, profiles),
   };
 }
 
@@ -31,13 +33,14 @@ export async function generateStory(
   supabase: SupabaseClient,
   inputs: StoryInputs
 ): Promise<GenerateStoryResult> {
-  const { summary, warning: memoryWarning } = await loadSeriesMemory(supabase);
+  const [{ summary, warning: memoryWarning }, { profiles, warning: profileWarning }] =
+    await Promise.all([loadSeriesMemory(supabase), loadCharacterProfiles(supabase)]);
 
-  const ai = await tryAiGeneration(inputs, summary);
+  const ai = await tryAiGeneration(inputs, summary, profiles);
   if (ai.ok) {
     return {
-      result: enforceIllustrationContinuity(ai.result, inputs),
-      warning: memoryWarning,
+      result: enforceIllustrationContinuity(ai.result, inputs, profiles),
+      warning: combineWarnings(memoryWarning, profileWarning),
     };
   }
 
@@ -45,7 +48,7 @@ export async function generateStory(
   const fallbackWarning = `AI generation unavailable (${ai.reason}). Using template story.`;
 
   return {
-    result: enforceIllustrationContinuity(mockResult, inputs),
-    warning: combineWarnings(memoryWarning, fallbackWarning),
+    result: enforceIllustrationContinuity(mockResult, inputs, profiles),
+    warning: combineWarnings(memoryWarning, profileWarning, fallbackWarning),
   };
 }

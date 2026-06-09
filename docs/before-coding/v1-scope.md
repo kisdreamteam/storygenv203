@@ -316,7 +316,12 @@ This section does **not** change what V1 was. Sections 1–10 above remain the *
 
 **How future work is managed:**
 
-* Future improvements are tracked in [docs/product-roadmap.md](../product-roadmap.md)
+Post-V1 work is tracked in:
+
+* [docs/product-roadmap.md](../product-roadmap.md) for strategic buckets
+* [docs/roadmap-todo.md](../roadmap-todo.md) for tactical next steps
+* [docs/project-changelog.md](../project-changelog.md) for meaningful project changes
+
 * New features listed in the roadmap do **not** automatically become committed work
 * **Bucket 1** items (Core Product Evolution) may be implemented incrementally after documentation and drift-log updates
 * **Bucket 2** items (Experiments) require validation before promotion to Bucket 1

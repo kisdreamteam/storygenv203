@@ -1,7 +1,7 @@
-import {
-  CHARACTER_BIBLE_EXCERPT,
-  TIER1_CHARACTER_RULES,
-} from "@/lib/constants/character-bible";
+import type { CharacterProfileMap } from "@/lib/character-profiles";
+import { formatOfficialCharacterProfilesForStory } from "@/lib/character-profiles/format-for-story-prompt";
+import { CHARACTER_BIBLE_EXCERPT } from "@/lib/constants/character-bible";
+import { formatOfficialCharacterRulesForAi } from "@/lib/generation/character-continuity";
 import { ILLUSTRATION_PROMPT_FORMAT } from "@/lib/constants/illustration-style";
 import type { SeriesMemorySummary, StoryInputs } from "./types";
 
@@ -15,12 +15,14 @@ const JSON_SCHEMA = `{
   ]
 }`;
 
-export function buildSystemPrompt(): string {
+export function buildSystemPrompt(profiles: CharacterProfileMap): string {
   return `You are a children's educational story writer for the Nina & Nino series (ages 4–6).
 
 ${CHARACTER_BIBLE_EXCERPT}
 
-${TIER1_CHARACTER_RULES}
+${formatOfficialCharacterProfilesForStory(profiles)}
+
+${formatOfficialCharacterRulesForAi(profiles)}
 ${ILLUSTRATION_PROMPT_FORMAT}
 
 Output rules (strict):

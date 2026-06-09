@@ -348,6 +348,30 @@ Status: Accepted
 
 ---
 
+Date: 2026-06-09
+
+Domain: Characters / Post-V1 Evolution
+
+Problem: Character definitions are currently hardcoded in code and static documentation. Any appearance or personality change requires code or Cursor edits.
+
+What changed:
+
+* Editable Characters **Phase 1** approved for **post-V1 future implementation** (not yet built)
+* Scope: editable **global default profiles** for official characters only — Nina, Nino, Mom, Dad, Grandpa, Ms. Lee
+* Reset-to-default required (one character, all characters, factory defaults from Character Bible)
+* Saved profiles will be used in future story generation and illustration prompts
+* **Deferred:** series-scoped profiles, story-specific overrides, teacher-created / story-introduced character persistence (Phases 2–3 per [docs/character-editing-decision-record.md](../character-editing-decision-record.md))
+
+Why change is needed: Teachers need a simple in-app path to adjust official character setup without code changes, while preserving the V1 baseline and avoiding scope creep.
+
+Documents affected: drift-log.md, source-of-truth.md, character-bible.md, illustration-guide.md, docs/phase-b-architecture-map.md, .cursor/rules/architecture-freeze.mdc, docs/roadmap-todo.md, docs/project-changelog.md
+
+Decision: Editable Characters Phase 1 approved for post-V1 implementation planning. Code, schema, and UI not started.
+
+Status: Accepted
+
+---
+
 # 9. Current Open Decisions
 
 Use this section for unresolved items.

@@ -44,9 +44,55 @@ if (url && serviceKey && !serviceKey.includes("your-")) {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  for (const table of ["stories", "story_pages", "story_vocabulary", "series_memory"]) {
+  for (const table of [
+    "stories",
+    "story_pages",
+    "story_vocabulary",
+    "series_memory",
+    "character_profiles",
+  ]) {
     const { error } = await admin.from(table).select("id").limit(1);
     record(`table_${table}`, !error, error?.message ?? "readable");
+  }
+
+  const OFFICIAL_CHARACTER_KEYS = ["nina", "nino", "mom", "dad", "grandpa", "ms_lee"];
+
+  const { data: profiles, error: profilesErr } = await admin
+    .from("character_profiles")
+    .select(
+      "character_key, appearance_description, personality_description, factory_appearance, factory_personality"
+    );
+
+  record("character_profiles_readable", !profilesErr, profilesErr?.message ?? "");
+  record(
+    "character_profiles_count",
+    !profilesErr && profiles?.length === 6,
+    profilesErr ? "" : `count=${profiles?.length ?? 0}`
+  );
+
+  if (profiles?.length) {
+    const keys = new Set(profiles.map((p) => p.character_key));
+    const missingKeys = OFFICIAL_CHARACTER_KEYS.filter((k) => !keys.has(k));
+    record(
+      "character_profiles_keys",
+      missingKeys.length === 0,
+      missingKeys.length ? `missing: ${missingKeys.join(", ")}` : "all six official keys present"
+    );
+
+    const emptyFields = profiles.filter(
+      (p) =>
+        !p.appearance_description?.trim() ||
+        !p.personality_description?.trim() ||
+        !p.factory_appearance?.trim() ||
+        !p.factory_personality?.trim()
+    );
+    record(
+      "character_profiles_fields_populated",
+      emptyFields.length === 0,
+      emptyFields.length
+        ? `empty fields on: ${emptyFields.map((p) => p.character_key).join(", ")}`
+        : "appearance and personality populated for all rows"
+    );
   }
 
   const { data: memory, error: memErr } = await admin

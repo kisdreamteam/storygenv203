@@ -1,0 +1,326 @@
+# Project Changelog
+
+Version: 1.0
+
+Purpose:
+
+Track meaningful StoryGen project evolution in a human-readable way.
+
+This document summarizes important changes made through Cursor prompts and major project decisions.
+
+It is not a git log or implementation diary.
+
+---
+
+# How To Use This Document
+
+Add a new entry when a Cursor prompt or planning decision changes:
+
+- project direction
+- roadmap status
+- authority documents
+- architecture
+- scope
+- workflow
+- validation status
+
+Do not add entries for tiny code changes.
+
+---
+
+# Entry Template
+
+## YYYY-MM-DD — Short Title
+
+Prompt / Context:
+
+What changed:
+
+Why it changed:
+
+Files affected:
+
+Impact:
+
+Follow-up needed:
+
+---
+
+# Changelog Entries
+
+## 2026-06-09 — Product Roadmap Added
+
+Prompt / Context:
+
+Project moved from strict V1 definition into controlled post-V1 evolution.
+
+What changed:
+
+- Created docs/product-roadmap.md
+- Added Post-V1 Evolution section to docs/before-coding/v1-scope.md
+- Organized future work into Bucket 1, Bucket 2, and Bucket 3
+
+Why it changed:
+
+The app is now expected to evolve slowly as a personal tool while preserving the original V1 baseline.
+
+Files affected:
+
+- docs/product-roadmap.md
+- docs/before-coding/v1-scope.md
+
+Impact:
+
+Future improvements now have a controlled place to live without automatically becoming implementation commitments.
+
+Follow-up needed:
+
+Before Bucket 1 implementation, update drift-log.md, source-of-truth.md, character-bible.md, illustration-guide.md, phase-b-architecture-map.md, and architecture freeze rules.
+
+---
+
+## 2026-06-09 — Editable Characters Promoted To Bucket 1
+
+Prompt / Context:
+
+Character definitions are currently hardcoded and can only be changed through Cursor/code edits.
+
+What changed:
+
+- Added Character System → Phase 1: Editable Characters to Bucket 1 in product-roadmap.md
+
+Why it changed:
+
+Editable character setup improves the existing core workflow by allowing small character adjustments from the app instead of code.
+
+Files affected:
+
+- docs/product-roadmap.md
+
+Impact:
+
+Editable official characters are now a planned post-V1 core product evolution item, but not yet approved for implementation.
+
+Follow-up needed:
+
+Before implementation, update authority docs and architecture freeze, then create a dedicated implementation plan.
+
+---
+
+## 2026-06-09 — Character Editing Direction Recorded
+
+Prompt / Context:
+
+The user clarified how character editing should work after V1.
+
+What changed:
+
+- Added character-editing-decision-record.md
+- Clarified global editable defaults
+- Deferred series-level profiles
+- Documented story-specific overrides as future hidden story-only adjustments
+- Documented story-introduced recurring characters as a future continuity direction
+
+Why it changed:
+
+Character definitions are currently hardcoded, which limits app-based editing. The project needs a simple path toward editable character setup without immediately overcomplicating scope.
+
+Files affected:
+
+- docs/character-editing-decision-record.md
+- docs/roadmap-todo.md
+- docs/product-roadmap.md
+- docs/project-changelog.md
+
+Impact:
+
+Editable Characters now has a documented direction. It is still not ready for implementation until authority documents and architecture rules are updated.
+
+Follow-up needed:
+
+Update drift-log.md, source-of-truth.md, character-bible.md, illustration-guide.md, phase-b-architecture-map.md, and architecture-freeze.mdc before code.
+
+---
+
+## 2026-06-09 — Editable Characters Phase 1 Approved For Planning
+
+Prompt / Context:
+
+Character editing direction was recorded; authority documents needed updating before any implementation.
+
+What changed:
+
+- Added accepted drift-log entry for Editable Characters Phase 1
+- Updated source-of-truth.md, character-bible.md, illustration-guide.md with post-V1 Phase 1 rules
+- Added phase-b-architecture-map.md §11 future architecture note (`character_profiles`, generation flow, Edit Characters UI)
+- Added architecture-freeze.mdc approved post-V1 exception
+- Marked roadmap-todo documentation prerequisites complete
+
+Why it changed:
+
+Promote Editable Characters from planned direction to approved future implementation candidate while keeping Phase 2 and Phase 3 deferred.
+
+Files affected:
+
+- docs/before-coding/drift-log.md
+- docs/before-coding/source-of-truth.md
+- docs/before-coding/character-bible.md
+- docs/before-coding/illustration-guide.md
+- docs/phase-b-architecture-map.md
+- .cursor/rules/architecture-freeze.mdc
+- docs/roadmap-todo.md
+- docs/project-changelog.md
+
+Impact:
+
+Phase 1 (editable global official character profiles with reset-to-default) is approved for implementation planning. No code or schema changes were made. V1 locked character behavior remains in force until Phase 1 ships.
+
+Follow-up needed:
+
+Write implementation plan; then build Phase 1 only (no series scope, story overrides, or teacher-created characters).
+
+---
+
+## 2026-06-09 — Editable Characters Phase 1 — Database Foundation Implemented
+
+Prompt / Context:
+
+Step 1 of Editable Characters Phase 1 — database foundation only.
+
+What changed:
+
+- Added `supabase/migrations/004_character_profiles.sql` — table, RLS, seed for six official characters
+- Extended `scripts/verify-supabase.mjs` with character_profiles checks
+- Marked roadmap-todo table + seed items complete
+
+Why it changed:
+
+Persist editable global character profiles before UI, API, and generation wiring (Steps 2–8).
+
+Files affected:
+
+- supabase/migrations/004_character_profiles.sql
+- scripts/verify-supabase.mjs
+- docs/roadmap-todo.md
+- docs/project-changelog.md
+
+Impact:
+
+Database foundation ready. Six official characters seeded with factory appearance and personality from Character Bible. No UI, API, generation, or illustration behavior changed.
+
+Follow-up needed:
+
+Step 2 — `lib/character-profiles/` resolver; then API, generation wiring, and Edit Characters modal per implementation plan.
+
+---
+
+## 2026-06-09 — Editable Characters Phase 1 Resolver Layer Added
+
+Prompt / Context:
+
+Step 2 — character profile resolver/helper layer only.
+
+What changed:
+
+- Added `lib/character-profiles/` — types, factory defaults, load, resolve, normalize
+- Added `scripts/verify-character-profiles.ts` and `npm run verify:character-profiles`
+
+Why it changed:
+
+Bridge between `character_profiles` table and future generation integration without changing app behavior yet.
+
+Files affected:
+
+- lib/character-profiles/*
+- scripts/verify-character-profiles.ts
+- package.json
+- docs/roadmap-todo.md
+- docs/project-changelog.md
+
+Impact:
+
+DB-backed profiles can be loaded and merged with factory fallback. No UI, API, generation, or illustration behavior changed.
+
+Follow-up needed:
+
+Step 3 — API routes; then wire resolver into generation and illustration paths.
+
+---
+
+## 2026-06-09 — Editable Characters Phase 1 Story Generation Integration Added
+
+Prompt / Context:
+
+Step 3 — wire character profile resolver into story generation prompt building only.
+
+What changed:
+
+- Story generation loads resolved character profiles in `lib/generation/pipeline.ts`
+- `buildSystemPrompt` accepts resolved profiles and includes dynamic official character appearance/personality context
+- Static Character Bible excerpt retained for series tone and structure; `TIER1_CHARACTER_RULES` unchanged (illustration continuity for Step 4)
+- Extended `verify:character-profiles` with story prompt formatter checks
+
+Why it changed:
+
+Future story text generation should use saved `character_profiles` values when available, with factory fallback via the existing resolver.
+
+Files affected:
+
+- lib/character-profiles/format-for-story-prompt.ts
+- lib/character-profiles/index.ts
+- lib/constants/character-bible.ts
+- lib/generation/prompts.ts
+- lib/generation/pipeline.ts
+- lib/generation/ai-generation.ts
+- scripts/verify-character-profiles.ts
+- docs/roadmap-todo.md
+- docs/project-changelog.md
+
+Impact:
+
+Story generation prompt context now uses resolved character profiles; DB profile values win over factory defaults; factory fallback remains. Illustration prompts, UI, reset behavior, API routes, and schema were not changed.
+
+Follow-up needed:
+
+Step 4 — wire resolved profiles into illustration prompt continuity.
+
+---
+
+## 2026-06-09 — Editable Characters Phase 1 Illustration Prompt Integration Added
+
+Prompt / Context:
+
+Step 4 — wire character profile resolver into illustration prompt continuity only.
+
+What changed:
+
+- Illustration continuity blocks built from resolved `appearanceDescription` via `buildCharacterContinuityMap`
+- `injectIllustrationContinuityIntoPages` and `buildIllustrationPrompt` accept profiles from the generation pipeline
+- Per-page prompt regeneration loads profiles in lib layer (no API route changes)
+- `formatOfficialCharacterRulesForAi(profiles)` uses resolved appearances in story-generation AI rules
+- Clipboard copy path unchanged — uses factory continuity when profiles are not passed
+
+Why it changed:
+
+Newly generated or regenerated illustration prompts should reflect saved `character_profiles` appearances with factory fallback.
+
+Files affected:
+
+- lib/character-profiles/format-for-illustration-continuity.ts
+- lib/character-profiles/types.ts
+- lib/character-profiles/index.ts
+- lib/generation/character-continuity.ts
+- lib/generation/pipeline.ts
+- lib/generation/prompts.ts
+- lib/generation/regenerate-page-prompt.ts
+- scripts/verify-character-profiles.ts
+- docs/roadmap-todo.md
+- docs/project-changelog.md
+
+Impact:
+
+Illustration prompt continuity now uses resolved character profile appearances; DB values win over factory defaults; global illustration suffix unchanged. Existing saved stories are not rewritten. UI, API routes, schema, and reset behavior were not changed.
+
+Follow-up needed:
+
+Edit Characters UI, save API, and reset behavior per implementation plan.

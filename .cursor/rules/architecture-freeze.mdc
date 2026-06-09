@@ -37,3 +37,22 @@ alwaysApply: true
 ## Revision path
 
 Document change → update `docs/before-coding/drift-log.md` → update architecture map and source docs → then implement.
+
+## Approved post-V1 exception: Editable Characters Phase 1
+
+The V1 architecture freeze above remains intact for all current behavior.
+
+**Editable Characters Phase 1** is an approved post-V1 exception (drift-log 2026-06-09). A future implementation may:
+
+- Add **one** table: `character_profiles` (global defaults for official characters only)
+- Add **one** simple UI entry point: **Edit Characters** (button + modal; no new route unless explicitly approved)
+
+Phase 1 must NOT include:
+
+- Series-scoped profiles
+- Story-specific character overrides
+- Teacher-created / story-introduced character editing or persistence
+- Character presets, multiple series, or in-app image generation
+- Additional routes without separate approval
+
+See `docs/phase-b-architecture-map.md` §11 and `docs/character-editing-decision-record.md`.

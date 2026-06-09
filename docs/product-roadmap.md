@@ -16,6 +16,11 @@ This document is **not** a product redesign and **not** a scope expansion. It de
 
 **Rule:** Items in this roadmap are **not committed work** until promoted through the bucket rules below and documented in `drift-log.md` before implementation.
 
+**Related documents:**
+
+- [docs/roadmap-todo.md](roadmap-todo.md) — tactical working queue for roadmap items
+- [docs/project-changelog.md](project-changelog.md) — human-readable history of major project changes
+
 ---
 
 # Bucket Framework
@@ -46,6 +51,8 @@ Actively planned improvements that extend the current workflow without replacing
 
 **Status:** Planned (post-V1)
 
+**Direction:** Character editing approach is documented in [docs/character-editing-decision-record.md](character-editing-decision-record.md). Phase 1 focuses **only** on official editable **global** character profiles. Story-specific overrides (Phase 2) and story-introduced recurring characters (Phase 3) are documented future directions — **not** part of the first implementation.
+
 **Problem:** Official character definitions (Nina, Nino, Mom, Dad, Grandpa, Ms. Lee) are locked in static documentation and code for V1. Teachers cannot adjust appearance or personality descriptions without code changes.
 
 **Goal:** Allow teachers to view and edit official character profiles while preserving the existing story creation workflow.
@@ -64,7 +71,10 @@ Actively planned improvements that extend the current workflow without replacing
 
 **Out of scope for Phase 1:**
 
-* Tier 2 / teacher-introduced character persistence
+* Story-specific character overrides (Phase 2 in decision record)
+* Story-introduced / teacher-created character persistence (Phase 3 in decision record)
+* Series-scoped character profiles
+* Tier 2 recurring character persistence beyond official roster
 * Per-teacher character sets or multiple series
 * In-app image generation or reference-image upload
 * Changes to required story inputs or page count

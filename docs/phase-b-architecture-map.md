@@ -514,3 +514,42 @@ No unresolved spec conflicts.
 | Story pages | 12 |
 | Illustration prompts | 12 (one per page) |
 | Vocabulary items | Variable (aligned to vocabulary focus) |
+
+---
+
+# 11. Post-V1 Approved Future: Editable Characters Phase 1
+
+**Status:** Approved for future implementation — **not yet built**. Sections 1–10 above describe the frozen V1 architecture and remain unchanged until Phase 1 ships.
+
+**Direction:** [docs/character-editing-decision-record.md](character-editing-decision-record.md)
+
+## Future table: `character_profiles`
+
+| Purpose | Notes |
+|---------|--------|
+| Store editable **global default** profiles | Official characters only: Nina, Nino, Mom, Dad, Grandpa, Ms. Lee |
+| Seed from Character Bible | Factory defaults from [character-bible.md](before-coding/character-bible.md) |
+| Reset-to-default | Restore one character, all characters, or full factory set from bible |
+
+Suggested columns (implementation detail — not finalized): character id/key, appearance text, personality text, updated_at. Exact schema to be defined at implementation time.
+
+## Future generation flow change
+
+1. Load `character_profiles` before story generation (alongside Series Memory and teacher inputs)
+2. Use saved profiles for official character descriptors when present
+3. Fall back to Character Bible / code defaults when no saved row exists
+4. Illustration prompt generation uses the same profile source for official characters on each page
+5. Locked illustration continuity suffix unchanged
+
+## Future UI (minimal)
+
+* **Edit Characters** button — single entry point on authenticated teacher surfaces (exact placement TBD; no new route required unless explicitly approved later)
+* **Edit Characters** modal — edit appearance and personality; save and reset actions
+
+## Explicitly not in Phase 1
+
+* Series-scoped profiles
+* Story-level character overrides stored on stories
+* Teacher-created / story-introduced character persistence
+* Character presets, multiple series, in-app image generation
+* Additional routes beyond existing four unless separately approved

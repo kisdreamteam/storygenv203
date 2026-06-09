@@ -194,6 +194,24 @@ Tier 3 (story-specific):
 
 * Teacher-introduced or one-story characters — generated when needed; not persisted as profiles
 
+## Post-V1 Character Editing (Approved Future Phase 1)
+
+The V1 character rules above remain the **historical baseline**. Post-V1 may allow editable **global default profiles** for official characters only, per [docs/character-editing-decision-record.md](../character-editing-decision-record.md).
+
+**Approved future behavior (Phase 1 — not yet implemented):**
+
+* Official characters still **start from** [character-bible.md](character-bible.md) factory defaults
+* Teachers may edit global default **appearance** and **personality** descriptions for Nina, Nino, Mom, Dad, Grandpa, Ms. Lee
+* Saved profiles override hardcoded defaults during **future** story generation and illustration prompts
+* **Reset-to-default** must exist (one character, all characters, restore factory defaults from Character Bible)
+* Global profile edits affect **future generations only** — they do not automatically rewrite old saved stories
+
+**Deferred (not Phase 1):**
+
+* Series-scoped character profiles
+* Story-specific character overrides (hidden story-only adjustments)
+* Teacher-created / story-introduced character persistence in the database
+
 Series Memory updates when:
 
 * Generate completes successfully (story auto-saved)
@@ -341,6 +359,14 @@ Lower authority may extend.
 Lower authority may NOT contradict.
 
 **Locked V1 decisions:** When general language in `docs/before-coding/product-spec.md` conflicts with a locked V1 decision in this document, the locked V1 decision wins and `docs/before-coding/product-spec.md` should be updated to match.
+
+**Supporting post-V1 documents:**
+
+* [docs/product-roadmap.md](../product-roadmap.md) — strategic future direction
+* [docs/roadmap-todo.md](../roadmap-todo.md) — tactical roadmap queue
+* [docs/project-changelog.md](../project-changelog.md) — meaningful project history
+
+These documents do not override `product-spec.md`, `source-of-truth.md`, `v1-scope.md`, `drift-log.md`, `character-bible.md`, or `illustration-guide.md`.
 
 ---
 

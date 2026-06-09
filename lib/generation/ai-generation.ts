@@ -1,3 +1,4 @@
+import type { CharacterProfileMap } from "@/lib/character-profiles";
 import { buildSystemPrompt, buildUserPrompt } from "./prompts";
 import type { MockGenerationResult, SeriesMemorySummary, StoryInputs } from "./types";
 import { validateGenerationOutput } from "./validate-output";
@@ -29,7 +30,8 @@ function parseJsonContent(content: string): unknown {
 
 export async function tryAiGeneration(
   inputs: StoryInputs,
-  memory: SeriesMemorySummary
+  memory: SeriesMemorySummary,
+  profiles: CharacterProfileMap
 ): Promise<AiGenerationResult> {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) {
@@ -52,7 +54,7 @@ export async function tryAiGeneration(
         temperature: 0.7,
         response_format: { type: "json_object" },
         messages: [
-          { role: "system", content: buildSystemPrompt() },
+          { role: "system", content: buildSystemPrompt(profiles) },
           { role: "user", content: buildUserPrompt(inputs, memory) },
         ],
       }),

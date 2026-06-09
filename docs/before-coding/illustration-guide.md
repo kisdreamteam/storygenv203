@@ -257,7 +257,26 @@ If added later, update this guide, [character-bible.md](character-bible.md), and
 
 ---
 
-# 14. Final Rule
+# 14. Post-V1 Character Profiles In Prompts (Phase 1 Approved)
+
+**Status:** Approved for future implementation — not yet built. V1 rules above remain in force.
+
+**Current (V1):** Illustration prompts use locked Character Bible descriptors and the continuity suffix defined in section 3.
+
+**After Editable Characters Phase 1 (when implemented):**
+
+* Prompts should use **saved character profiles** when available
+* If no saved profile exists for an official character, use Character Bible factory defaults
+* The locked illustration continuity **style suffix** (section 3) remains unchanged
+
+**Deferred:**
+
+* Story-specific visual overrides in prompts (Phase 2)
+* Persisted descriptors for teacher-introduced characters (Phase 3)
+
+---
+
+# 15. Final Rule
 
 When uncertain about a visual decision:
 

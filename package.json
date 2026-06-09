@@ -11,7 +11,8 @@
     "verify:workflow": "node scripts/verify-workflow.mjs",
     "setup:teacher": "node scripts/setup-teacher.mjs",
     "setup:complete": "node scripts/complete-setup.mjs",
-    "verify:debug": "node scripts/verify-debug.mjs"
+    "verify:debug": "node scripts/verify-debug.mjs",
+    "verify:character-profiles": "npx tsx scripts/verify-character-profiles.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",

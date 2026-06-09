@@ -424,7 +424,30 @@ If added later, update this bible, [illustration-guide.md](illustration-guide.md
 
 ---
 
-# 16. Final Rule
+# 16. Post-V1 Editable Profiles (Phase 1 Approved)
+
+**Status:** Approved for future implementation — not yet built. V1 rules in sections 1 and 15 remain in force until implementation ships.
+
+This document remains the **factory default** source for official character appearance and personality.
+
+**Post-V1 Phase 1 (when implemented):**
+
+* Editable global profiles may override factory defaults stored in code or database
+* **Reset-to-default** restores profiles from this Character Bible (sections 3 and 14)
+* Official characters in Phase 1: Nina, Nino, Mom, Dad, Grandpa, Ms. Lee only
+* Global edits affect future generations only — existing saved stories are not automatically rewritten
+
+**Still deferred:**
+
+* New story-introduced / teacher-created characters as persisted profiles (Phase 3)
+* Story-specific visual overrides (Phase 2)
+* Series-scoped profiles
+
+See [docs/character-editing-decision-record.md](../character-editing-decision-record.md) for full phased direction.
+
+---
+
+# 17. Final Rule
 
 When uncertain about a character decision:
 
