@@ -159,6 +159,13 @@ Continuity should not block generation.
 
 V1 locks official Nina & Nino character appearances in [character-bible.md](character-bible.md).
 
+Purpose:
+
+* Keep core characters visually identical across stories
+* Improve illustration prompt consistency
+* Preserve the original Nina & Nino appearance used in earlier stories
+* Support future character customization without implementing it in V1
+
 Rules:
 
 * Official locked characters: Nina, Nino, Mom, Dad, Grandpa, Ms. Lee

@@ -315,7 +315,7 @@ What changed:
 * Official V1 illustration continuity suffix: 16:9 landscape, zoomed-out view, full-body characters, reserved space for educational text overlays, no text/bubbles/labels/watermarks, consistent character appearance
 * Future character editing UI explicitly deferred (Edit Characters button, character modal, profile persistence)
 
-Why change is needed: Production-quality character continuity across stories and illustration prompts; preserves original Nina & Nino appearance; supports future customization without implementing it now.
+Why change is needed: Production-quality character continuity across stories and illustration prompts; keeps core characters visually identical; improves prompt consistency; preserves original Nina & Nino appearance from earlier stories; supports future customization without implementing it now.
 
 Documents affected: character-bible.md, illustration-guide.md, source-of-truth.md, drift-log.md
 

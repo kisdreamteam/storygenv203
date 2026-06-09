@@ -16,13 +16,20 @@ Authority: Below [v1-scope.md](v1-scope.md), above [illustration-guide.md](illus
 
 V1 uses **locked character definitions** for official series characters.
 
+Continuity goals:
+
+* Keep core characters visually identical across stories
+* Improve illustration prompt consistency
+* Preserve the original Nina & Nino appearance used in earlier stories
+* Support future character customization without implementing it in V1
+
 Rules:
 
 * Teachers **cannot** edit character profiles in V1
 * Official character appearances are fixed in this document and injected at generation time
 * Illustration prompts must use the locked visual descriptors for every official character on the page
 * Unknown characters introduced by teachers (friends, classmates, visitors, etc.) may appear in stories when the plot requires them, but are **not** persisted as character profiles in V1
-* Future versions may allow teachers to edit and save character profiles — explicitly out of V1 scope (see section 14)
+* Future versions may allow teachers to edit and save character profiles — explicitly out of V1 scope (see section 15)
 
 When uncertain:
 

@@ -1,7 +1,10 @@
 import { buildIllustrationPrompt } from "./character-continuity";
 
 export {
+  appendGlobalIllustrationSuffix,
   buildIllustrationPrompt,
+  getCharacterContinuityText,
+  GLOBAL_ILLUSTRATION_SUFFIX,
   moodForPageNumber,
   sceneFromPageText,
 } from "./character-continuity";
