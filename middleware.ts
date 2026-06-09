@@ -9,22 +9,22 @@ function hasSupabaseAuthCookie(request: NextRequest): boolean {
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  const isLoginPage = pathname === "/login";
+  const isPublicPath = pathname === "/";
   const isApiRoute = pathname.startsWith("/api/");
   const hasSession = hasSupabaseAuthCookie(request);
 
-  if (!hasSession && !isLoginPage) {
+  if (!hasSession && !isPublicPath) {
     if (isApiRoute) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = "/";
     return NextResponse.redirect(url);
   }
 
-  if (hasSession && isLoginPage) {
+  if (hasSession && pathname === "/") {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = "/stories";
     return NextResponse.redirect(url);
   }
 

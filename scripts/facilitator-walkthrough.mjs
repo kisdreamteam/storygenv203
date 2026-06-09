@@ -31,12 +31,12 @@ async function main() {
 
   try {
     // 1 Login
-    await page.goto(`${BASE_URL}/login`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
     await page.fill("#email", EMAIL);
     await page.fill("#password", PASSWORD);
     await page.click('button[type="submit"]');
-    await page.waitForURL(`${BASE_URL}/`, { timeout: 15000 });
-    const onHome = page.url() === `${BASE_URL}/` || page.url() === `${BASE_URL}`;
+    await page.waitForURL(`${BASE_URL}/stories`, { timeout: 15000 });
+    const onHome = page.url() === `${BASE_URL}/stories`;
     step(1, "Login with provisioned teacher account", onHome, page.url());
 
     // 2 Generate
@@ -58,8 +58,8 @@ async function main() {
 
     // 3 Save
     await page.click('button:has-text("Save story")');
-    await page.waitForURL(`${BASE_URL}/`, { timeout: 15000 });
-    const onHomeAfterSave = /\/$/.test(page.url()) || page.url() === BASE_URL;
+    await page.waitForURL(`${BASE_URL}/stories`, { timeout: 15000 });
+    const onHomeAfterSave = page.url() === `${BASE_URL}/stories`;
     const storyOnHome = await page.locator(`a[href="${new URL(story1Url).pathname}"]`).count();
     step(3, "Save story", onHomeAfterSave && storyOnHome > 0, story1Title?.trim() ?? "");
 
@@ -134,21 +134,21 @@ async function main() {
 
     // 7 Save again
     await page.click('button:has-text("Save story")');
-    await page.waitForURL(`${BASE_URL}/`, { timeout: 15000 });
+    await page.waitForURL(`${BASE_URL}/stories`, { timeout: 15000 });
     const storyBackOnHome = await page.locator(`a[href="${new URL(story1Url).pathname}"]`).count();
     step(7, "Save again", storyBackOnHome > 0, "story visible on home after re-save");
 
     // 8 Logout
     await page.click('button:has-text("Sign out")');
-    await page.waitForURL(`${BASE_URL}/login`, { timeout: 15000 });
-    step(8, "Logout", page.url().includes("/login"), page.url());
+    await page.waitForURL(`${BASE_URL}/`, { timeout: 15000 });
+    step(8, "Logout", page.url() === `${BASE_URL}/` || page.url() === BASE_URL, page.url());
 
     // 9 Login again
     await page.fill("#email", EMAIL);
     await page.fill("#password", PASSWORD);
     await page.click('button[type="submit"]');
-    await page.waitForURL(`${BASE_URL}/`, { timeout: 15000 });
-    step(9, "Login again", true, page.url());
+    await page.waitForURL(`${BASE_URL}/stories`, { timeout: 15000 });
+    step(9, "Login again", page.url() === `${BASE_URL}/stories`, page.url());
 
     // 10 Story still exists
     const storyStillThere = await page.locator(`a[href="${new URL(story1Url).pathname}"]`).count();

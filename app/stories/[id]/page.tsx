@@ -20,7 +20,7 @@ function NotFoundState() {
         This story does not exist or you do not have access to it.
       </p>
       <Link
-        href="/"
+        href="/stories"
         className="mt-6 inline-block text-sm text-gray-600 hover:text-gray-900"
       >
         ← Back to home
@@ -85,7 +85,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
       <StoryEditorShell>
         <header className="mb-10 flex items-start justify-between gap-2">
           <div>
-            <Link href="/" className="text-sm text-gray-600 hover:text-gray-900">
+            <Link href="/stories" className="text-sm text-gray-600 hover:text-gray-900">
               ← Back to home
             </Link>
             <h1 className="mt-4 text-2xl font-semibold">{story.title}</h1>

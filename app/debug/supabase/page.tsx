@@ -46,7 +46,7 @@ export default async function SupabaseDebugPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-xl p-8">
-      <Link href="/" className="text-sm text-gray-600 hover:text-gray-900">
+      <Link href="/stories" className="text-sm text-gray-600 hover:text-gray-900">
         ← Back to home
       </Link>
       <h1 className="mt-4 text-2xl font-semibold">Supabase connection debug</h1>

@@ -47,7 +47,7 @@ export function SaveButton({ storyId }: SaveButtonProps) {
       logStorySaveCompleted(storyId);
       clearDirty();
 
-      router.push("/");
+      router.push("/stories");
       router.refresh();
     } catch {
       setError("Failed to save story.");

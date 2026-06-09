@@ -118,7 +118,7 @@ export function StoryInputForm() {
         >
           {loading ? "Generating…" : "Generate"}
         </button>
-        <Link href="/" className="text-sm text-gray-600 hover:text-gray-900">
+        <Link href="/stories" className="text-sm text-gray-600 hover:text-gray-900">
           Back to stories
         </Link>
       </div>

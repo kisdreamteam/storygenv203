@@ -84,12 +84,13 @@ Do **not** commit real teacher credentials to the repo.
 
 ### Browser checks
 
-- [ ] Visit `/` unauthenticated → redirects to `/login`
-- [ ] `/login` loads; invalid credentials show error message
-- [ ] Valid credentials → redirect to `/` (home)
-- [ ] Visit `/login` while signed in → redirect to `/`
-- [ ] **Sign out** on home or story page → returns to `/login`
-- [ ] After sign out, visit `/` → redirects to `/login`
+- [ ] Visit `/` unauthenticated → landing page with sign-in form
+- [ ] Invalid credentials on `/` show error message
+- [ ] Valid credentials → redirect to `/stories` (home)
+- [ ] Visit `/` while signed in → redirect to `/stories`
+- [ ] Visit `/stories` unauthenticated → redirect to `/`
+- [ ] **Sign out** on stories or story page → returns to `/` (landing)
+- [ ] After sign out, visit `/stories` → redirects to `/`
 
 ### API checks (unauthenticated)
 
@@ -169,7 +170,7 @@ Verified by migration policies in `supabase/migrations/001_initial.sql` and auto
 - [ ] Open draft story → refresh → same story and pages load
 - [ ] Close browser tab → reopen app URL → session persists (Supabase auth cookie)
 - [ ] After browser close, saved stories still on home (Supabase persistence)
-- [ ] Sign out → close tab → reopen → `/login` (no session)
+- [ ] Sign out → close tab → reopen → `/` landing (no session)
 
 **Note:** Middleware checks for auth cookie presence (`sb-*-auth-token`). Invalid/expired cookies may require re-login — acceptable for V1.
 
@@ -216,7 +217,7 @@ Run on local dev against configured Supabase project.
 | `npm run verify:workflow` | **Pass** — auth, CRUD, edit, save, memory merge |
 | `npm run verify:debug` | **Pass** — session + DB read OK |
 | `npm run build` | **Pass** |
-| Unauth middleware (GET `/` → `/login`, APIs → 401) | **Pass** |
+| Unauth middleware (GET `/stories` → `/`, APIs → 401) | **Pass** |
 | RLS cross-user isolation (read/update/delete) | **Pass** (verified via post-operation reads) |
 | Auth sign-out clears DB access | **Pass** |
 | UI generate produces 12-page stories | **Pass** (confirmed in DB: `kindness`, `friendship` stories) |

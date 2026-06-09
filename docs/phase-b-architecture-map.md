@@ -96,20 +96,21 @@ Keep routes minimal. Only what V1 requires.
 
 | Route | Purpose |
 |-------|---------|
-| `/login` | Supabase Auth sign-in for teachers |
-| `/` | Story list (teacher's own saved stories) + "New Story" action |
+| `/` | Public landing page; existing `LoginForm` entry (invite-only sign-in) |
+| `/stories` | Authenticated story list (teacher's own saved stories) + "New Story" action |
 | `/stories/new` | Input form (4 required + optional fields) + Generate |
 | `/stories/[id]` | Story viewer/editor: 12 pages, illustration prompts with copy button, vocabulary, Edit Story Setup, Regenerate, Save story (edits only) |
 
 **Auth behavior:**
 
-* Unauthenticated users redirect to `/login`
+* Unauthenticated users redirect to `/`
+* Authenticated users visiting `/` redirect to `/stories`
 * Auth onboarding: invite-only — admin provisions teacher accounts; public sign-up disabled in Supabase
 * No routes for settings, export, student mode, image preview, or marketplace features
 
 **Story list behavior (locked):**
 
-* `/` lists teacher's own `saved` stories only (`status = saved` and `is_archived = false`)
+* `/stories` lists teacher's own `saved` stories only (`status = saved` and `is_archived = false`)
 * `draft` status is not used after successful generate (schema may retain the value; generate/regenerate write `saved`)
 * After generate, teacher is redirected to `/stories/[id]`; story is auto-saved and appears on home immediately
 * Teachers can archive a saved story from the home list (X on story card); sets `is_archived = true`; story hidden from home; Series Memory does not update on archive
@@ -391,9 +392,9 @@ Simple, framework-agnostic folder structure. No unnecessary architecture.
 
 ```
 app/                          # or pages/ — route files
-  login/
-  page.tsx                    # story list (home)
+  page.tsx                    # public landing + sign-in
   stories/
+    page.tsx                  # story list (authenticated home)
     new/page.tsx              # create + generate
     [id]/page.tsx             # view / edit / save / regenerate
 

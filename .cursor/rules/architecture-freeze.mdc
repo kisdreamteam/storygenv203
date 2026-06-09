@@ -11,8 +11,8 @@ alwaysApply: true
 
 | Area | Frozen value |
 |------|--------------|
-| Routes | `/login`, `/`, `/stories/new`, `/stories/[id]` only |
-| Auth | Supabase Auth; teachers only; redirect unauthenticated to `/login` |
+| Routes | `/`, `/stories`, `/stories/new`, `/stories/[id]` only |
+| Auth | Supabase Auth; teachers only; `/` public landing; unauthenticated redirect to `/`; authenticated home at `/stories` |
 | Persistence | Supabase; not localStorage as primary |
 | Tables | `stories`, `story_pages`, `story_vocabulary`, `series_memory` (5 tables total) |
 | Series Memory | Global shared singleton; updates on **save only** — not draft, not failed generation |

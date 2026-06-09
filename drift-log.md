@@ -325,6 +325,29 @@ Status: Accepted
 
 ---
 
+Date: 2026-06-08
+
+Domain: Routing / Auth
+
+Problem: No landing page; story list occupied `/`; logged-in teachers had no dedicated stories home URL.
+
+What changed:
+
+* `/` = public landing page with existing teacher sign-in (invite-only; no new sign-up UI)
+* `/stories` = authenticated story list (default home after login)
+* `/login` removed; unauthenticated users redirect to `/`
+* Post-login and post-save redirects target `/stories`
+
+Why change is needed: Improves teacher speed — logged-in teachers land directly on story management; aligns with V1 workflow (open app → create/reopen stories quickly).
+
+Documents affected: drift-log.md, docs/phase-b-architecture-map.md, .cursor/rules/architecture-freeze.mdc, docs/workflow-validation-checklist.md
+
+Decision: Landing-at-root + `/stories` as authenticated home accepted for V1.
+
+Status: Accepted
+
+---
+
 # 9. Current Open Decisions
 
 Use this section for unresolved items.
