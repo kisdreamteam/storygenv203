@@ -1,4 +1,4 @@
-/** Single source of truth for V1 illustration character continuity (character-bible.md + illustration-guide.md). */
+/** Single source of truth for V1 illustration character continuity (docs/before-coding/character-bible.md + docs/before-coding/illustration-guide.md). */
 
 export type OfficialCharacterId =
   | "nina"
@@ -101,7 +101,7 @@ DO NOT:
 - change shoes`,
 };
 
-/** Compact quick-reference descriptors from character-bible.md §14. */
+/** Compact quick-reference descriptors from docs/before-coding/character-bible.md §14. */
 export const NINA_DESCRIPTOR = CHARACTER_CONTINUITY.nina;
 export const NINO_DESCRIPTOR = CHARACTER_CONTINUITY.nino;
 export const MOM_DESCRIPTOR = CHARACTER_CONTINUITY.mom;

@@ -8,9 +8,9 @@ alwaysApply: true
 ## MUST
 
 - Update documentation **before** changing scope, workflow, inputs, outputs, success metrics, or Series Memory behavior.
-- Log unresolved decisions in `drift-log.md` using its entry template.
+- Log unresolved decisions in `docs/before-coding/drift-log.md` using its entry template.
 - Document proposed changes (what, why, documents affected) before implementing them.
-- Keep `drift-log.md` current when validation reveals a needed spec change.
+- Keep `docs/before-coding/drift-log.md` current when validation reveals a needed spec change.
 
 ## MUST NOT
 

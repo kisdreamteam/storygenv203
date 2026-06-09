@@ -10,12 +10,12 @@ Validation only. No production code. No app implementation.
 
 **Documents reviewed:**
 
-1. [product-spec.md](../product-spec.md)
-2. [source-of-truth.md](../source-of-truth.md)
-3. [v1-scope.md](../v1-scope.md)
-4. [character-bible.md](../character-bible.md)
-5. [illustration-guide.md](../illustration-guide.md)
-6. [drift-log.md](../drift-log.md)
+1. [product-spec.md](before-coding/product-spec.md)
+2. [source-of-truth.md](before-coding/source-of-truth.md)
+3. [v1-scope.md](before-coding/v1-scope.md)
+4. [character-bible.md](before-coding/character-bible.md)
+5. [illustration-guide.md](before-coding/illustration-guide.md)
+6. [drift-log.md](before-coding/drift-log.md)
 7. [docs/phase-b-architecture-map.md](phase-b-architecture-map.md)
 8. [.cursor/rules/project-authority.mdc](../.cursor/rules/project-authority.mdc)
 9. [.cursor/rules/anti-overengineering.mdc](../.cursor/rules/anti-overengineering.mdc)
@@ -63,8 +63,8 @@ flowchart TD
 
 | Step | Expected behavior | Required data | Possible failure | Docs clear? |
 |------|-------------------|---------------|------------------|-------------|
-| 1. Teacher visits private hosted URL | App loads; unauthenticated user redirected to `/login` | Hosted deployment URL | App unreachable; SSL/hosting misconfiguration | **Yes** |
-| 2. Teacher signs in | Supabase Auth session created; redirect to `/` | Email + password (teacher account) | Invalid credentials; auth service down | **Mostly** — auth method clear; invite vs open sign-up undecided |
+| 1. Teacher visits private hosted URL | App loads at `/` with public landing and invite-only sign-in | Hosted deployment URL | App unreachable; SSL/hosting misconfiguration | **Yes** |
+| 2. Teacher signs in | Supabase Auth session created; redirect to `/stories` | Email + password (teacher account) | Invalid credentials; auth service down | **Mostly** — auth method clear; invite vs open sign-up undecided |
 | 3. Teacher sees story list | List shows teacher's own **saved** stories + "New Story" action | `stories` where `created_by` = user and `status` = `saved` | Empty list (acceptable for new user); query failure | **Mostly** — draft visibility in list not explicitly stated |
 | 4. Teacher clicks New Story | Navigate to `/stories/new`; empty input form shown | None | Route error | **Yes** |
 | 5. Teacher enters required inputs | Form accepts Theme, Learning Goal, Vocabulary Focus, Main Events; validation blocks Generate if missing | 4 required text fields | Client validation failure messaging | **Yes** |
@@ -77,7 +77,7 @@ flowchart TD
 | 12. Teacher regenerates from edited inputs if needed | Regenerate re-runs pipeline with current inputs; replaces all pages, prompts, vocabulary; memory unchanged | Current inputs + memory; story remains `draft` | Regeneration failure; teacher loses unsaved page edits if not persisted before regen | **Yes** |
 | 13. Teacher saves story | `status` → `saved`; `saved_at` set; pages and vocabulary persisted | Full story record | Save transaction failure | **Yes** |
 | 14. Saved story updates Series Memory | Server-side merge into global `series_memory.summary`; not client-triggered | Saved story content + summary extraction | Memory merge failure; partial update | **Yes** |
-| 15. Teacher returns to story list | Navigate to `/`; saved story appears in list | `stories` with `status` = `saved` | List not refreshed | **Yes** |
+| 15. Teacher returns to story list | Navigate to `/stories`; saved story appears in list | `stories` with `status` = `saved` | List not refreshed | **Yes** |
 | 16. Teacher reopens saved story | Click story card → `/stories/[id]`; exact saved content displayed | `stories`, `story_pages`, `story_vocabulary` | Story not found; permission error | **Yes** |
 | 17. Teacher creates a second story | Repeat create flow; memory now includes first story summary | Updated `series_memory.summary` | Same as step 8–9 failures | **Yes** |
 | 18. System uses Series Memory for continuity | Second generation references compressed history; avoids exact repetition; teacher inputs still override | `recent_stories`, `vocabulary_history`, `themes_covered` in memory | Weak continuity (quality issue, not workflow failure) | **Yes** |
@@ -121,8 +121,8 @@ Test: *Does this help validate the core teacher workflow?*
 | Edit + regenerate | **Keep** | Locked V1 edit scope; required for workflow validation |
 | Illustration prompts (no images) | **Keep** | Core V1 output; simpler than in-app image generation |
 | Vocabulary support / flashcards | **Keep** | Core V1 output; required for usable story definition |
-| Story list on `/` | **Keep** | Required for reopen saved stories |
-| 4 routes (`/login`, `/`, `/stories/new`, `/stories/[id]`) | **Keep** | Minimal set per architecture freeze; maps 1:1 to workflow |
+| Story list on `/stories` | **Keep** | Required for reopen saved stories |
+| 4 routes (`/`, `/stories`, `/stories/new`, `/stories/[id]`) | **Keep** | Minimal set per architecture freeze; maps 1:1 to workflow |
 | 5 Supabase tables | **Keep** | No over-engineering; no 6th table needed |
 | JSONB Series Memory summary | **Keep** | Simpler than normalized memory tables for V1 |
 | Cursor rules (6 files) | **Keep** | Lightweight guardrails; no runtime cost; prevent drift during build |

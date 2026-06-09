@@ -267,7 +267,7 @@ What changed:
 
 Why change is needed: Reduces home-list clutter without expanding scope to trash/restore flows; supports teacher pilot validation.
 
-Documents affected: drift-log.md, v1-scope.md, docs/phase-b-architecture-map.md, docs/teacher-pilot-test-plan.md
+Documents affected: drift-log.md, v1-scope.md, docs/phase-b-architecture-map.md, docs/archive/teacher-pilot-test-plan.md
 
 Decision: Soft delete via `is_archived` accepted for V1.
 
@@ -292,7 +292,7 @@ What changed:
 
 Why change is needed: Simplifies first-generation workflow; aligns Series Memory with successful generation; keeps Save for meaningful teacher edits.
 
-Documents affected: product-spec.md, source-of-truth.md, v1-scope.md, drift-log.md, docs/phase-b-architecture-map.md, docs/teacher-pilot-test-plan.md
+Documents affected: product-spec.md, source-of-truth.md, v1-scope.md, drift-log.md, docs/phase-b-architecture-map.md, docs/archive/teacher-pilot-test-plan.md
 
 Decision: Save workflow simplification accepted for V1.
 
@@ -340,7 +340,7 @@ What changed:
 
 Why change is needed: Improves teacher speed — logged-in teachers land directly on story management; aligns with V1 workflow (open app → create/reopen stories quickly).
 
-Documents affected: drift-log.md, docs/phase-b-architecture-map.md, .cursor/rules/architecture-freeze.mdc, docs/workflow-validation-checklist.md
+Documents affected: drift-log.md, docs/phase-b-architecture-map.md, .cursor/rules/architecture-freeze.mdc, docs/archive/workflow-validation-checklist.md
 
 Decision: Landing-at-root + `/stories` as authenticated home accepted for V1.
 

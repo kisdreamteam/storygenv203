@@ -305,3 +305,31 @@ If YES:
 If NO:
 
 > Do not build yet
+
+---
+
+# 11. Post-V1 Evolution
+
+The original V1 definition phase is complete. The project is entering a **controlled evolution** phase.
+
+This section does **not** change what V1 was. Sections 1–10 above remain the **historical baseline** for what V1 included, excluded, and validated.
+
+**How future work is managed:**
+
+* Future improvements are tracked in [docs/product-roadmap.md](../product-roadmap.md)
+* New features listed in the roadmap do **not** automatically become committed work
+* **Bucket 1** items (Core Product Evolution) may be implemented incrementally after documentation and drift-log updates
+* **Bucket 2** items (Experiments) require validation before promotion to Bucket 1
+* **Bucket 3** items (Future Possibilities) remain parked until justified and reclassified
+
+**Rules that still apply:**
+
+* V1 locked decisions in [source-of-truth.md](source-of-truth.md) remain in force until explicitly revised
+* Implementation must not silently expand scope — document first, then build
+* The core teacher workflow (create → generate → optional edit → save/reopen) remains the center of gravity
+
+When evaluating any post-V1 item, ask:
+
+> Does this improve the existing workflow without turning StoryGen into a different product?
+
+If unclear, keep it in Bucket 2 or Bucket 3 until validated.

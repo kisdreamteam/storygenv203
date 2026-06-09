@@ -4,7 +4,7 @@ Version: 1.0
 
 Purpose: Guide a small trusted teacher pilot for StoryGen V2 workflow validation. Documentation only — no product changes from this file.
 
-Authority: [product-spec.md](../product-spec.md), [source-of-truth.md](../source-of-truth.md), [v1-scope.md](../v1-scope.md)
+Authority: [product-spec.md](../before-coding/product-spec.md), [source-of-truth.md](../before-coding/source-of-truth.md), [v1-scope.md](../before-coding/v1-scope.md)
 
 ---
 
@@ -114,7 +114,7 @@ After the pilot:
 
 1. **Do not** implement new features from feedback immediately.
 2. **Log** all feedback first (spreadsheet, notes, or future drift-log entry).
-3. **Compare** every request against [source-of-truth.md](../source-of-truth.md) and [v1-scope.md](../v1-scope.md).
+3. **Compare** every request against [source-of-truth.md](../before-coding/source-of-truth.md) and [v1-scope.md](../before-coding/v1-scope.md).
 4. **Only implement** changes that improve faster story creation. Use the test: *Does this help teachers create stories faster?*
 
 **Deferred by design (not pilot blockers)**
@@ -141,12 +141,12 @@ After the pilot:
 
 | Item | Detail |
 |------|--------|
-| Login | `/login` — facilitator provides invited email/password (do not share in this repo) |
-| Home | `/` — saved stories only |
+| Sign in | `/` — facilitator provides invited email/password (do not share in this repo) |
+| Home | `/stories` — saved stories only |
 | New story | `/stories/new` — four required fields |
 | Story viewer | `/stories/[id]` — edit pages, Edit Story Setup, Regenerate, Save story (edits only) |
-| Characters | Nina & Nino series ([character-bible.md](../character-bible.md)) |
-| Illustrations | Prompts only ([illustration-guide.md](../illustration-guide.md)) |
+| Characters | Nina & Nino series ([character-bible.md](../before-coding/character-bible.md)) |
+| Illustrations | Prompts only ([illustration-guide.md](../before-coding/illustration-guide.md)) |
 | Pilot success | Full scenario completed without facilitator rescue |
 
 ---

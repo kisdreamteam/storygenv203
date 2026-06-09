@@ -8,18 +8,18 @@ First implementation guide for a mock-first build. Planning only — no applicat
 
 **Prerequisites:**
 
-* [docs/phase-b-architecture-map.md](phase-b-architecture-map.md)
-* [docs/phase-c-validation-before-coding.md](phase-c-validation-before-coding.md)
+* [docs/phase-b-architecture-map.md](../phase-b-architecture-map.md)
+* [docs/phase-c-validation-before-coding.md](../phase-c-validation-before-coding.md)
 
 **Authority (highest first):**
 
-1. [product-spec.md](../product-spec.md)
-2. [source-of-truth.md](../source-of-truth.md)
-3. [v1-scope.md](../v1-scope.md)
-4. [character-bible.md](../character-bible.md)
-5. [illustration-guide.md](../illustration-guide.md)
-6. [drift-log.md](../drift-log.md)
-7. [.cursor/rules/](../.cursor/rules/)
+1. [product-spec.md](../before-coding/product-spec.md)
+2. [source-of-truth.md](../before-coding/source-of-truth.md)
+3. [v1-scope.md](../before-coding/v1-scope.md)
+4. [character-bible.md](../before-coding/character-bible.md)
+5. [illustration-guide.md](../before-coding/illustration-guide.md)
+6. [drift-log.md](../before-coding/drift-log.md)
+7. [.cursor/rules/](../../.cursor/rules/)
 
 **Stack:** Next.js 14+ App Router + TypeScript + Tailwind CSS + Supabase JS client
 
@@ -246,7 +246,7 @@ Run SQL in Supabase SQL Editor or via Supabase CLI (`supabase db push`).
 
 # 5. Routes to Build
 
-Frozen per [architecture-freeze.mdc](../.cursor/rules/architecture-freeze.mdc). No extra routes.
+Frozen per [architecture-freeze.mdc](../../.cursor/rules/architecture-freeze.mdc). No extra routes.
 
 ## 5.1 Page routes
 
@@ -391,10 +391,10 @@ export interface MockGenerationResult {
 |------|--------|
 | Page count | Always exactly 12 |
 | Words per page | ~30–40 words of simple ages 4–6 text |
-| Characters | Nina (6) and Nino (4) appear; reference [character-bible.md](../character-bible.md) |
+| Characters | Nina (6) and Nino (4) appear; reference [character-bible.md](../before-coding/character-bible.md) |
 | Page text | Reference `theme`, `learning_goal`, `main_events`; use `setting` if provided else default from bible |
 | Continuity callback | If `memory.summary.recent_stories.length > 0`, page 1 opens with "Nina and Nino remember..." + prior theme |
-| Illustration prompts | Scene from page text + bible descriptors + style suffix from [illustration-guide.md](../illustration-guide.md) |
+| Illustration prompts | Scene from page text + bible descriptors + style suffix from [illustration-guide.md](../before-coding/illustration-guide.md) |
 | Vocabulary count | 5–7 items; parse comma-separated words from `vocabulary_focus` or use 5 placeholders |
 | Title | `theme` truncated to 60 characters |
 
@@ -519,7 +519,7 @@ Copy-paste this into Cursor to start implementation.
 Implement Phase D steps D1 and D2 only for StoryGen V2.
 
 Read first:
-- docs/phase-d-mock-first-coding-plan.md
+- docs/archive/phase-d-mock-first-coding-plan.md
 - docs/phase-b-architecture-map.md
 - .cursor/rules/
 
@@ -527,7 +527,7 @@ Tasks:
 1. Scaffold Next.js 14 App Router + TypeScript + Tailwind in this repo.
 2. Add @supabase/supabase-js and @supabase/ssr.
 3. Create lib/supabase/client.ts and lib/supabase/server.ts.
-4. Create supabase/migrations/001_initial.sql exactly as specified in phase-d-mock-first-coding-plan.md Section 4.
+4. Create supabase/migrations/001_initial.sql exactly as specified in docs/archive/phase-d-mock-first-coding-plan.md Section 4.
 5. Add .env.local.example with required env vars (no real keys).
 6. Create placeholder app/layout.tsx and app/page.tsx (minimal).
 
@@ -548,7 +548,7 @@ Add:
 - Redirect authenticated users away from /login to /
 
 Use Supabase Auth email + password. Invite-only — no sign-up UI.
-Follow docs/phase-d-mock-first-coding-plan.md.
+Follow docs/archive/phase-d-mock-first-coding-plan.md.
 ```
 
 ## Prompt D4–D5: List + Create Form

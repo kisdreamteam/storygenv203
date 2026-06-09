@@ -4,7 +4,7 @@ Version: 1.0
 
 Purpose: Verify the complete V1 teacher workflow end-to-end **before** pilot sessions. Documentation only — not a spec change, not product analytics.
 
-Authority: [product-spec.md](../product-spec.md), [source-of-truth.md](../source-of-truth.md), [v1-scope.md](../v1-scope.md), [docs/phase-b-architecture-map.md](phase-b-architecture-map.md)
+Authority: [product-spec.md](../before-coding/product-spec.md), [source-of-truth.md](../before-coding/source-of-truth.md), [v1-scope.md](../before-coding/v1-scope.md), [docs/phase-b-architecture-map.md](../phase-b-architecture-map.md)
 
 Related:
 
@@ -34,7 +34,7 @@ Validate these seven areas. **Do not add features or change architecture during 
 
 Before running checks:
 
-- [ ] `.env.local` configured (see [.env.local.example](../.env.local.example))
+- [ ] `.env.local` configured (see [.env.local.example](../../.env.local.example))
 - [ ] Supabase migration applied (`supabase/migrations/001_initial.sql`, `002_stories_delete_policy.sql`)
 - [ ] Teacher account provisioned (see §1 below)
 - [ ] `npm install` completed
@@ -70,7 +70,7 @@ npm run build              # production build + typecheck
 
 ### By design (not a failure)
 
-- Public sign-up is **disabled** per [drift-log.md](../drift-log.md) and architecture map.
+- Public sign-up is **disabled** per [drift-log.md](../before-coding/drift-log.md) and architecture map.
 - Teachers are provisioned by admin: Supabase dashboard **Authentication → Users → Add user**, or `npm run setup:teacher` for local dev.
 
 ### Local dev credentials (from `setup:teacher`)
@@ -221,7 +221,7 @@ Run on local dev against configured Supabase project.
 | RLS cross-user isolation (read/update/delete) | **Pass** (verified via post-operation reads) |
 | Auth sign-out clears DB access | **Pass** |
 | UI generate produces 12-page stories | **Pass** (confirmed in DB: `kindness`, `friendship` stories) |
-| Dev server browser activity | **Pass** (login, home, story pages served 200) |
+| Dev server browser activity | **Pass** (landing sign-in, `/stories`, story pages served 200) |
 
 **Not automated (requires facilitator browser pass):** logout button UX, regenerate confirm flow, page-edit blur UX, second-story continuity wording, session after full browser restart.
 

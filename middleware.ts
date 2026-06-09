@@ -13,6 +13,12 @@ export async function middleware(request: NextRequest) {
   const isApiRoute = pathname.startsWith("/api/");
   const hasSession = hasSupabaseAuthCookie(request);
 
+  if (pathname === "/login") {
+    const url = request.nextUrl.clone();
+    url.pathname = hasSession ? "/stories" : "/";
+    return NextResponse.redirect(url);
+  }
+
   if (!hasSession && !isPublicPath) {
     if (isApiRoute) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

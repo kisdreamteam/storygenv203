@@ -10,12 +10,12 @@ Planning only. No production code.
 
 **Source of truth (authority order):**
 
-1. [product-spec.md](../product-spec.md)
-2. [source-of-truth.md](../source-of-truth.md)
-3. [v1-scope.md](../v1-scope.md)
-4. [character-bible.md](../character-bible.md)
-5. [illustration-guide.md](../illustration-guide.md)
-6. [drift-log.md](../drift-log.md)
+1. [product-spec.md](before-coding/product-spec.md)
+2. [source-of-truth.md](before-coding/source-of-truth.md)
+3. [v1-scope.md](before-coding/v1-scope.md)
+4. [character-bible.md](before-coding/character-bible.md)
+5. [illustration-guide.md](before-coding/illustration-guide.md)
+6. [drift-log.md](before-coding/drift-log.md)
 
 **Architecture decisions incorporated (Phase B):**
 
@@ -103,8 +103,10 @@ Keep routes minimal. Only what V1 requires.
 
 **Auth behavior:**
 
-* Unauthenticated users redirect to `/`
+* Unauthenticated users visiting protected routes redirect to `/`
 * Authenticated users visiting `/` redirect to `/stories`
+* Post-login redirect to `/stories`; sign-out returns to `/`
+* Legacy `/login` requests redirect to `/` (signed out) or `/stories` (signed in); no `/login` page
 * Auth onboarding: invite-only — admin provisions teacher accounts; public sign-up disabled in Supabase
 * No routes for settings, export, student mode, image preview, or marketplace features
 
@@ -121,7 +123,7 @@ Keep routes minimal. Only what V1 requires.
 
 Supabase tables for V1. Five tables — no over-engineering.
 
-Locked official character definitions (Nina, Nino, Mom, Dad, Grandpa, Ms. Lee) come from static [character-bible.md](../character-bible.md) at generation time. They are not duplicated in the database for V1; teachers cannot edit profiles in V1.
+Locked official character definitions (Nina, Nino, Mom, Dad, Grandpa, Ms. Lee) come from static [character-bible.md](before-coding/character-bible.md) at generation time. They are not duplicated in the database for V1; teachers cannot edit profiles in V1.
 
 ## `stories`
 
@@ -156,7 +158,7 @@ One row per page. Exactly 12 pages per story.
 | `story_id` | uuid | FK to `stories` |
 | `page_number` | int | 1–12 |
 | `text` | text | ~30–40 words |
-| `illustration_prompt` | text | Copy-ready prompt per [illustration-guide.md](../illustration-guide.md) |
+| `illustration_prompt` | text | Copy-ready prompt per [illustration-guide.md](before-coding/illustration-guide.md) |
 
 Unique constraint on `(story_id, page_number)`.
 
@@ -226,7 +228,7 @@ erDiagram
 
 ## What memory stores
 
-Per [source-of-truth.md](../source-of-truth.md), Series Memory tracks:
+Per [source-of-truth.md](before-coding/source-of-truth.md), Series Memory tracks:
 
 * Characters (Tier 2/3 promotions, appearance changes from saved stories)
 * Character appearance rules and relationships observed in stories
@@ -236,7 +238,7 @@ Per [source-of-truth.md](../source-of-truth.md), Series Memory tracks:
 * Vocabulary history
 * Repetition patterns
 
-Locked official characters (Nina, Nino, Mom, Dad, Grandpa, Ms. Lee) are always injected from [character-bible.md](../character-bible.md) at generation time.
+Locked official characters (Nina, Nino, Mom, Dad, Grandpa, Ms. Lee) are always injected from [character-bible.md](before-coding/character-bible.md) at generation time.
 
 ## When memory updates
 
@@ -320,7 +322,7 @@ flowchart LR
 
 ## Inputs
 
-**Required** (from [v1-scope.md](../v1-scope.md)):
+**Required** (from [v1-scope.md](before-coding/v1-scope.md)):
 
 * Theme / Topic
 * Learning Goal
@@ -382,7 +384,7 @@ flowchart LR
 
 ## V1 shortcut
 
-Per [v1-scope.md](../v1-scope.md), mock/fixture generation is acceptable initially. Wire the real LLM after the display and save flows work.
+Per [v1-scope.md](before-coding/v1-scope.md), mock/fixture generation is acceptable initially. Wire the real LLM after the display and save flows work.
 
 ---
 
@@ -432,7 +434,7 @@ Each step is independently understandable and validates one part of the core wor
 | Step | What to build | Validates |
 |------|---------------|-----------|
 | 1 | Supabase project setup — tables, RLS policies, auth enabled | Persistence foundation |
-| 2 | Auth shell — login page, session guard, sign-out | Teacher access |
+| 2 | Auth shell — landing sign-in at `/`, session guard, sign-out | Teacher access |
 | 3 | Story list route — fetch teacher's saved stories | Reopen stories |
 | 4 | Create route + input form — 4 required + optional fields | Minimal inputs |
 | 5 | Generation pipeline (mock) — fixture 12-page story with prompts + vocab | Generate flow |
@@ -451,7 +453,7 @@ Build in order. Do not skip save and memory steps before adding real generation.
 
 # 9. Explicit Non-Goals
 
-Do not build these in V1. Sourced from [v1-scope.md](../v1-scope.md) and locked decisions.
+Do not build these in V1. Sourced from [v1-scope.md](before-coding/v1-scope.md) and locked decisions.
 
 * Student accounts / student mode
 * Parent / non-teacher user flows
@@ -482,9 +484,9 @@ Genuine blockers or risks only. No invented complexity.
 | **Shared memory across teachers** | Global memory means Teacher A's saved story affects Teacher B's next generation. | Accepted — intentional for V1 validation. Monitor during teacher testing. |
 | **Generation latency** | Soft target, not SLA. Long LLM calls need clear loading UX. | Accepted — loading states in step 12. |
 
-**Resolved in Phase C (see drift-log.md):** invite-only auth, saved-only story list, error behavior defaults, no story deletion in V1.
+**Resolved in Phase C (see [drift-log.md](before-coding/drift-log.md)):** invite-only auth, saved-only story list, error behavior defaults, no story deletion in V1.
 
-**Resolved 2026-06-08 (see drift-log.md):** generate/regenerate auto-save; Save story for edit commits only; Edit Story Setup without auto-regenerate.
+**Resolved 2026-06-08 (see [drift-log.md](before-coding/drift-log.md)):** generate/regenerate auto-save; Save story for edit commits only; Edit Story Setup without auto-regenerate.
 
 No unresolved spec conflicts.
 

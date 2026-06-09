@@ -39,7 +39,7 @@ During teacher pilots, the app writes **console-only** events prefixed with `[St
 | `story_reopened` | Same story id viewed again in session (e.g. from home) | `storyId`, `status` |
 | `second_story_created` | Second successful generate in same browser session | `storyId`, `generateCount` |
 
-Implementation: [`lib/validation/workflow-log.ts`](../lib/validation/workflow-log.ts)
+Implementation: [`lib/validation/workflow-log.ts`](../../lib/validation/workflow-log.ts)
 
 ---
 
@@ -57,7 +57,7 @@ Implementation: [`lib/validation/workflow-log.ts`](../lib/validation/workflow-lo
 
 ## What metrics actually matter
 
-For V1 pilot validation (per [source-of-truth.md](../source-of-truth.md)):
+For V1 pilot validation (per [source-of-truth.md](../before-coding/source-of-truth.md)):
 
 1. **Time to first draft** — soft target ~2 minutes total; `durationMs` covers generate wait only (~2s mock). Story is auto-saved on generate.
 2. **Edit commit rate** — if the teacher edited, did they click Save story? (`story_save_completed` after edits)
@@ -90,7 +90,7 @@ Do **not** optimize for page views, DAU, or funnel conversion. This pilot valida
 - Do not treat console logs as production telemetry.
 - Do not add analytics SDKs without a new architecture decision.
 - Remove or gate this instrumentation after pilot if no longer needed.
-- Compare any workflow change request against [v1-scope.md](../v1-scope.md): *Does this reduce time-to-first-story?*
+- Compare any workflow change request against [v1-scope.md](../before-coding/v1-scope.md): *Does this reduce time-to-first-story?*
 
 ---
 

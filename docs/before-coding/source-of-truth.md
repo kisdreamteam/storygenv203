@@ -298,7 +298,7 @@ When documents conflict:
 1. Higher authority wins
 2. Lower authority documents must update
 3. Implementation may NOT resolve conflicts
-4. Unresolved decisions belong in drift-log.md
+4. Unresolved decisions belong in [drift-log.md](drift-log.md)
 
 ---
 
@@ -306,27 +306,27 @@ When documents conflict:
 
 Authority order:
 
-product-spec.md
+docs/before-coding/product-spec.md
 
 ↓
 
-source-of-truth.md
+docs/before-coding/source-of-truth.md
 
 ↓
 
-v1-scope.md
+docs/before-coding/v1-scope.md
 
 ↓
 
-character-bible.md
+docs/before-coding/character-bible.md
 
 ↓
 
-illustration-guide.md
+docs/before-coding/illustration-guide.md
 
 ↓
 
-domain documents
+domain documents (e.g. docs/phase-b-architecture-map.md)
 
 ↓
 
@@ -340,7 +340,7 @@ Lower authority may extend.
 
 Lower authority may NOT contradict.
 
-**Locked V1 decisions:** When general language in `product-spec.md` conflicts with a locked V1 decision in this document, the locked V1 decision wins and `product-spec.md` should be updated to match.
+**Locked V1 decisions:** When general language in `docs/before-coding/product-spec.md` conflicts with a locked V1 decision in this document, the locked V1 decision wins and `docs/before-coding/product-spec.md` should be updated to match.
 
 ---
 

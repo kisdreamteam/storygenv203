@@ -5,7 +5,7 @@ import {
   STYLE_SECTION_HEADER,
 } from "@/lib/generation/character-continuity";
 
-/** Locked continuity suffix from illustration-guide.md §3 */
+/** Locked continuity suffix from docs/before-coding/illustration-guide.md §3 */
 export const ILLUSTRATION_STYLE_SUFFIX = GLOBAL_ILLUSTRATION_SUFFIX;
 
 export const ILLUSTRATION_PROMPT_FORMAT = `

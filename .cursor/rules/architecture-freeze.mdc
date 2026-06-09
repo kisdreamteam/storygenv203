@@ -24,7 +24,7 @@ alwaysApply: true
 
 - Follow the architecture map for routes, data model, pipeline, and folder structure.
 - Update `docs/phase-b-architecture-map.md` and affected source docs before changing frozen areas.
-- Log architectural revisions in `drift-log.md`.
+- Log architectural revisions in `docs/before-coding/drift-log.md`.
 
 ## MUST NOT
 
@@ -36,4 +36,4 @@ alwaysApply: true
 
 ## Revision path
 
-Document change → update `drift-log.md` → update architecture map and source docs → then implement.
+Document change → update `docs/before-coding/drift-log.md` → update architecture map and source docs → then implement.

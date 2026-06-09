@@ -4,7 +4,7 @@ Version: 1.0
 
 Purpose: Run teacher workflow validation sessions consistently. Documentation only — not product analytics, not a spec change.
 
-Authority: [product-spec.md](../product-spec.md), [source-of-truth.md](../source-of-truth.md), [v1-scope.md](../v1-scope.md)
+Authority: [product-spec.md](../before-coding/product-spec.md), [source-of-truth.md](../before-coding/source-of-truth.md), [v1-scope.md](../before-coding/v1-scope.md)
 
 Related:
 
@@ -17,7 +17,7 @@ Related:
 
 Complete this checklist before the teacher arrives.
 
-- [ ] **Verify production deployment running** — app loads at the hosted URL; `/login` and home respond without errors
+- [ ] **Verify production deployment running** — app loads at the hosted URL; `/` (landing/sign-in) and `/stories` respond without errors
 - [ ] **Verify login credentials available** — invited teacher email/password ready (do not share credentials in this repo)
 - [ ] **Verify Supabase connected** — sign in once as facilitator; confirm home loads and a test generate/save works if needed
 - [ ] **Open browser console** — DevTools (F12) → Console tab on the machine the teacher will use
@@ -81,7 +81,7 @@ Capture these while memory is fresh (within 30 minutes).
 | **Major confusion points** | Steps, UI labels, draft vs saved, optional fields, etc. |
 | **Whether teacher would use again** | Yes / Maybe / No — and why in one sentence |
 | **Top requested changes** | Up to three, in teacher’s words |
-| **Whether requested changes conflict with V1 scope** | Compare each request to [v1-scope.md](../v1-scope.md) and [source-of-truth.md](../source-of-truth.md) |
+| **Whether requested changes conflict with V1 scope** | Compare each request to [v1-scope.md](../before-coding/v1-scope.md) and [source-of-truth.md](../before-coding/source-of-truth.md) |
 
 **Post-session facilitator checklist**
 
@@ -127,9 +127,9 @@ Only then consider changes
 **Reminders**
 
 - Mock/template story quality is **expected** — not a workflow failure ([teacher-pilot-test-plan.md](teacher-pilot-test-plan.md) §6)
-- Illustration **prompts only** in V1 — no in-app images ([illustration-guide.md](../illustration-guide.md))
+- Illustration **prompts only** in V1 — no in-app images ([illustration-guide.md](../before-coding/illustration-guide.md))
 - Home list shows **saved stories only** — drafts stay on story URL until Save
-- No spec updates from a single session unless a request **clearly conflicts** with authority docs and must be recorded in [drift-log.md](../drift-log.md)
+- No spec updates from a single session unless a request **clearly conflicts** with authority docs and must be recorded in [drift-log.md](../before-coding/drift-log.md)
 
 **Common out-of-scope requests** (log, do not build during pilot)
 

@@ -7,11 +7,11 @@ alwaysApply: true
 
 When making product or implementation decisions, follow this authority order (highest first):
 
-1. `product-spec.md`
-2. `source-of-truth.md`
-3. `v1-scope.md`
-4. `character-bible.md`
-5. `illustration-guide.md`
+1. `docs/before-coding/product-spec.md`
+2. `docs/before-coding/source-of-truth.md`
+3. `docs/before-coding/v1-scope.md`
+4. `docs/before-coding/character-bible.md`
+5. `docs/before-coding/illustration-guide.md`
 6. Domain documents (e.g. `docs/phase-b-architecture-map.md`)
 7. `.cursor/rules/`
 8. Implementation code
@@ -19,7 +19,7 @@ When making product or implementation decisions, follow this authority order (hi
 ## MUST
 
 - Treat documentation as higher authority than code.
-- Follow locked V1 decisions in `source-of-truth.md` when they conflict with general language elsewhere.
+- Follow locked V1 decisions in `docs/before-coding/source-of-truth.md` when they conflict with general language elsewhere.
 - Update lower-authority documents when a higher-authority document wins a conflict.
 - Ask: "Does this help teachers create stories faster?" before adding work.
 
@@ -33,5 +33,5 @@ When making product or implementation decisions, follow this authority order (hi
 
 1. Higher authority wins.
 2. Lower authority must be updated.
-3. Unresolved decisions go in `drift-log.md`.
+3. Unresolved decisions go in `docs/before-coding/drift-log.md`.
 4. Do not implement until the conflict is documented and resolved.

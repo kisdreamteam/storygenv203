@@ -9,17 +9,17 @@ alwaysApply: true
 
 | Domain | Owner documents | Owns |
 |--------|-----------------|------|
-| Product / workflow | `product-spec.md`, `source-of-truth.md`, `v1-scope.md` | Goals, workflow, inputs, outputs, V1 scope |
-| Characters / continuity | `character-bible.md` | Nina & Nino, tiers, voice, appearance, age guardrails |
-| Illustration prompts | `illustration-guide.md` | Prompt format, style, consistency rules |
+| Product / workflow | `docs/before-coding/product-spec.md`, `docs/before-coding/source-of-truth.md`, `docs/before-coding/v1-scope.md` | Goals, workflow, inputs, outputs, V1 scope |
+| Characters / continuity | `docs/before-coding/character-bible.md` | Nina & Nino, tiers, voice, appearance, age guardrails |
+| Illustration prompts | `docs/before-coding/illustration-guide.md` | Prompt format, style, consistency rules |
 | Architecture | `docs/phase-b-architecture-map.md` | Routes, data model, pipeline, folder structure |
-| Drift / decisions | `drift-log.md` | Unresolved and accepted change decisions |
+| Drift / decisions | `docs/before-coding/drift-log.md` | Unresolved and accepted change decisions |
 
 ## MUST
 
 - Change only the domain you are working in.
 - Read the owning document before modifying behavior in that domain.
-- Document cross-domain changes in `drift-log.md` before implementing.
+- Document cross-domain changes in `docs/before-coding/drift-log.md` before implementing.
 - Extend lower-authority docs; do not contradict higher-authority docs.
 
 ## MUST NOT
@@ -31,4 +31,4 @@ alwaysApply: true
 
 ## Cross-domain change
 
-If a change touches two or more domains: add a `drift-log.md` entry, update each affected document, then implement.
+If a change touches two or more domains: add a `docs/before-coding/drift-log.md` entry, update each affected document, then implement.
