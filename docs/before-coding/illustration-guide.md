@@ -121,6 +121,20 @@ Each illustration prompt should follow this structure:
 Nina and Nino sit on a wooden bench feeding breadcrumbs to ducks at a small pond. Nina is a 6-year-old girl with medium skin tone, dark brown hair in two neat pigtails, bright red t-shirt, dark red shorts, white socks, red sneakers, brown eyes, warm friendly smile. Nino is a 4-year-old boy with medium skin tone, short messy warm-brown hair, light green t-shirt, dark green shorts, white socks, green sneakers, brown eyes, curious cheerful expression. Sunny neighborhood park with green grass and a paved path. Bright cheerful morning light. 16:9 aspect ratio, landscape composition, zoomed-out view, full-body characters visible, extra empty space suitable for adding educational text later, no speech bubbles, no text, no labels, no watermarks, child-friendly educational illustration style, warm soft colors, simple shapes, friendly expressions, consistent character appearance, ages 4-6.
 ```
 
+## Story generation assembly (AI + server)
+
+During **Generate** and **Regenerate**, the LLM returns a short `illustration_scene` per page (10–50 words): a visual description of what should appear in the image — who is doing what, key objects, composition hint. It does **not** include locked character appearance details, style suffixes, or section headers.
+
+The server saves **scene only** to `illustration_prompt` in the database (no new column). Mock fallback and per-page **Regenerate prompt** also store a short scene derived from page text.
+
+**UI:** Teachers see and edit the scene only (Show/Hide toggle unchanged). **Copy prompt** and **Copy Illustrations** assemble the full production prompt on the fly:
+
+1. **LOCKED CHARACTER CONTINUITY** — verbatim blocks from resolved `character_profiles` (database when available, factory fallback) for official characters mentioned in the page text or scene
+2. **SCENE** — stored scene, plus story setting and page mood/lighting when not already present
+3. **STYLE** — locked global suffix from section 3
+
+**Legacy stories** that still have full prompts saved in `illustration_prompt`: the UI extracts and displays the SCENE section only. The database is normalized to scene-only when the teacher edits, saves, or regenerates that page.
+
 ---
 
 # 6. Page-to-Prompt Mapping

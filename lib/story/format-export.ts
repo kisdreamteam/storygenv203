@@ -1,3 +1,4 @@
+import type { CharacterProfileMap } from "@/lib/character-profiles/types";
 import { resolveProductionIllustrationPrompt } from "./resolve-production-prompt";
 
 type StoryPageText = {
@@ -27,7 +28,8 @@ export function formatStoryForCopy(title: string, pages: StoryPageText[]): strin
 export function formatIllustrationsForCopy(
   title: string,
   pages: StoryPagePrompt[],
-  setting?: string | null
+  setting?: string | null,
+  profiles?: CharacterProfileMap
 ): string {
   const sorted = sortByPageNumber(pages);
   const body = sorted
@@ -37,6 +39,7 @@ export function formatIllustrationsForCopy(
         pageNumber: page.page_number,
         setting,
         storedPrompt: page.illustration_prompt,
+        profiles,
       });
       return `Page ${page.page_number}\n${prompt}`;
     })

@@ -124,7 +124,10 @@ export function moodForPageNumber(pageNumber: number): string {
  * Structure: LOCKED CHARACTER CONTINUITY → SCENE → STYLE
  */
 export function buildIllustrationPrompt(input: BuildIllustrationPromptInput): string {
-  const continuity = getCharacterContinuityText(input.pageText, input.profiles);
+  const continuityText = [input.pageText, input.scene?.trim()]
+    .filter(Boolean)
+    .join("\n");
+  const continuity = getCharacterContinuityText(continuityText, input.profiles);
   const scene = input.scene?.trim() || sceneFromPageText(input.pageText);
   const mood =
     input.mood?.trim() ||
@@ -172,6 +175,7 @@ export function injectIllustrationContinuityIntoPages<
       pageText: page.text,
       pageNumber: page.page_number,
       setting,
+      scene: page.illustration_prompt,
       profiles,
     }),
   }));

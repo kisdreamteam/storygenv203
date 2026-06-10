@@ -1,6 +1,6 @@
 import {
-  buildIllustrationPromptFromPageText,
   DEFAULT_ILLUSTRATION_SETTING,
+  sceneFromPageText,
 } from "./illustration-prompt";
 import type {
   MockGenerationResult,
@@ -92,11 +92,7 @@ export function runMockPipeline(
     return {
       page_number: pageNumber,
       text,
-      illustration_prompt: buildIllustrationPromptFromPageText(
-        text,
-        pageNumber,
-        setting
-      ),
+      illustration_prompt: sceneFromPageText(text),
     };
   });
 

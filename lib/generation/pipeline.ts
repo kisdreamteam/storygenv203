@@ -1,7 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { loadCharacterProfiles, type CharacterProfileMap } from "@/lib/character-profiles";
-import { injectIllustrationContinuityIntoPages } from "./character-continuity";
-import { DEFAULT_ILLUSTRATION_SETTING } from "./illustration-prompt";
+import { loadCharacterProfiles } from "@/lib/character-profiles";
 import { tryAiGeneration } from "./ai-generation";
 import { runMockPipeline } from "./mock-pipeline";
 import { loadSeriesMemory } from "@/lib/series-memory/load";
@@ -17,18 +15,6 @@ function combineWarnings(...parts: Array<string | null | undefined>): string | n
   return messages.length > 0 ? messages.join(" ") : null;
 }
 
-function enforceIllustrationContinuity(
-  result: MockGenerationResult,
-  inputs: StoryInputs,
-  profiles: CharacterProfileMap
-): MockGenerationResult {
-  const setting = inputs.setting?.trim() || DEFAULT_ILLUSTRATION_SETTING;
-  return {
-    ...result,
-    pages: injectIllustrationContinuityIntoPages(result.pages, setting, profiles),
-  };
-}
-
 export async function generateStory(
   supabase: SupabaseClient,
   inputs: StoryInputs
@@ -39,7 +25,7 @@ export async function generateStory(
   const ai = await tryAiGeneration(inputs, summary, profiles);
   if (ai.ok) {
     return {
-      result: enforceIllustrationContinuity(ai.result, inputs, profiles),
+      result: ai.result,
       warning: combineWarnings(memoryWarning, profileWarning),
     };
   }
@@ -48,7 +34,7 @@ export async function generateStory(
   const fallbackWarning = `AI generation unavailable (${ai.reason}). Using template story.`;
 
   return {
-    result: enforceIllustrationContinuity(mockResult, inputs, profiles),
+    result: mockResult,
     warning: combineWarnings(memoryWarning, profileWarning, fallbackWarning),
   };
 }

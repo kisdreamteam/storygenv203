@@ -118,6 +118,21 @@ record(
   systemPrompt.includes("OFFICIAL CHARACTER PROFILES:"),
   "profiles section in system prompt"
 );
+record(
+  "build_system_prompt_no_continuity_blocks",
+  !systemPrompt.includes("Full locked continuity blocks"),
+  "no AI continuity blocks in system prompt"
+);
+record(
+  "build_system_prompt_no_style_suffix",
+  !systemPrompt.includes(GLOBAL_ILLUSTRATION_SUFFIX),
+  "no style suffix in system prompt"
+);
+record(
+  "build_system_prompt_illustration_scene_schema",
+  systemPrompt.includes("illustration_scene"),
+  "schema uses illustration_scene"
+);
 
 const customAppearance = "wears a blue friendship bracelet for verification";
 const modifiedProfiles = {
@@ -185,6 +200,31 @@ record(
   injected.length === 12 &&
     injected.every((p) => p.illustration_prompt.includes(GLOBAL_ILLUSTRATION_SUFFIX)),
   `count=${injected.length}`
+);
+
+const aiScene =
+  "Nina kneels beside Nino at a wooden sandbox, scooping sand into a bright red bucket while Mom watches from a picnic blanket nearby with a gentle smile.";
+const injectedWithScene = injectIllustrationContinuityIntoPages(
+  [
+    {
+      page_number: 1,
+      text: "They played quietly in the yard.",
+      illustration_prompt: aiScene,
+    },
+  ],
+  "Sunny Grove Kindergarten",
+  factory
+)[0];
+record(
+  "illustration_inject_uses_ai_scene",
+  injectedWithScene.illustration_prompt.includes(aiScene) &&
+    !injectedWithScene.illustration_prompt.includes("They played quietly"),
+  "SCENE uses AI illustration_scene not page text"
+);
+record(
+  "illustration_inject_scene_detects_mom",
+  injectedWithScene.illustration_prompt.includes(factory.mom.appearanceDescription),
+  "Mom continuity from scene text"
 );
 
 async function main() {

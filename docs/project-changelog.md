@@ -324,3 +324,207 @@ Illustration prompt continuity now uses resolved character profile appearances; 
 Follow-up needed:
 
 Edit Characters UI, save API, and reset behavior per implementation plan.
+
+---
+
+## 2026-06-10 — Per-Page Illustration Prompt Show/Hide Toggle
+
+Prompt / Context:
+
+Manual UX change on the story detail page — illustration prompts are long for continuity but clutter the page layout.
+
+What changed:
+
+- Per-page **Show Prompt** / **Hide Prompt** toggle next to **Copy prompt** on `/stories/[id]`
+- Illustration prompt text hidden by default on each page; toggled individually
+- Copy prompt, edit prompt, and regenerate prompt behavior unchanged
+
+Why it changed:
+
+Reduce visual noise on the story editor while keeping full prompts accessible on demand.
+
+Files affected:
+
+- components/story/StoryPageItem.tsx
+- components/story/PromptEditor.tsx
+- docs/project-changelog.md
+
+Impact:
+
+UI-only; no workflow, data model, or prompt-generation changes.
+
+Follow-up needed:
+
+None. Optional future: global “show all prompts” control (out of scope for now).
+
+---
+
+## 2026-06-10 — AI Illustration Scene Split
+
+Prompt / Context:
+
+Story generation and regeneration were timing out because OpenAI was asked to produce full locked illustration prompts (continuity blocks, style suffix) for all 12 pages in one JSON response — work the server already discarded and rebuilt from character profiles.
+
+What changed:
+
+- OpenAI now returns a short `illustration_scene` (30–50 words) per page instead of a full `illustration_prompt`
+- Story-generation system prompt slimmed: removed locked continuity blocks and illustration format rules from the LLM context
+- Server assembles final copy-ready prompts from resolved `character_profiles` + AI scene + setting + mood + locked style suffix
+- Character detection for continuity uses page text and AI scene together
+
+Why it changed:
+
+Reduce OpenAI input/output size and generation latency while keeping teacher-facing illustration prompts unchanged.
+
+Files affected:
+
+- lib/generation/prompts.ts
+- lib/generation/validate-output.ts
+- lib/generation/character-continuity.ts
+- scripts/verify-character-profiles.ts
+- docs/before-coding/illustration-guide.md
+- docs/project-changelog.md
+
+Impact:
+
+Generate and Regenerate should be less prone to timeout fallback. Saved `illustration_prompt` format in the UI is unchanged. Mock fallback and per-page Regenerate prompt behavior unchanged.
+
+Follow-up needed:
+
+Monitor Generate/Regenerate in production; adjust scene word-count bounds if validation rejects valid model output too often.
+
+---
+
+## 2026-06-10 — Scene-Only Illustration UI
+
+Prompt / Context:
+
+After the AI Illustration Scene Split, full continuity blocks were still saved to the database and shown in the UI even though teachers only need the short visual scene for review and editing.
+
+What changed:
+
+- **Stored:** `illustration_prompt` holds short scene (30–50 words), not full continuity blocks
+- **UI:** Teachers see/edit scene only; Show/Hide toggle unchanged; label reads "Illustration scene"
+- **Copy:** Full production prompt assembled from Supabase character profiles + scene + locked style (Copy prompt and Copy Illustrations)
+- **Legacy:** Existing full prompts display extracted scene; DB normalized on edit/save/regenerate
+
+Why it changed:
+
+Keep the story editor focused on the editable visual moment while continuity and style stay assembled only when copying for external image generation.
+
+Files affected:
+
+- lib/generation/pipeline.ts
+- lib/generation/mock-pipeline.ts
+- lib/generation/regenerate-page-prompt.ts
+- lib/story/resolve-production-prompt.ts
+- lib/story/format-export.ts
+- components/story/StoryPageItem.tsx
+- components/story/StoryPagesSection.tsx
+- app/stories/[id]/page.tsx
+- docs/before-coding/illustration-guide.md
+- docs/project-changelog.md
+
+Impact:
+
+Story page UI is less cluttered. Copy output remains full production prompts with current character profiles from Supabase.
+
+Follow-up needed:
+
+None.
+
+---
+
+## 2026-06-10 — Illustration Scene Word Bounds Loosened
+
+Prompt / Context:
+
+Generate was falling back to the template story when the AI returned slightly short but usable illustration scenes (e.g. 27 words on one page).
+
+What changed:
+
+- `illustration_scene` validation: 30–50 → 20–50 words
+- AI system prompt and JSON schema updated to match
+
+Why it changed:
+
+Reduce false fallback when the model produces valid scenes that fall a few words below the previous minimum.
+
+Files affected:
+
+- lib/generation/validate-output.ts
+- lib/generation/prompts.ts
+- docs/before-coding/illustration-guide.md
+- docs/project-changelog.md
+
+Impact:
+
+Stories with scenes between 20–29 words now pass validation instead of triggering mock fallback.
+
+Follow-up needed:
+
+None.
+
+---
+
+## 2026-06-10 — Vocabulary Count Bounds Loosened
+
+Prompt / Context:
+
+Generate and Regenerate were falling back to the template story when the AI returned more than 7 vocabulary items (e.g. 8 items from a long vocabulary focus).
+
+What changed:
+
+- vocabulary validation: 5–7 → 1–40 items
+- AI system prompt and character-bible updated to match
+
+Why it changed:
+
+Reduce false fallback when the model includes all words from the teacher's vocabulary focus.
+
+Files affected:
+
+- lib/generation/validate-output.ts
+- lib/generation/prompts.ts
+- docs/before-coding/character-bible.md
+- docs/project-changelog.md
+
+Impact:
+
+Stories with 8+ vocabulary items (up to 40) now pass validation instead of triggering mock fallback.
+
+Follow-up needed:
+
+None.
+
+---
+
+## 2026-06-10 — Illustration Scene Minimum Lowered
+
+Prompt / Context:
+
+Regenerate was falling back to the template story when the AI returned slightly short illustration scenes (e.g. 19 words on page 10).
+
+What changed:
+
+- `illustration_scene` validation: 20–50 → 10–50 words
+- AI system prompt and illustration-guide updated to match
+
+Why it changed:
+
+Reduce false fallback when the model produces valid scenes that fall below the previous 20-word minimum.
+
+Files affected:
+
+- lib/generation/validate-output.ts
+- lib/generation/prompts.ts
+- docs/before-coding/illustration-guide.md
+- docs/project-changelog.md
+
+Impact:
+
+Scenes between 10–19 words now pass validation instead of triggering mock fallback.
+
+Follow-up needed:
+
+None.

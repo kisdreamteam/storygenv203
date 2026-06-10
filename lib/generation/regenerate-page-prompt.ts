@@ -1,7 +1,6 @@
 import { loadCharacterProfiles } from "@/lib/character-profiles";
 import { createClient } from "@/lib/supabase/server";
-import { buildIllustrationPrompt } from "./character-continuity";
-import { DEFAULT_ILLUSTRATION_SETTING } from "./illustration-prompt";
+import { sceneFromPageText } from "./illustration-prompt";
 
 export type RegeneratePagePromptInput = {
   pageText: string;
@@ -18,17 +17,10 @@ export type RegeneratePagePromptResult = {
 export async function regeneratePageIllustrationPrompt(
   input: RegeneratePagePromptInput
 ): Promise<RegeneratePagePromptResult> {
-  const setting = input.setting?.trim() || DEFAULT_ILLUSTRATION_SETTING;
-
   const supabase = await createClient();
-  const { profiles, warning: profileWarning } = await loadCharacterProfiles(supabase);
+  const { warning: profileWarning } = await loadCharacterProfiles(supabase);
 
-  const illustration_prompt = buildIllustrationPrompt({
-    pageText: input.pageText,
-    pageNumber: input.pageNumber,
-    setting,
-    profiles,
-  });
+  const illustration_prompt = sceneFromPageText(input.pageText);
 
   return { illustration_prompt, warning: profileWarning };
 }

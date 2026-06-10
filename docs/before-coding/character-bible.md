@@ -389,7 +389,7 @@ When a teacher provides Vocabulary Focus:
 * Reinforce on pages 5–8 through dialogue or action
 * Revisit on pages 10–11 in a short recap line
 * Avoid listing words without story context
-* Do not exceed 5–7 target words per story unless Notes request more
+* Include 1–40 vocabulary items drawn from the teacher's vocabulary focus
 
 ---
 

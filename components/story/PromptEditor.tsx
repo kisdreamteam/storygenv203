@@ -7,6 +7,7 @@ type PromptEditorProps = {
   pageId: string;
   prompt: string;
   isEditing: boolean;
+  visible?: boolean;
   onPromptChange: (prompt: string) => void;
   onEditingChange: (editing: boolean) => void;
   onManualEdit?: () => void;
@@ -20,6 +21,7 @@ export function PromptEditor({
   pageId,
   prompt,
   isEditing,
+  visible = true,
   onPromptChange,
   onEditingChange,
   onManualEdit,
@@ -139,6 +141,10 @@ export function PromptEditor({
         </div>
       </div>
     );
+  }
+
+  if (!visible) {
+    return null;
   }
 
   return (

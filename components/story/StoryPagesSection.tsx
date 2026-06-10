@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import type { CharacterProfileMap } from "@/lib/character-profiles/types";
 import {
   formatIllustrationsForCopy,
   formatStoryForCopy,
@@ -14,6 +15,7 @@ type StoryPagesSectionProps = {
   storyTitle: string;
   storySetting?: string | null;
   pages: StoryPage[];
+  profiles: CharacterProfileMap;
 };
 
 export function StoryPagesSection({
@@ -21,6 +23,7 @@ export function StoryPagesSection({
   storyTitle,
   storySetting,
   pages,
+  profiles,
 }: StoryPagesSectionProps) {
   const [livePages, setLivePages] = useState<StoryPage[]>(pages);
 
@@ -43,8 +46,9 @@ export function StoryPagesSection({
   );
 
   const getIllustrationsCopyText = useCallback(
-    () => formatIllustrationsForCopy(storyTitle, livePages, storySetting),
-    [storyTitle, livePages, storySetting]
+    () =>
+      formatIllustrationsForCopy(storyTitle, livePages, storySetting, profiles),
+    [storyTitle, livePages, storySetting, profiles]
   );
 
   return (
@@ -66,6 +70,7 @@ export function StoryPagesSection({
             storyId={storyId}
             page={page}
             storySetting={storySetting}
+            profiles={profiles}
             onLiveChange={updateLivePage}
           />
         ))}

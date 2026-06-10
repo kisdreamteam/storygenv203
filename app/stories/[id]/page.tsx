@@ -6,6 +6,7 @@ import { StoryEditorShell } from "@/components/story/StoryEditorShell";
 import { StoryPagesSection } from "@/components/story/StoryPagesSection";
 import { VocabularyList } from "@/components/story/VocabularyList";
 import { PilotWorkflowStoryView } from "@/components/validation/PilotWorkflowStoryView";
+import { loadCharacterProfiles } from "@/lib/character-profiles";
 import { createClient } from "@/lib/supabase/server";
 
 type StoryPageProps = {
@@ -57,6 +58,8 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
     .select("word, definition_or_example, sort_order")
     .eq("story_id", id)
     .order("sort_order", { ascending: true });
+
+  const { profiles } = await loadCharacterProfiles(supabase);
 
   const savedDate = story.saved_at
     ? new Date(story.saved_at).toLocaleDateString(undefined, {
@@ -127,6 +130,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
           storyTitle={story.title}
           storySetting={story.setting}
           pages={pages ?? []}
+          profiles={profiles}
         />
       </StoryEditorShell>
 

@@ -1,7 +1,7 @@
+import type { CharacterProfileMap } from "@/lib/character-profiles/types";
 import {
+  buildIllustrationPrompt,
   CONTINUITY_SECTION_HEADER,
-  getCharacterContinuityText,
-  GLOBAL_ILLUSTRATION_SUFFIX,
   moodForPageNumber,
   sceneFromPageText,
   SCENE_SECTION_HEADER,
@@ -14,6 +14,7 @@ export type ResolveProductionIllustrationPromptInput = {
   pageNumber: number;
   setting?: string | null;
   storedPrompt?: string | null;
+  profiles?: CharacterProfileMap;
 };
 
 function extractSceneSection(storedPrompt: string): string | null {
@@ -34,6 +35,13 @@ function extractSceneSection(storedPrompt: string): string | null {
 
   const scene = afterScene.trim();
   return scene || null;
+}
+
+function isLegacyFullPrompt(stored: string): boolean {
+  return (
+    stored.includes(CONTINUITY_SECTION_HEADER) ||
+    stored.includes(SCENE_SECTION_HEADER)
+  );
 }
 
 function defaultSceneContent(
@@ -65,30 +73,41 @@ function resolveSceneContent(input: ResolveProductionIllustrationPromptInput): s
   return defaultSceneContent(input.pageText, input.pageNumber, input.setting);
 }
 
-function assembleProductionPrompt(pageText: string, sceneContent: string): string {
-  const continuity = getCharacterContinuityText(pageText);
-  const scene = sceneContent.trim();
-  const normalizedScene = scene.endsWith(".") ? scene : `${scene}.`;
-
-  const sections: string[] = [];
-
-  if (continuity) {
-    sections.push(`${CONTINUITY_SECTION_HEADER}\n\n${continuity}`);
-  }
-
-  sections.push(`${SCENE_SECTION_HEADER}\n\n${normalizedScene}`);
-  sections.push(`${STYLE_SECTION_HEADER}\n\n${GLOBAL_ILLUSTRATION_SUFFIX}`);
-
-  return sections.join("\n\n");
+/**
+ * Returns the short scene string for UI display and edit.
+ * Legacy full prompts are reduced to their SCENE section; scene-only rows pass through.
+ */
+export function resolveIllustrationSceneForDisplay(
+  input: ResolveProductionIllustrationPromptInput
+): string {
+  return resolveSceneContent(input);
 }
 
 /**
  * Resolves the full production illustration prompt for clipboard copy.
- * LOCKED CHARACTER CONTINUITY and STYLE are always injected; SCENE preserves teacher edits when present.
+ * Assembles LOCKED CHARACTER CONTINUITY + SCENE + STYLE from profiles and stored scene.
  */
 export function resolveProductionIllustrationPrompt(
   input: ResolveProductionIllustrationPromptInput
 ): string {
+  const stored = input.storedPrompt?.trim() ?? "";
   const sceneContent = resolveSceneContent(input);
-  return assembleProductionPrompt(input.pageText, sceneContent);
+  const resolvedSetting =
+    input.setting?.trim() || DEFAULT_ILLUSTRATION_SETTING;
+
+  if (isLegacyFullPrompt(stored)) {
+    return buildIllustrationPrompt({
+      pageText: input.pageText,
+      scene: sceneContent,
+      profiles: input.profiles,
+    });
+  }
+
+  return buildIllustrationPrompt({
+    pageText: input.pageText,
+    pageNumber: input.pageNumber,
+    setting: resolvedSetting,
+    scene: sceneContent,
+    profiles: input.profiles,
+  });
 }

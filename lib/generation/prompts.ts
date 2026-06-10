@@ -1,14 +1,12 @@
 import type { CharacterProfileMap } from "@/lib/character-profiles";
 import { formatOfficialCharacterProfilesForStory } from "@/lib/character-profiles/format-for-story-prompt";
 import { CHARACTER_BIBLE_EXCERPT } from "@/lib/constants/character-bible";
-import { formatOfficialCharacterRulesForAi } from "@/lib/generation/character-continuity";
-import { ILLUSTRATION_PROMPT_FORMAT } from "@/lib/constants/illustration-style";
 import type { SeriesMemorySummary, StoryInputs } from "./types";
 
 const JSON_SCHEMA = `{
   "story": { "title": "string (max 60 chars, from theme)" },
   "pages": [
-    { "page_number": 1, "text": "string (~30-40 words)", "illustration_prompt": "string" }
+    { "page_number": 1, "text": "string (~30-40 words)", "illustration_scene": "string (10-50 words)" }
   ],
   "vocabulary": [
     { "word": "string", "definition_or_example": "string", "sort_order": 1 }
@@ -22,17 +20,14 @@ ${CHARACTER_BIBLE_EXCERPT}
 
 ${formatOfficialCharacterProfilesForStory(profiles)}
 
-${formatOfficialCharacterRulesForAi(profiles)}
-${ILLUSTRATION_PROMPT_FORMAT}
-
 Output rules (strict):
 - Return ONLY valid JSON matching the schema below. No markdown fences.
 - Exactly 12 pages with page_number 1 through 12.
 - Each page text: ~30–40 words, simple sentences, ages 4–6 readability.
-- Exactly 5–7 vocabulary items from the teacher's vocabulary focus.
-- One illustration_prompt per page (server rebuilds with locked continuity; still follow format below).
-- illustration_prompt must use LOCKED CHARACTER CONTINUITY / SCENE / STYLE sections verbatim.
-- Copy full continuity blocks for official characters on that page — never paraphrase.
+- 1–40 vocabulary items from the teacher's vocabulary focus.
+- One illustration_scene per page: a short visual description (10–50 words) of what should appear in the illustration.
+- illustration_scene: who is doing what, key objects, composition hint only — no character clothing or appearance details (the server adds those).
+- Do not include style suffixes, section headers, or JSON inside illustration_scene.
 - Educational usefulness over flashy creativity. Classroom-safe tone.
 - If Series Memory has recent_stories, page 1 may open with a brief warm callback to the prior theme (optional, subtle).
 - Teacher inputs override Series Memory when they conflict.

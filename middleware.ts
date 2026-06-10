@@ -1,40 +1,44 @@
 import { NextResponse, type NextRequest } from "next/server";
-
-function hasSupabaseAuthCookie(request: NextRequest): boolean {
-  return request.cookies.getAll().some(
-    (cookie) =>
-      cookie.name.startsWith("sb-") && cookie.name.includes("auth-token")
-  );
-}
+import { copyCookies, updateSession } from "@/lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isPublicPath = pathname === "/";
   const isApiRoute = pathname.startsWith("/api/");
-  const hasSession = hasSupabaseAuthCookie(request);
+  const isSignOutRoute = pathname === "/auth/signout";
 
   if (pathname === "/login") {
+    const { user, supabaseResponse } = await updateSession(request);
     const url = request.nextUrl.clone();
-    url.pathname = hasSession ? "/stories" : "/";
-    return NextResponse.redirect(url);
+    url.pathname = user ? "/stories" : "/";
+    const redirectResponse = NextResponse.redirect(url);
+    copyCookies(supabaseResponse, redirectResponse);
+    return redirectResponse;
   }
 
-  if (!hasSession && !isPublicPath) {
+  const { user, supabaseResponse } = await updateSession(request);
+
+  if (!user && !isPublicPath && !isSignOutRoute) {
     if (isApiRoute) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
     const url = request.nextUrl.clone();
     url.pathname = "/";
-    return NextResponse.redirect(url);
+    const redirectResponse = NextResponse.redirect(url);
+    copyCookies(supabaseResponse, redirectResponse);
+    return redirectResponse;
   }
 
-  if (hasSession && pathname === "/") {
+  if (user && pathname === "/") {
     const url = request.nextUrl.clone();
     url.pathname = "/stories";
-    return NextResponse.redirect(url);
+    const redirectResponse = NextResponse.redirect(url);
+    copyCookies(supabaseResponse, redirectResponse);
+    return redirectResponse;
   }
 
-  return NextResponse.next();
+  return supabaseResponse;
 }
 
 export const config = {

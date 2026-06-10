@@ -3,8 +3,10 @@ import type { MockGenerationResult } from "./types";
 const PAGE_COUNT = 12;
 const MIN_WORDS_PER_PAGE = 20;
 const MAX_WORDS_PER_PAGE = 55;
-const MIN_VOCAB = 5;
-const MAX_VOCAB = 7;
+const MIN_SCENE_WORDS = 10;
+const MAX_SCENE_WORDS = 50;
+const MIN_VOCAB = 1;
+const MAX_VOCAB = 40;
 const MAX_TITLE_LENGTH = 60;
 
 function wordCount(text: string): number {
@@ -55,8 +57,8 @@ export function validateGenerationOutput(raw: unknown): ValidationResult {
 
     const pageNumber = page.page_number;
     const text = typeof page.text === "string" ? page.text.trim() : "";
-    const illustrationPrompt =
-      typeof page.illustration_prompt === "string" ? page.illustration_prompt.trim() : "";
+    const illustrationScene =
+      typeof page.illustration_scene === "string" ? page.illustration_scene.trim() : "";
 
     if (typeof pageNumber !== "number" || pageNumber < 1 || pageNumber > PAGE_COUNT) {
       return { ok: false, reason: `invalid page_number on page index ${i}` };
@@ -76,14 +78,21 @@ export function validateGenerationOutput(raw: unknown): ValidationResult {
         reason: `page ${pageNumber} has ${words} words (expected ${MIN_WORDS_PER_PAGE}–${MAX_WORDS_PER_PAGE})`,
       };
     }
-    if (!illustrationPrompt) {
-      return { ok: false, reason: `page ${pageNumber} illustration_prompt is empty` };
+    if (!illustrationScene) {
+      return { ok: false, reason: `page ${pageNumber} illustration_scene is empty` };
+    }
+    const sceneWords = wordCount(illustrationScene);
+    if (sceneWords < MIN_SCENE_WORDS || sceneWords > MAX_SCENE_WORDS) {
+      return {
+        ok: false,
+        reason: `page ${pageNumber} illustration_scene has ${sceneWords} words (expected ${MIN_SCENE_WORDS}–${MAX_SCENE_WORDS})`,
+      };
     }
 
     pages.push({
       page_number: pageNumber,
       text,
-      illustration_prompt: illustrationPrompt,
+      illustration_prompt: illustrationScene,
     });
   }
 
