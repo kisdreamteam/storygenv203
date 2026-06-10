@@ -23,13 +23,14 @@ Continuity goals:
 * Preserve the original Nina & Nino appearance used in earlier stories
 * Support future character customization without implementing it in V1
 
-Rules:
+Rules (historical V1 baseline):
 
-* Teachers **cannot** edit character profiles in V1
-* Official character appearances are fixed in this document and injected at generation time
-* Copy-assembled production illustration prompts must use locked visual descriptors for every official character on the page (from `character_profiles` when available); LLM `illustration_scene` output does not include appearance details
-* Unknown characters introduced by teachers (friends, classmates, visitors, etc.) may appear in stories when the plot requires them, but are **not** persisted as character profiles in V1
-* Future versions may allow teachers to edit and save character profiles — explicitly out of V1 scope (see section 15)
+* Teachers **could not** edit character profiles in frozen V1
+* Official character **factory** appearances are defined in this document and used as defaults at generation time
+* Copy-assembled production illustration prompts must use locked visual descriptors for every official character on the page (from `character_profiles` when available, factory fallback from this bible); LLM `illustration_scene` output does not include appearance details
+* Unknown characters introduced by teachers (friends, classmates, visitors, etc.) may appear in stories when the plot requires them, but are **not** persisted as character profiles
+
+**Post-V1 Phase 1 (implemented 2026-06-10):** Teachers may edit global default appearance and personality for the six official characters in-app. Saved profiles override factory defaults for future generation; reset restores this document's factory values. See section 16. Phase 2/3 remain out of scope.
 
 When uncertain:
 
@@ -411,33 +412,35 @@ Use these compact descriptors in every illustration prompt that includes the cha
 
 ---
 
-# 15. Future Scope (Not V1)
+# 15. Historical V1 Exclusions (Frozen Baseline)
 
-The following are explicitly out of V1 scope:
+The following were explicitly **out of scope for frozen V1** at original ship:
 
 * Teacher-editable character profiles
 * "Edit Characters" button or character management modal
 * Character profile persistence in the database
 * Per-teacher character customization
 
-If added later, update this bible, [illustration-guide.md](illustration-guide.md), and [source-of-truth.md](source-of-truth.md) first.
+**Post-V1 note:** Phase 1 (shipped 2026-06-10) implements the first three items as **global shared** profiles for official characters only. Per-teacher customization remains excluded. This section is preserved as the historical V1 baseline record.
 
 ---
 
-# 16. Post-V1 Editable Profiles (Phase 1 Approved)
+# 16. Post-V1 Editable Profiles (Phase 1 — Implemented)
 
-**Status:** Approved for future implementation — not yet built. V1 rules in sections 1 and 15 remain in force until implementation ships.
+**Status:** Phase 1 **shipped 2026-06-10**. Sections 1 and 15 remain the **historical V1 baseline**; this section describes current post-V1 behavior.
 
-This document remains the **factory default** source for official character appearance and personality.
+This document remains the **factory default** source for official character appearance and personality. Reset in the Edit Characters modal restores values from sections 3 and 14.
 
-**Post-V1 Phase 1 (when implemented):**
+**Shipped Phase 1 behavior:**
 
-* Editable global profiles may override factory defaults stored in code or database
-* **Reset-to-default** restores profiles from this Character Bible (sections 3 and 14)
-* Official characters in Phase 1: Nina, Nino, Mom, Dad, Grandpa, Ms. Lee only
+* **Edit Characters** button on `/stories` opens a modal (no new route) for Nina, Nino, Mom, Dad, Grandpa, Ms. Lee
+* Teachers edit global `appearance_description` and `personality_description`; **Save** persists to `character_profiles`
+* Saved profiles override factory defaults in story generation and copy-assembled illustration prompts
+* **Reset this character** / **Reset all characters** restore factory defaults from this bible
+* **Unsaved-changes guard** when switching characters or closing with unsaved edits (Save / Discard / Cancel)
 * Global edits affect future generations only — existing saved stories are not automatically rewritten
 
-**Still deferred:**
+**Still deferred (Phase 2/3 — not approved for implementation):**
 
 * New story-introduced / teacher-created characters as persisted profiles (Phase 3)
 * Story-specific visual overrides (Phase 2)

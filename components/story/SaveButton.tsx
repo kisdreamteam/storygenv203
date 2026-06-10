@@ -69,7 +69,7 @@ export function SaveButton({ storyId }: SaveButtonProps) {
         {loading ? "Saving…" : "Save story"}
       </button>
       {!isDirty && !loading && (
-        <p className="text-xs text-gray-500">Save when you&apos;ve <br /> edited the story.</p>
+        <p className="text-xs text-gray-500"> Story is saved </p>
       )}
       {warning && (
         <p className="max-w-xs text-xs text-amber-700" role="status">

@@ -166,14 +166,15 @@ Purpose:
 * Preserve the original Nina & Nino appearance used in earlier stories
 * Support future character customization without implementing it in V1
 
-Rules:
+Rules (historical V1 baseline — frozen at original V1 ship):
 
 * Official locked characters: Nina, Nino, Mom, Dad, Grandpa, Ms. Lee
-* Teachers cannot edit character profiles in V1
-* Locked clothing, hair, and facial appearance remain the same across all stories
+* Teachers could not edit character profiles in frozen V1
+* Locked clothing, hair, and facial appearance remain the same across all stories unless a teacher Note requests a one-story exception
 * Mom always wears the yellow áo dài
 * Teacher-introduced characters (friends, classmates, visitors) may appear in stories but are not persisted as character profiles
-* Future character editing may be added later — explicitly out of V1 scope
+
+**Post-V1 update:** Editable Characters **Phase 1** is implemented (2026-06-10). Teachers may edit global default appearance and personality for the six official characters via the Edit Characters modal. Factory defaults remain in [character-bible.md](character-bible.md); reset restores them. Phase 2/3 (story overrides, teacher-created character persistence) remain deferred — see [Post-V1 Character Editing](#post-v1-character-editing-approved-future-phase-1) below.
 
 Character priority:
 
@@ -194,19 +195,20 @@ Tier 3 (story-specific):
 
 * Teacher-introduced or one-story characters — generated when needed; not persisted as profiles
 
-## Post-V1 Character Editing (Approved Future Phase 1)
+## Post-V1 Character Editing (Phase 1 — Implemented)
 
-The V1 character rules above remain the **historical baseline**. Post-V1 may allow editable **global default profiles** for official characters only, per [docs/character-editing-decision-record.md](../character-editing-decision-record.md).
+The V1 character rules above remain the **historical baseline**. Post-V1 **Phase 1** is **implemented** per [docs/character-editing-decision-record.md](../character-editing-decision-record.md) and drift-log entry (2026-06-09).
 
-**Approved future behavior (Phase 1 — not yet implemented):**
+**Shipped behavior (Phase 1 — 2026-06-10):**
 
-* Official characters still **start from** [character-bible.md](character-bible.md) factory defaults
-* Teachers may edit global default **appearance** and **personality** descriptions for Nina, Nino, Mom, Dad, Grandpa, Ms. Lee
-* Saved profiles override hardcoded defaults during **future** story generation and illustration prompts
-* **Reset-to-default** must exist (one character, all characters, restore factory defaults from Character Bible)
+* Official characters still **start from** [character-bible.md](character-bible.md) factory defaults; reset restores factory values
+* Teachers edit global default **appearance** and **personality** for Nina, Nino, Mom, Dad, Grandpa, Ms. Lee via **Edit Characters** on `/stories` (modal only; no new route)
+* Saved profiles in `character_profiles` override factory defaults during **future** story generation and copy-assembled illustration prompts
+* **Reset-to-default:** reset one character, reset all characters (with confirm)
+* **Unsaved-changes guard:** switching characters or closing the modal with unsaved edits prompts Save, Discard, or Cancel
 * Global profile edits affect **future generations only** — they do not automatically rewrite old saved stories
 
-**Deferred (not Phase 1):**
+**Still deferred (Phase 2/3 — not approved for implementation):**
 
 * Series-scoped character profiles
 * Story-specific character overrides (hidden story-only adjustments)

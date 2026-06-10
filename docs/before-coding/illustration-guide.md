@@ -21,12 +21,17 @@ Authority: Below [character-bible.md](character-bible.md).
 * **Copy prompt** / **Copy Illustrations** assembles the full copy-ready production prompt for external image tools (e.g., Midjourney, DALL·E, Ideogram, manual illustration briefs)
 * Locked character descriptors and standardized illustration continuity suffix on every **copy-assembled** production prompt (from Supabase `character_profiles` when available)
 
-## What V1 does NOT provide
+## What frozen V1 baseline did NOT provide
 
 * In-app image rendering
 * Automatic image upload or storage
 * Image editing inside the product
-* Teacher-editable character profiles
+* Teacher-editable character profiles (added post-V1 in Phase 1 — see section 14)
+
+## Post-V1 Phase 1 addition (implemented 2026-06-10)
+
+* **Edit Characters** on `/stories` — teachers edit global default appearance/personality for six official characters
+* Copy-assembled production prompts use saved `character_profiles` when available; factory fallback from [character-bible.md](character-bible.md)
 
 Rule: **A good prompt teachers can use elsewhere is a successful V1 illustration output.**
 
@@ -249,9 +254,9 @@ A prompt is acceptable when:
 
 ---
 
-# 13. Future Scope (Not V1)
+# 13. Historical V1 Exclusions (Frozen Baseline)
 
-The following are explicitly out of V1 scope:
+The following were explicitly **out of scope for frozen V1** at original ship:
 
 * In-app image generation APIs
 * Stored generated images in Supabase
@@ -261,29 +266,24 @@ The following are explicitly out of V1 scope:
 * "Edit Characters" button or character management modal
 * Character profile persistence in the database
 
-Potential future UI (documentation only — do not implement):
-
-* "Edit Characters" button on story or series settings
-* Character management modal with per-character appearance fields
-* Saved character profiles that override or extend the locked bible defaults
-
-If added later, update this guide, [character-bible.md](character-bible.md), and [source-of-truth.md](source-of-truth.md) first.
+**Post-V1 note:** Phase 1 (shipped 2026-06-10) implements global editable profiles and the Edit Characters modal for official characters only. In-app image generation and the other items above remain excluded. This section is preserved as the historical V1 baseline record.
 
 ---
 
-# 14. Post-V1 Character Profiles In Prompts (Phase 1 Approved)
+# 14. Post-V1 Character Profiles In Prompts (Phase 1 — Implemented)
 
-**Status:** Approved for future implementation — not yet built. V1 rules above remain in force.
+**Status:** Phase 1 **shipped 2026-06-10**. Sections 1 and 13 above remain the **historical V1 baseline**.
 
-**Current (V1):** Illustration prompts use locked Character Bible descriptors and the continuity suffix defined in section 3.
+**Historical V1:** Copy-assembled prompts used locked Character Bible descriptors and the continuity suffix defined in section 3.
 
-**After Editable Characters Phase 1 (when implemented):**
+**Shipped Phase 1 behavior:**
 
-* Prompts should use **saved character profiles** when available
-* If no saved profile exists for an official character, use Character Bible factory defaults
+* **Copy prompt** / **Copy Illustrations** use **saved character profiles** from `character_profiles` when available
+* If no saved row exists for an official character, use Character Bible factory defaults
 * The locked illustration continuity **style suffix** (section 3) remains unchanged
+* LLM `illustration_scene` output still excludes appearance details; profiles are injected at copy time
 
-**Deferred:**
+**Still deferred (Phase 2/3 — not approved for implementation):**
 
 * Story-specific visual overrides in prompts (Phase 2)
 * Persisted descriptors for teacher-introduced characters (Phase 3)

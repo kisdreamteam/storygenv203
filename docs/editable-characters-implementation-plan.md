@@ -2,7 +2,7 @@
 
 Version: 1.0
 
-Status: Planning — approved for implementation; code not started
+Status: **Implemented** — Phase 1 shipped 2026-06-10
 
 **Authority:**
 
@@ -274,6 +274,7 @@ Global singleton — **six rows** after seed (one per official character). Share
 3. Right or below: two textareas — Appearance, Personality
 4. Actions: **Save** · **Reset this character** · **Reset all** · **Close**
 5. Inline note: "Affects future stories only."
+6. **Unsaved-changes guard:** switching characters or closing with unsaved edits prompts Save / Discard / Cancel
 
 ## What to avoid
 
@@ -347,7 +348,7 @@ Build in small vertical slices. Match [docs/roadmap-todo.md](roadmap-todo.md) im
 * [docs/project-changelog.md](project-changelog.md) entry
 * Check off implementation candidates in [docs/roadmap-todo.md](roadmap-todo.md)
 
-**Do not start step 1 until this plan is reviewed.** Steps 4–5 should not ship before step 2 resolver exists.
+**All steps 1–8 shipped 2026-06-10.** Phase 2/3 remain out of scope per section 8.
 
 ---
 
@@ -389,9 +390,10 @@ Resolve during implementation (defaults recommended):
 | Drift-log Accepted entry | Yes |
 | Authority docs updated (source-of-truth, bible, illustration-guide, phase-b §11, architecture-freeze) | Yes |
 | Roadmap-todo documentation prerequisites | Complete |
-| Implementation plan (this document) | Yes — after review |
-| Code / schema started | No |
+| Implementation plan (this document) | Yes |
+| Code / schema shipped | Yes — 2026-06-10 |
+| Post-ship doc sync (source-of-truth, bible, illustration-guide, decision record) | Yes — 2026-06-10 |
 
-**Phase 1 appears ready for implementation** after a quick review of this plan. No authority conflicts identified — post-V1 sections explicitly preserve V1 baseline until Phase 1 ships.
+**Phase 1 is shipped.** Post-V1 authority sections preserve the historical V1 baseline and document current behavior. Phase 2/3 remain documented only.
 
 **Scope creep watchlist:** storing full continuity templates in DB; per-teacher rows; story-editor override UI; `/characters` route; Tier 2 editing; merging Phase 2 into Phase 1 "while we're here."

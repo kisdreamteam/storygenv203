@@ -47,7 +47,7 @@ Status: Phase 1 foundation + Edit Characters UI shipped; Phase 2/3 not started
 
 ### Implementation candidates
 
-Documentation prerequisites complete. Do not start code until an implementation plan is written.
+Documentation prerequisites complete. Phase 1 implementation shipped 2026-06-10. Phase 2/3 remain documented only — not approved for implementation.
 
 #### Character profile foundation
 
@@ -75,6 +75,7 @@ See drift-log entry (2026-06-10 — AI Generation / Illustration Prompts / Chara
 - [x] Allow editing appearance descriptions
 - [x] Allow editing personality descriptions
 - [x] Save character edits
+- [x] Unsaved-changes guard when switching characters or closing modal
 
 ### Open decisions
 

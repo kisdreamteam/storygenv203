@@ -542,6 +542,7 @@ What changed:
 - **Edit Characters** button on `/stories` header (modal only; no new route)
 - Modal for six official characters with appearance and personality textareas
 - Save updates global `character_profiles` rows; reset one or reset all restores factory defaults from seeded `factory_*` columns
+- Unsaved-changes guard when switching characters or closing modal (Save / Discard / Cancel)
 - API: `GET /api/character-profiles`, `PATCH /api/character-profiles/[character_key]`, `POST /api/character-profiles/reset`
 - UI note: changes affect future stories only; existing saved stories are not rewritten
 
@@ -566,4 +567,43 @@ Teachers can edit global Nina & Nino family profiles in-app; next Generate, Rege
 
 Follow-up needed:
 
-Optional doc sync: source-of-truth.md and character-bible.md still mention "cannot edit profiles in V1" in some sections.
+None.
+
+---
+
+## 2026-06-10 — Documentation Sync After Edit Characters Phase 1
+
+Prompt / Context:
+
+Authority and planning docs still described Editable Characters Phase 1 as future-only or not implemented after the UI shipped.
+
+What changed:
+
+- **source-of-truth.md** — V1 character rules labeled historical baseline; Post-V1 Phase 1 section updated to shipped behavior
+- **character-bible.md** — sections 1, 15, 16 aligned: frozen V1 exclusions preserved; Phase 1 marked implemented
+- **illustration-guide.md** — frozen V1 exclusions preserved; section 14 updated to shipped copy-time profile behavior
+- **character-editing-decision-record.md** — Phase 1 checklist complete; Phase 2/3 remain documented only
+- **editable-characters-implementation-plan.md** — status and appendix updated to shipped
+- **roadmap-todo.md** — implementation-complete note; unsaved-changes guard checked
+
+Why it changed:
+
+Keep documentation accurate after Phase 1 ship without approving Phase 2/3 or expanding scope.
+
+Files affected:
+
+- docs/before-coding/source-of-truth.md
+- docs/before-coding/character-bible.md
+- docs/before-coding/illustration-guide.md
+- docs/character-editing-decision-record.md
+- docs/editable-characters-implementation-plan.md
+- docs/roadmap-todo.md
+- docs/project-changelog.md
+
+Impact:
+
+Readers can distinguish frozen historical V1 baseline from current post-V1 Phase 1 behavior. Phase 2/3 explicitly remain not approved.
+
+Follow-up needed:
+
+Optional: sync `docs/phase-b-architecture-map.md` §11 and drift-log Phase 1 status line if those files are reviewed next.

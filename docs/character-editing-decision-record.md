@@ -1,6 +1,6 @@
 # Character Editing Decision Record
 
-Status: Proposed / Documentation Accepted, Not Ready For Implementation
+Status: Phase 1 implemented (2026-06-10); Phase 2/3 documented only — not approved for implementation
 
 Purpose:
 
@@ -95,12 +95,13 @@ If a story introduces a doctor, future doctor stories should try to reuse the sa
 
 ### Phase 1 — Official Editable Characters
 
-Status: Future implementation candidate
+Status: **Shipped 2026-06-10**
 
-* [ ] Create editable global profiles for official characters
-* [ ] Add reset-to-default
-* [ ] Use saved profiles in story generation
-* [ ] Use saved profiles in illustration prompts
+* [x] Create editable global profiles for official characters (`character_profiles` table + seed)
+* [x] Add reset-to-default (one character, all characters)
+* [x] Use saved profiles in story generation
+* [x] Use saved profiles in copy-assembled illustration prompts
+* [x] Edit Characters UI on `/stories` (modal, Save, unsaved-changes guard)
 
 ### Phase 2 — Story-Specific Overrides
 
@@ -123,8 +124,6 @@ Status: Documented future direction
 
 ## 6. Current Implementation Boundary
 
-Do not build all three phases together.
+Phase 1 is **implemented**. Do not expand into Phase 2 or Phase 3 without a new drift-log entry and authority doc updates.
 
-Only Phase 1 may be promoted to implementation after authority docs are updated.
-
-Phase 2 and Phase 3 remain documented future directions.
+Phase 2 (story-specific overrides) and Phase 3 (teacher-created / story-introduced character persistence) remain **documented future directions only** — not approved for implementation.

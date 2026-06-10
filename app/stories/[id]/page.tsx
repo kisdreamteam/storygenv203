@@ -83,17 +83,37 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
   };
 
   return (
-    <main className="mx-auto min-h-screen max-w-3xl p-8">
+    <main className="mx-auto min-h-screen max-w-3xl p-5">
       <PilotWorkflowStoryView storyId={story.id} status={story.status} />
       <StoryEditorShell>
-        <header className="mb-10 flex items-start justify-between gap-2">
-          <div>
+        
+        
+        
+        <header className="mb-10 flex flex-col items-start justify-between gap-2">
+          <div className="flex flex-row w-full items-center justify-between gap-5">
             <Link href="/stories" className="text-sm text-gray-600 hover:text-gray-900">
               ← Back to home
             </Link>
-            <h1 className="mt-4 text-2xl font-semibold">{story.title}</h1>
-            <p className="mt-1 text-sm text-gray-600">{story.theme}</p>
             <div className="mb-3 mt-3 flex flex-wrap items-center gap-2">
+              <Link
+                href="/stories/new"
+                className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+              >
+                New Story
+              </Link>
+              <SignOutButton />
+            </div>
+          </div>
+          <div className="flex flex-col w-full items-start gap-1">
+            <h1 className="mt-4 text-xl md:text-2xl font-semibold">{story.title}</h1>
+            <p className="mt-1 text-sm text-gray-600">{story.theme}</p>
+            <div className="mb-3 flex flex-row  justify-between w-full items-center gap-2 items-start">
+              <StoryActionButtons storyId={story.id} setup={setup} />
+              <SaveButton storyId={story.id} />
+            </div>
+          </div>
+          <div className="flex flex-row items-start gap-2">
+            <div className="mb-3 mt-3 flex flex-wrap items-center gap-2 justify-end">
               <span
                 className={`rounded px-2 py-0.5 text-xs font-medium ${story.status === "saved"
                   ? "bg-green-100 text-green-800"
@@ -106,24 +126,10 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
                 <span className="text-xs text-gray-500">Saved {savedDate}</span>
               )}
             </div>
-            <div className="mb-3 flex flex-wrap items-center gap-2 items-start">
-              <StoryActionButtons storyId={story.id} setup={setup} />
-              <SaveButton storyId={story.id} />
-            </div>
-
-          </div>
-          <div className="flex shrink-0 flex-col items-end gap-3">
-            <div className="flex items-center gap-3">
-              <Link
-                href="/stories/new"
-                className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-              >
-                New Story
-              </Link>
-              <SignOutButton />
-            </div>
           </div>
         </header>
+
+
 
         <StoryPagesSection
           storyId={story.id}
