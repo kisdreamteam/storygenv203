@@ -23,19 +23,21 @@ export default async function StoriesPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-2xl p-8">
-      <header className="mb-8 flex items-start justify-between gap-4">
+      <header className="mb-8 flex flex-col items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">StoryGen</h1>
           <p className="mt-1 text-sm text-gray-600">Your saved stories</p>
         </div>
-        <div className="flex shrink-0 items-center gap-3">
-          <EditCharactersButton />
-          <Link
-            href="/stories/new"
-            className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-          >
-            New Story
-          </Link>
+        <div className="flex shrink-0 items-center justify-between w-full gap-3">
+          <div className="flex flex-row items-center gap-3">
+            <Link
+              href="/stories/new"
+              className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+            >
+              New Story
+            </Link>
+            <EditCharactersButton />
+          </div>
           <SignOutButton />
         </div>
       </header>
