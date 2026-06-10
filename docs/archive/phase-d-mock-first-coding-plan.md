@@ -6,6 +6,8 @@ Purpose:
 
 First implementation guide for a mock-first build. Planning only — no application code in this phase.
 
+**Superseded in part (2026-06-10):** Stored `illustration_prompt` is a short scene; full copy-ready prompts are assembled on copy. See drift-log entry and [illustration-guide.md](../before-coding/illustration-guide.md) § Story generation assembly.
+
 **Prerequisites:**
 
 * [docs/phase-b-architecture-map.md](../phase-b-architecture-map.md)
@@ -394,13 +396,13 @@ export interface MockGenerationResult {
 | Characters | Nina (6) and Nino (4) appear; reference [character-bible.md](../before-coding/character-bible.md) |
 | Page text | Reference `theme`, `learning_goal`, `main_events`; use `setting` if provided else default from bible |
 | Continuity callback | If `memory.summary.recent_stories.length > 0`, page 1 opens with "Nina and Nino remember..." + prior theme |
-| Illustration prompts | Scene from page text + bible descriptors + style suffix from [illustration-guide.md](../before-coding/illustration-guide.md) |
-| Vocabulary count | 5–7 items; parse comma-separated words from `vocabulary_focus` or use 5 placeholders |
+| Illustration scenes | Short scene stored per page; full production prompt assembled on copy from profiles + scene + style suffix ([illustration-guide.md](../before-coding/illustration-guide.md)) |
+| Vocabulary count | 1–40 items (validation); mock pipeline still caps at 7 via `parseVocabularyWords` |
 | Title | `theme` truncated to 60 characters |
 
 ## 7.3 Illustration prompt template
 
-Per illustration-guide:
+Applies to **copy-assembled production prompts** (not the stored short scene). Per illustration-guide:
 
 ```
 [Scene from page]. Nina is a 6-year-old girl, medium-brown skin, dark curly hair in two puffs, yellow shirt, blue overalls, red sneakers. Nino is a 4-year-old boy, medium-brown skin, short curly dark hair, green shirt, tan shorts, blue sneakers. [Setting]. [Mood]. Children's book illustration, warm soft colors, simple shapes, friendly expressions, clean background, ages 4-6, no text in image.
@@ -439,7 +441,7 @@ Locked per drift-log and phase-b-architecture-map.
 
 **Drafts not in list:** Home page shows `saved` only. Teacher reaches drafts via post-generate redirect.
 
-**Illustration prompts:** Read-only + copy button. Regenerate for new prompts.
+**Illustration scenes:** Show/hide in UI; copy assembles full production prompt. Regenerate for new scene after page text edit.
 
 **Vocabulary:** Read-only. Regenerate to change.
 

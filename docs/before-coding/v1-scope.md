@@ -71,7 +71,7 @@ Series Memory updates
 
 ↓
 
-Teacher optionally edits page text, illustration prompts, or story setup inputs
+Teacher optionally edits page text, illustration scenes, or story setup inputs
 
 ↓
 
@@ -124,7 +124,7 @@ Generation must provide:
 Required:
 
 Story pages (12 pages, ~30–40 words per page)
-Illustration prompts (one per page; copy-ready for external image tools)
+Illustration scenes (one short scene per page, stored and editable; full copy-ready production prompts assembled on copy for external image tools)
 Vocabulary support / flashcards
 Continuity-aware generation
 
@@ -163,11 +163,11 @@ Story Management
 Auto-save on generate and regenerate
 Save story (commit later edits only)
 Reopen stories
-Edit stories (page text, illustration prompts, setup inputs + regenerate)
+Edit stories (page text, illustration scenes, setup inputs + regenerate)
 Story persistence (Supabase — persist, reopen, edit across sessions)
 Illustration Prompts
-Prompt generation per page
-Copy-friendly prompt display
+Short scene generation per page (stored in `illustration_prompt`)
+Show/hide scene in UI; copy assembles full production prompt
 No in-app image generation
 Series Memory
 Generated stories persist via Supabase
@@ -188,7 +188,7 @@ Allowed:
 * Manual workflows
 * Temporary duplication
 * Fake loading states
-* Illustration prompts copied externally for manual image creation
+* Full production illustration prompts copied externally for manual image creation (assembled on copy from stored scenes)
 
 Allowed manually:
 
@@ -248,8 +248,8 @@ Teachers create stories quickly
 Generated stories appear on home automatically
 Teachers commit later edits via Save story when needed
 Teachers reopen stories
-Teachers edit stories (page text, prompts, setup inputs; regenerate from stored inputs)
-Illustration prompt workflow works sufficiently
+Teachers edit stories (page text, illustration scenes, setup inputs; regenerate from stored inputs)
+Illustration scene + copy workflow works sufficiently
 Continuity remains acceptable
 Story repetition remains acceptable
 Workflow feels simple

@@ -372,6 +372,38 @@ Status: Accepted
 
 ---
 
+Date: 2026-06-10
+
+Domain: AI Generation / Illustration Prompts / Character Continuity
+
+Problem: Full illustration prompts became too long for the UI and too expensive/slow for AI generation. OpenAI was being asked to generate locked character continuity blocks and style suffixes that the system already owns and can assemble from saved character profiles.
+
+What changed:
+
+* OpenAI now returns a short per-page `illustration_scene` instead of a full production illustration prompt
+* Stored `story_pages.illustration_prompt` now represents the editable short scene, not the full copy-ready prompt
+* Story page UI shows/hides the short illustration scene only
+* Copy prompt / Copy Illustrations assembles the full production prompt at copy time
+* Full production prompt is built from:
+  * Supabase character profiles
+  * Short AI scene
+  * story setting / mood context
+  * locked V1 illustration style suffix
+* Character detection for prompt assembly uses both page text and short scene
+* Legacy full prompts are normalized/extracted into short scene form when edited, saved, or regenerated
+* Illustration scene validation was loosened to 10–50 words
+* Vocabulary validation was loosened to 1–40 items to avoid false fallback when teachers provide longer vocabulary focus lists
+
+Why change is needed: This keeps the teacher UI readable, reduces OpenAI input/output size, lowers timeout risk, and preserves full copy-ready illustration prompts without asking the LLM to recreate static continuity rules.
+
+Documents affected: drift-log.md, illustration-guide.md, source-of-truth.md, v1-scope.md, phase-b-architecture-map.md, phase-d-mock-first-coding-plan.md, workflow-validation-checklist.md, teacher-pilot-test-plan.md, character-bible.md, roadmap-todo.md
+
+Decision: Accepted for V1. V1 stores and displays short editable illustration scenes, while full production illustration prompts are assembled only when copied/exported. Character continuity and locked illustration style remain system-owned, not LLM-owned.
+
+Status: Accepted
+
+---
+
 # 9. Current Open Decisions
 
 Use this section for unresolved items.

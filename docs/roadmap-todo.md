@@ -32,7 +32,7 @@ Rules:
 
 ## Character System — Phase 1: Editable Characters
 
-Status: Approved for implementation planning; code not started
+Status: Phase 1 foundation + Edit Characters UI shipped; Phase 2/3 not started
 
 **Decision record:** [docs/character-editing-decision-record.md](character-editing-decision-record.md)
 
@@ -49,17 +49,32 @@ Status: Approved for implementation planning; code not started
 
 Documentation prerequisites complete. Do not start code until an implementation plan is written.
 
+#### Character profile foundation
+
 - [x] Create character_profiles table
 - [x] Seed Nina, Nino, Mom, Dad, Grandpa, and Ms. Lee
 - [x] Create character profile resolver/helper layer
-- [ ] Load character profiles during generation
-- [ ] Add Edit Characters button
-- [ ] Add Edit Characters modal
-- [ ] Allow editing appearance descriptions
-- [ ] Allow editing personality descriptions
-- [ ] Save character edits
+- [x] Load character profiles during generation
 - [x] Use saved profiles in story generation
-- [x] Use saved profiles in illustration prompts
+- [x] Use saved profiles in production illustration prompt assembly
+
+#### Illustration prompt architecture
+
+See drift-log entry (2026-06-10 — AI Generation / Illustration Prompts / Character Continuity).
+
+- [x] Store short illustration scene per page
+- [x] Display short illustration scene in the UI
+- [x] Hide illustration scene by default
+- [x] Add Show/Hide illustration scene toggle
+- [x] Assemble full production prompt only on Copy prompt / Copy Illustrations
+
+#### Character editing UI
+
+- [x] Add Edit Characters button
+- [x] Add Edit Characters modal
+- [x] Allow editing appearance descriptions
+- [x] Allow editing personality descriptions
+- [x] Save character edits
 
 ### Open decisions
 

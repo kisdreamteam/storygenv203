@@ -15,7 +15,19 @@ export {
   isOfficialCharacterKey,
 } from "./factory-defaults";
 
+export {
+  CHARACTER_PROFILE_API_COLUMNS,
+  sortProfilesByOfficialOrder,
+  type CharacterProfileApiRow,
+} from "./api-types";
+
 export { isValidEditableProfile, normalizeCharacterProfileRow } from "./normalize";
+
+export {
+  MAX_PROFILE_FIELD_LENGTH,
+  validateEditableProfileFields,
+  type ValidateEditableProfileFieldsResult,
+} from "./validate-editable-fields";
 
 export {
   getCharacterProfileByKey,

@@ -247,12 +247,11 @@ Educational usefulness is prioritized over creativity alone.
 
 ## V1 Illustrations (Locked)
 
-* Illustration prompts only
-* No in-app image generation in V1
-* One illustration prompt per story page
-* Every prompt includes the locked V1 illustration continuity suffix (see [illustration-guide.md](illustration-guide.md))
+* Illustration prompts only (no in-app image generation in V1)
+* One short **illustration scene** per story page stored in `illustration_prompt` (10–50 words; editable in UI)
+* Full copy-ready production prompts assembled only on **Copy prompt** / **Copy Illustrations** from character profiles + scene + setting/mood + locked style suffix (see [illustration-guide.md](illustration-guide.md))
 * Official V1 illustration framing: 16:9 landscape, zoomed-out composition, full-body characters visible, extra empty space for educational text overlays, no text/speech bubbles/labels/watermarks in image
-* Locked character descriptors from [character-bible.md](character-bible.md) on every official character appearance
+* Locked character descriptors from [character-bible.md](character-bible.md) / `character_profiles` on every official character in copy-assembled prompts
 
 ## V1 Persistence (Locked)
 
@@ -268,7 +267,7 @@ Educational usefulness is prioritized over creativity alone.
 ## V1 Edit Scope (Locked)
 
 * Edit story text per page
-* Edit illustration prompts per page
+* Edit illustration scenes per page (stored in `illustration_prompt` column)
 * Edit story setup inputs (theme, learning goal, vocabulary focus, main events, optional fields)
 * Regenerate story from stored setup inputs (replaces pages, prompts, and vocabulary; auto-saves)
 * Save story — commit later edits only; not required after first generation

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SignOutButton } from "@/components/auth/SignOutButton";
+import { EditCharactersButton } from "@/components/characters/EditCharactersButton";
 import { StoryList } from "@/components/stories/StoryList";
 import type { SavedStory } from "@/components/stories/StoryCard";
 import { createClient } from "@/lib/supabase/server";
@@ -28,6 +29,7 @@ export default async function StoriesPage() {
           <p className="mt-1 text-sm text-gray-600">Your saved stories</p>
         </div>
         <div className="flex shrink-0 items-center gap-3">
+          <EditCharactersButton />
           <Link
             href="/stories/new"
             className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"

@@ -4,6 +4,8 @@ Version: 1.0
 
 Purpose: Guide a small trusted teacher pilot for StoryGen V2 workflow validation. Documentation only — no product changes from this file.
 
+**Superseded in part (2026-06-10):** Stored `illustration_prompt` is a short scene; full copy-ready prompts are assembled on copy. See drift-log entry and [illustration-guide.md](../before-coding/illustration-guide.md) § Story generation assembly.
+
 Authority: [product-spec.md](../before-coding/product-spec.md), [source-of-truth.md](../before-coding/source-of-truth.md), [v1-scope.md](../before-coding/v1-scope.md)
 
 ---
@@ -42,7 +44,7 @@ This is a **private, invite-only** test of how fast and clear the story-creation
 
 - Story **wording may feel template-like** right now. Real AI generation is coming later.
 - We want your feedback on **workflow, clarity, speed, and usefulness** — not on whether the app is finished.
-- You will see **illustration prompts** with a copy button. V1 does not show images in the app; you would use prompts in an external image tool if you want pictures.
+- You will see short **illustration scenes** (Show/Hide) with a copy button that assembles the full production prompt. V1 does not show images in the app; you would paste copied prompts into an external image tool if you want pictures.
 - The session takes about **10–15 minutes**. Bring a simple classroom theme in mind (e.g. sharing, kindness, visiting the fire station).
 
 There is no right or wrong answer. Pause wherever you feel unsure — that is useful feedback.
@@ -66,7 +68,7 @@ Facilitator: observe quietly; help only if the teacher is blocked (login failure
 | 9 | Click **New Story** again | New create form |
 | 10 | Create a **second story** with a different theme; Generate | Page 1 should reference the prior story (e.g. “Nina and Nino remember…”) |
 
-**Observer note:** Generated stories appear on home immediately after Generate. **Save story** is only needed after the teacher edits page text, prompts, or setup inputs.
+**Observer note:** Generated stories appear on home immediately after Generate. **Save story** is only needed after the teacher edits page text, illustration scenes, or setup inputs. **Copy prompt** delivers the full external-tool-ready text.
 
 ---
 

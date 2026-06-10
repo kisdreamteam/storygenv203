@@ -4,6 +4,8 @@ Version: 1.0
 
 Purpose: Verify the complete V1 teacher workflow end-to-end **before** pilot sessions. Documentation only — not a spec change, not product analytics.
 
+**Superseded in part (2026-06-10):** Stored `illustration_prompt` is a short scene; full copy-ready prompts are assembled on copy. See drift-log entry and [illustration-guide.md](../before-coding/illustration-guide.md) § Story generation assembly.
+
 Authority: [product-spec.md](../before-coding/product-spec.md), [source-of-truth.md](../before-coding/source-of-truth.md), [v1-scope.md](../before-coding/v1-scope.md), [docs/phase-b-architecture-map.md](../phase-b-architecture-map.md)
 
 Related:
@@ -106,7 +108,7 @@ Do **not** commit real teacher credentials to the repo.
 - [ ] Submit with empty required fields → Generate disabled
 - [ ] Fill Theme, Learning Goal, Vocabulary Focus, Main Events → **Generate** enabled
 - [ ] Click **Generate** → redirect to `/stories/{id}`
-- [ ] Story page shows **12 pages**, each with text + illustration prompt + copy button
+- [ ] Story page shows **12 pages**, each with text + illustration scene (Show/Hide) + copy button that yields full production prompt
 - [ ] Vocabulary section populated (words from Vocabulary Focus)
 - [ ] Status badge shows **Draft**
 - [ ] Console: `[StoryGen:pilot] story_create_page_opened`, `story_generate_clicked`, `story_generate_completed`

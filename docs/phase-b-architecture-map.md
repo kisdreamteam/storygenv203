@@ -37,7 +37,7 @@ V1 delivers:
 
 * **Nina & Nino** stories for ages 4–6, English only
 * **12 story pages** per story (~30–40 words per page)
-* **Illustration prompts** (one per page) — copy-ready for external image tools; no in-app image generation
+* **Illustration scenes** (one short scene per page, stored in `illustration_prompt`) — full copy-ready production prompts assembled on copy for external image tools; no in-app image generation
 * **Vocabulary support** / flashcards aligned to the teacher's vocabulary focus
 * **Global Series Memory** persisted in Supabase — maintains continuity and reduces repetition across all saved stories
 * **Supabase Auth** for individual teacher accounts
@@ -59,11 +59,11 @@ This workflow must work end-to-end. If any step fails, V1 fails.
 4. Teacher clicks Generate
 5. System auto-saves and teacher receives:
    * 12 story pages
-   * 12 illustration prompts (one per page)
+   * 12 illustration scenes (one per page; full prompts on copy)
    * Vocabulary support / flashcards
    * Story on home / recent stories list
    * Series Memory updated
-6. Teacher optionally edits page text, illustration prompts, or story setup inputs
+6. Teacher optionally edits page text, illustration scenes, or story setup inputs
 7. If edited, teacher clicks **Save story** to commit changes (updates Series Memory)
 8. Teacher may **Regenerate** from stored setup inputs (replaces content; auto-saves)
 9. Teacher reopens the story later
@@ -99,7 +99,7 @@ Keep routes minimal. Only what V1 requires.
 | `/` | Public landing page; existing `LoginForm` entry (invite-only sign-in) |
 | `/stories` | Authenticated story list (teacher's own saved stories) + "New Story" action |
 | `/stories/new` | Input form (4 required + optional fields) + Generate |
-| `/stories/[id]` | Story viewer/editor: 12 pages, illustration prompts with copy button, vocabulary, Edit Story Setup, Regenerate, Save story (edits only) |
+| `/stories/[id]` | Story viewer/editor: 12 pages, illustration scenes (show/hide + copy for full prompt), vocabulary, Edit Story Setup, Regenerate, Save story (edits only) |
 
 **Auth behavior:**
 
@@ -158,7 +158,7 @@ One row per page. Exactly 12 pages per story.
 | `story_id` | uuid | FK to `stories` |
 | `page_number` | int | 1–12 |
 | `text` | text | ~30–40 words |
-| `illustration_prompt` | text | Copy-ready prompt per [illustration-guide.md](before-coding/illustration-guide.md) |
+| `illustration_prompt` | text | Short editable illustration scene (10–50 words) per [illustration-guide.md](before-coding/illustration-guide.md); full production prompt assembled on copy |
 
 Unique constraint on `(story_id, page_number)`.
 
@@ -307,7 +307,7 @@ flowchart LR
     bible[Character Bible static context] --> pipeline
     illusGuide[Illustration Guide rules] --> pipeline
     pipeline --> storyGen[Story: 12 pages]
-    pipeline --> promptGen[Illustration prompts: 1 per page]
+    pipeline --> promptGen[Illustration scenes: 1 per page]
     pipeline --> vocabGen[Vocabulary support]
     storyGen --> persist[Persist to Supabase]
     promptGen --> persist
@@ -343,21 +343,22 @@ flowchart LR
 | Teacher inputs | Story direction; overrides continuity |
 | Series Memory | Compressed history, vocab taught, themes, characters, repetition notes |
 | Character Bible | Tier 1 characters, voice rules, age guardrails, educational tone |
-| Illustration Guide | Prompt template, locked continuity suffix (16:9 framing), character consistency rules |
+| Illustration Guide | Scene format, copy-time assembly rules, locked continuity suffix (16:9 framing), character consistency rules |
+| Character profiles | Official character descriptors for copy-assembled production prompts |
 
 ## Outputs
 
 | Output | Spec |
 |--------|------|
 | Story pages | 12 pages, ~30–40 words each, ages 4–6 readability |
-| Illustration prompts | 1 per page; copy-ready; follows illustration-guide template + style suffix |
+| Illustration scenes | 1 per page; short scene stored (10–50 words); full copy-ready production prompt assembled on copy from profiles + scene + style suffix |
 | Vocabulary support | Words from vocabulary focus + context; child-friendly definitions or examples |
 
 ## Save behavior
 
 * Generate and Regenerate auto-save: `status = saved`, `saved_at` set, Series Memory merged
 * Teacher can edit story setup (inputs only) via **Edit Story Setup**; pages unchanged until Regenerate
-* Teacher can edit page text or illustration prompts; changes persist on blur
+* Teacher can edit page text or illustration scenes; changes persist on blur
 * Manual **Save story** commits saved state + Series Memory when the teacher has unsaved edits (dirty state)
 
 ## Regenerate behavior
@@ -371,7 +372,7 @@ flowchart LR
 * `draft` applies only before first successful generation (in-progress create flow)
 * Successful generate and regenerate write `saved` immediately
 * Story title auto-generated from theme (truncated short label); Edit Story Setup may update title from theme before Regenerate
-* Illustration prompts: read-only + copy button; regenerate for new prompts
+* Illustration scenes: show/hide in UI; copy assembles full production prompt; per-page regenerate for new scene after page text edit
 * Vocabulary items: read-only; regenerate to change
 
 ## Error behavior (locked)
@@ -533,13 +534,13 @@ No unresolved spec conflicts.
 
 Suggested columns (implementation detail — not finalized): character id/key, appearance text, personality text, updated_at. Exact schema to be defined at implementation time.
 
-## Future generation flow change
+## Character profiles in generation (implemented)
 
-1. Load `character_profiles` before story generation (alongside Series Memory and teacher inputs)
+1. Load `character_profiles` before story generation and on story detail page (alongside Series Memory and teacher inputs)
 2. Use saved profiles for official character descriptors when present
-3. Fall back to Character Bible / code defaults when no saved row exists
-4. Illustration prompt generation uses the same profile source for official characters on each page
-5. Locked illustration continuity suffix unchanged
+3. Fall back to Character Bible / factory defaults when no saved row exists
+4. OpenAI returns short `illustration_scene` per page; stored in `illustration_prompt`
+5. Copy-assembled production prompts use the same profile source + locked illustration continuity suffix
 
 ## Future UI (minimal)
 

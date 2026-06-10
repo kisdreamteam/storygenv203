@@ -27,7 +27,7 @@ Rules:
 
 * Teachers **cannot** edit character profiles in V1
 * Official character appearances are fixed in this document and injected at generation time
-* Illustration prompts must use the locked visual descriptors for every official character on the page
+* Copy-assembled production illustration prompts must use locked visual descriptors for every official character on the page (from `character_profiles` when available); LLM `illustration_scene` output does not include appearance details
 * Unknown characters introduced by teachers (friends, classmates, visitors, etc.) may appear in stories when the plot requires them, but are **not** persisted as character profiles in V1
 * Future versions may allow teachers to edit and save character profiles — explicitly out of V1 scope (see section 15)
 
@@ -316,7 +316,7 @@ Per locked product decisions:
 * 12 pages per story
 * ~30–40 words per page
 * Ages 4–6 readability
-* One illustration prompt per page (see [illustration-guide.md](illustration-guide.md))
+* One short illustration scene per page stored in `illustration_prompt`; full production prompt assembled on copy (see [illustration-guide.md](illustration-guide.md))
 
 Typical page rhythm:
 

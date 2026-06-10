@@ -527,4 +527,43 @@ Scenes between 10–19 words now pass validation instead of triggering mock fall
 
 Follow-up needed:
 
-None.
+None. Accepted decision recorded in [drift-log.md](before-coding/drift-log.md) (2026-06-10 — AI Generation / Illustration Prompts / Character Continuity).
+
+---
+
+## 2026-06-10 — Edit Characters Phase 1 UI
+
+Prompt / Context:
+
+Character profile foundation (table, seed, resolver, generation, copy-time assembly) was complete; teachers had no in-app way to edit official character appearance and personality.
+
+What changed:
+
+- **Edit Characters** button on `/stories` header (modal only; no new route)
+- Modal for six official characters with appearance and personality textareas
+- Save updates global `character_profiles` rows; reset one or reset all restores factory defaults from seeded `factory_*` columns
+- API: `GET /api/character-profiles`, `PATCH /api/character-profiles/[character_key]`, `POST /api/character-profiles/reset`
+- UI note: changes affect future stories only; existing saved stories are not rewritten
+
+Why it changed:
+
+Complete Editable Characters Phase 1 teacher workflow without rebuilding foundation or expanding into story overrides, presets, or per-teacher profiles.
+
+Files affected:
+
+- app/api/character-profiles/*
+- components/characters/EditCharactersButton.tsx
+- components/characters/EditCharactersModal.tsx
+- lib/character-profiles/validate-editable-fields.ts
+- lib/character-profiles/api-types.ts
+- app/stories/page.tsx
+- docs/roadmap-todo.md
+- docs/project-changelog.md
+
+Impact:
+
+Teachers can edit global Nina & Nino family profiles in-app; next Generate, Regenerate, and Copy illustration prompt use saved values. Phase 2/3 (story overrides, teacher-created characters) remain out of scope.
+
+Follow-up needed:
+
+Optional doc sync: source-of-truth.md and character-bible.md still mention "cannot edit profiles in V1" in some sections.
