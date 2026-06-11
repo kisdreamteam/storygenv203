@@ -3,8 +3,8 @@ import {
   sceneFromPageText,
 } from "./illustration-prompt";
 import type {
+  GenerationOptions,
   MockGenerationResult,
-  SeriesMemorySummary,
   StoryInputs,
 } from "./types";
 
@@ -36,20 +36,49 @@ function parseVocabularyWords(vocabularyFocus: string): string[] {
   return words.slice(0, 7);
 }
 
+function resolveVariantIndex(options?: GenerationOptions): number {
+  if (options?.mode !== "regenerate") return 0;
+  const seed = options.previousPages?.[0]?.text.length ?? 0;
+  return seed % 3;
+}
+
 function buildPageTexts(
   inputs: StoryInputs,
   setting: string,
-  memory: SeriesMemorySummary
+  variantIndex: number
 ): string[] {
   const { theme, learning_goal, main_events } = inputs;
-  const hasMemory = memory.recent_stories.length > 0;
-  const priorTheme = hasMemory
-    ? memory.recent_stories[memory.recent_stories.length - 1]?.theme ?? "their last adventure"
-    : "";
 
-  const page1Open = hasMemory
-    ? `Nina and Nino remember ${priorTheme}. Today they explore ${theme} together at ${setting}.`
-    : `Nina and Nino woke up on a sunny morning. Today they will learn about ${theme} at ${setting}.`;
+  const page1Variants = [
+    `Nina and Nino woke up on a sunny morning. Today they will learn about ${theme} at ${setting}.`,
+    `After breakfast, Nina and Nino get ready for ${theme}. They head to ${setting} with curious steps.`,
+    `Nina finds a note about ${theme}. Nino wonders what they will do today at ${setting}.`,
+  ];
+
+  const page1Open = page1Variants[variantIndex % page1Variants.length];
+
+  const middleVariants = [
+    [
+      `A small problem appears. Nino feels unsure for a moment. Nina says, "Let's try again together." They breathe and nod.`,
+      `They use kind words and gentle hands. Nina shares an idea. Nino adds a funny hop. Their ${theme} adventure grows brighter.`,
+    ],
+    [
+      `Something tricky happens. Nino pauses and watches. Nina whispers, "We can figure this out." They try a new way.`,
+      `They test a new plan together. Nina points. Nino copies her careful move. Their ${theme} task starts to work.`,
+    ],
+    [
+      `A surprise twist shows up. Nino asks a question. Nina thinks, then nods. They choose a fresh approach.`,
+      `They practice step by step. Nina names each part. Nino repeats with a grin. Their ${theme} work moves forward.`,
+    ],
+  ];
+
+  const [page6, page7] = middleVariants[variantIndex % middleVariants.length];
+
+  const endingVariants = [
+    `At home, Nina and Nino tell Mom and Dad about their day. They feel proud, tired, and glad. Tomorrow brings another story.`,
+    `Later, Nina and Nino draw a picture about ${theme}. They whisper about what they noticed. The day ends with a warm smile.`,
+    `Before bed, Nina and Nino talk about one favorite moment. Nino yawns. Nina says, "We helped each other today."`,
+  ];
 
   return [
     `${page1Open} Their goal is simple: ${learning_goal}. Nino smiles. Nina says, "We can do this!"`,
@@ -57,13 +86,13 @@ function buildPageTexts(
     `At ${setting}, Nina points and says, "Look!" Nino asks, "What is that?" They notice something new for their ${theme} story.`,
     `The main plan begins. ${main_events.split(".")[0] || main_events}. Nina listens carefully. Nino copies her brave smile.`,
     `They practice the learning goal: ${learning_goal}. Nina explains with short, clear words. Nino repeats each word with joy.`,
-    `A small problem appears. Nino feels unsure for a moment. Nina says, "Let's try again together." They breathe and smile.`,
-    `They use kind words and gentle hands. Nina shares an idea. Nino adds a funny hop. Their ${theme} adventure grows brighter.`,
+    page6,
+    page7,
     `Friends nearby cheer them on. Nina and Nino laugh softly. They remember ${learning_goal} and keep going step by step.`,
     `The hard part is solved with teamwork. Nino says, "We did it!" Nina claps once and gives a proud thumbs up.`,
     `They look around ${setting} and talk about what they learned. Nina names three things. Nino names two more with a grin.`,
     `Before heading home, they review ${theme} one more time. Nina says, "${learning_goal} matters." Nino nods and says, "Me too!"`,
-    `At home, Nina and Nino tell Mom and Dad about their day. They feel proud, tired, and happy. Tomorrow brings another story.`,
+    endingVariants[variantIndex % endingVariants.length],
   ];
 }
 
@@ -80,10 +109,11 @@ function buildVocabulary(
 
 export function runMockPipeline(
   inputs: StoryInputs,
-  memory: SeriesMemorySummary
+  options?: GenerationOptions
 ): MockGenerationResult {
   const setting = resolveSetting(inputs);
-  const pageTexts = buildPageTexts(inputs, setting, memory);
+  const variantIndex = resolveVariantIndex(options);
+  const pageTexts = buildPageTexts(inputs, setting, variantIndex);
   const vocabWords = parseVocabularyWords(inputs.vocabulary_focus);
 
   const pages = pageTexts.map((text, index) => {

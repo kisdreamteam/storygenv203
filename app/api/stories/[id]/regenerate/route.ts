@@ -46,9 +46,22 @@ export async function POST(_request: Request, context: RouteContext) {
     notes: story.notes ?? undefined,
   };
 
+  const { data: existingPages, error: pagesLoadError } = await supabase
+    .from("story_pages")
+    .select("page_number, text")
+    .eq("story_id", storyId)
+    .order("page_number");
+
+  if (pagesLoadError) {
+    return NextResponse.json({ error: "Failed to load story pages" }, { status: 500 });
+  }
+
   let generation;
   try {
-    generation = await generateStory(supabase, inputs);
+    generation = await generateStory(supabase, inputs, {
+      mode: "regenerate",
+      previousPages: existingPages ?? [],
+    });
   } catch {
     return NextResponse.json({ error: "Regeneration failed" }, { status: 500 });
   }

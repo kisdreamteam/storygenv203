@@ -3,7 +3,7 @@ import { loadCharacterProfiles } from "@/lib/character-profiles";
 import { tryAiGeneration } from "./ai-generation";
 import { runMockPipeline } from "./mock-pipeline";
 import { loadSeriesMemory } from "@/lib/series-memory/load";
-import type { MockGenerationResult, StoryInputs } from "./types";
+import type { GenerationOptions, MockGenerationResult, StoryInputs } from "./types";
 
 export type GenerateStoryResult = {
   result: MockGenerationResult;
@@ -17,12 +17,13 @@ function combineWarnings(...parts: Array<string | null | undefined>): string | n
 
 export async function generateStory(
   supabase: SupabaseClient,
-  inputs: StoryInputs
+  inputs: StoryInputs,
+  options?: GenerationOptions
 ): Promise<GenerateStoryResult> {
   const [{ summary, warning: memoryWarning }, { profiles, warning: profileWarning }] =
     await Promise.all([loadSeriesMemory(supabase), loadCharacterProfiles(supabase)]);
 
-  const ai = await tryAiGeneration(inputs, summary, profiles);
+  const ai = await tryAiGeneration(inputs, summary, profiles, options);
   if (ai.ok) {
     return {
       result: ai.result,
@@ -30,7 +31,7 @@ export async function generateStory(
     };
   }
 
-  const mockResult = runMockPipeline(inputs, summary);
+  const mockResult = runMockPipeline(inputs, options);
   const fallbackWarning = `AI generation unavailable (${ai.reason}). Using template story.`;
 
   return {

@@ -175,11 +175,10 @@ record(
 );
 
 const priorTheme = memoryAfter?.summary?.recent_stories?.at(-1)?.theme ?? "";
-const callbackText = `Nina and Nino remember ${priorTheme}`;
 record(
-  "d9_continuity_callback_ready",
+  "d9_memory_prior_theme_stored",
   priorTheme === "sharing",
-  `callback would use: "${callbackText}"`
+  `memory has prior theme for dedup only: ${priorTheme || "none"} (stories are standalone)`
 );
 
 const { data: savedList } = await authed

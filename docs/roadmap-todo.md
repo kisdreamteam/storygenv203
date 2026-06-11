@@ -91,13 +91,51 @@ See drift-log entry (2026-06-10 — AI Generation / Illustration Prompts / Chara
 
 ## Story Quality
 
-Status: Backlog
+Status: Backlog — Sprint 1, Sprint 2, and Regenerate Variation shipped; further iterations pending
 
-- [ ] Reduce repetitive wording
-- [ ] Improve story endings
+- [x] Reduce repetitive wording (regenerate anti-copy)
+- [x] Improve story endings (regenerate variation rule)
 - [ ] Improve educational usefulness
 - [ ] Improve vocabulary integration
 - [ ] Improve continuity between pages
+
+### Story Quality Sprint 1 (prompt-only)
+
+Status: Implemented 2026-06-10
+
+- [x] Improve story endings (pages 10–12)
+- [x] Reduce repetitive emotional wording
+- [x] Improve vocabulary reinforcement cadence
+- [x] Page rhythm guidance
+- [x] Limit unnecessary adult cameos
+
+### Story Quality Sprint 2 (prompt-only)
+
+Status: Implemented 2026-06-10
+
+- [x] Require clear story engine (goal, question, challenge, or discovery)
+- [x] Strengthen adult cameo rules and community-worker guidance
+- [x] Stricter word-variety limits and age-appropriate alternatives
+- [x] Stronger pages 10–12 (anti-summary, specific callbacks)
+- [x] Stronger vocabulary reinforcement through page 12
+
+- [x] Prevent unnecessary previous-story callbacks (standalone generation)
+
+### Regenerate Variation (prompt-only)
+
+Status: Implemented 2026-06-10
+
+- [x] Meaningfully different story on Regenerate with same teacher inputs
+- [x] Pass prior page text as anti-repetition context
+- [x] Internal generate vs regenerate mode in pipeline
+
+### Validation tolerance (prompt + bounds)
+
+Status: Implemented 2026-06-10
+
+- [x] Lower page word bound 20 → 25 words (target remains 30–40)
+- [x] Prompt: allow slightly shorter complete pages; no filler padding
+- [x] Prompt: allow natural positive emotional repetition for ages 4–6
 
 ## Illustration Prompt Quality
 

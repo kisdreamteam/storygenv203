@@ -1,6 +1,11 @@
 import type { CharacterProfileMap } from "@/lib/character-profiles";
 import { buildSystemPrompt, buildUserPrompt } from "./prompts";
-import type { MockGenerationResult, SeriesMemorySummary, StoryInputs } from "./types";
+import type {
+  GenerationOptions,
+  MockGenerationResult,
+  SeriesMemorySummary,
+  StoryInputs,
+} from "./types";
 import { validateGenerationOutput } from "./validate-output";
 
 const OPENAI_CHAT_URL = "https://api.openai.com/v1/chat/completions";
@@ -31,7 +36,8 @@ function parseJsonContent(content: string): unknown {
 export async function tryAiGeneration(
   inputs: StoryInputs,
   memory: SeriesMemorySummary,
-  profiles: CharacterProfileMap
+  profiles: CharacterProfileMap,
+  options?: GenerationOptions
 ): Promise<AiGenerationResult> {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) {
@@ -55,7 +61,7 @@ export async function tryAiGeneration(
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: buildSystemPrompt(profiles) },
-          { role: "user", content: buildUserPrompt(inputs, memory) },
+          { role: "user", content: buildUserPrompt(inputs, memory, options) },
         ],
       }),
       signal: controller.signal,

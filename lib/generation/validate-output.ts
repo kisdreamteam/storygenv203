@@ -1,7 +1,7 @@
 import type { MockGenerationResult } from "./types";
 
 const PAGE_COUNT = 12;
-const MIN_WORDS_PER_PAGE = 20;
+const MIN_WORDS_PER_PAGE = 25;
 const MAX_WORDS_PER_PAGE = 55;
 const MIN_SCENE_WORDS = 10;
 const MAX_SCENE_WORDS = 50;

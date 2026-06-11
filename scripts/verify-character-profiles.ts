@@ -19,7 +19,9 @@ import {
   GLOBAL_ILLUSTRATION_SUFFIX,
   injectIllustrationContinuityIntoPages,
 } from "@/lib/generation/character-continuity";
-import { buildSystemPrompt } from "@/lib/generation/prompts";
+import { buildSystemPrompt, buildUserPrompt } from "@/lib/generation/prompts";
+import { validateGenerationOutput } from "@/lib/generation/validate-output";
+import { EMPTY_SERIES_MEMORY } from "@/lib/generation/types";
 
 function loadEnv() {
   const text = readFileSync(resolve(process.cwd(), ".env.local"), "utf8").replace(/^\uFEFF/, "");
@@ -146,6 +148,80 @@ record(
   "build_system_prompt_modified_profile",
   buildSystemPrompt(modifiedProfiles).includes(customAppearance),
   "modified Nina appearance in prompt"
+);
+
+const sampleInputs = {
+  theme: "Art Class",
+  learning_goal: "Explore colors and shapes",
+  vocabulary_focus: "paint, brush, color",
+  main_events: "Nina and Nino paint at school",
+};
+const generateUserPrompt = buildUserPrompt(sampleInputs, EMPTY_SERIES_MEMORY);
+record(
+  "build_user_prompt_generate_no_regeneration",
+  !generateUserPrompt.includes("REGENERATION REQUEST"),
+  "generate mode omits regeneration block"
+);
+const regenerateUserPrompt = buildUserPrompt(sampleInputs, EMPTY_SERIES_MEMORY, {
+  mode: "regenerate",
+  previousPages: [{ page_number: 1, text: "Nina and Nino enter the art room." }],
+});
+record(
+  "build_user_prompt_regenerate_variation",
+  regenerateUserPrompt.includes("REGENERATION REQUEST") &&
+    regenerateUserPrompt.includes("substantially different") &&
+    regenerateUserPrompt.includes("Page 1:"),
+  "regenerate mode includes variation and prior page context"
+);
+record(
+  "build_system_prompt_word_count_guidance",
+  systemPrompt.includes("aim for 30–40 words") &&
+    systemPrompt.includes("slightly shorter") &&
+    systemPrompt.includes("Do not pad with filler"),
+  "system prompt includes flexible word-count guidance"
+);
+record(
+  "build_system_prompt_emotional_repetition_allowed",
+  systemPrompt.includes("may repeat naturally") &&
+    !systemPrompt.includes("Word variety (strict)"),
+  "system prompt allows natural positive emotional repetition"
+);
+
+function makeWords(count: number): string {
+  return Array.from({ length: count }, (_, i) => `word${i + 1}`).join(" ");
+}
+
+function makeValidGenerationPayload(pageWordCount: number) {
+  const pageText = makeWords(pageWordCount);
+  const sceneText = makeWords(12);
+  return {
+    story: { title: "Test Story" },
+    pages: Array.from({ length: 12 }, (_, i) => ({
+      page_number: i + 1,
+      text: pageText,
+      illustration_scene: sceneText,
+    })),
+    vocabulary: [{ word: "test", definition_or_example: "A test word.", sort_order: 1 }],
+  };
+}
+
+record(
+  "validate_page_words_25_passes",
+  validateGenerationOutput(makeValidGenerationPayload(25)).ok === true,
+  "25-word page passes validation"
+);
+record(
+  "validate_page_words_24_fails",
+  validateGenerationOutput(makeValidGenerationPayload(24)).ok === false,
+  "24-word page fails validation"
+);
+record(
+  "validate_page_count_wrong_fails",
+  validateGenerationOutput({
+    ...makeValidGenerationPayload(30),
+    pages: makeValidGenerationPayload(30).pages.slice(0, 11),
+  }).ok === false,
+  "11 pages fails validation"
 );
 
 const continuityMap = buildCharacterContinuityMap(factory);

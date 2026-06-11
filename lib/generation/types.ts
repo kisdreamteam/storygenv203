@@ -9,6 +9,18 @@ export interface StoryInputs {
   notes?: string;
 }
 
+export type GenerationMode = "generate" | "regenerate";
+
+export type PreviousStoryPage = {
+  page_number: number;
+  text: string;
+};
+
+export type GenerationOptions = {
+  mode?: GenerationMode;
+  previousPages?: PreviousStoryPage[];
+};
+
 export interface SeriesMemorySummary {
   characters: unknown[];
   settings: string[];

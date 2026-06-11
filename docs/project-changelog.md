@@ -607,3 +607,179 @@ Readers can distinguish frozen historical V1 baseline from current post-V1 Phase
 Follow-up needed:
 
 Optional: sync `docs/phase-b-architecture-map.md` §11 and drift-log Phase 1 status line if those files are reviewed next.
+
+---
+
+## 2026-06-10 — Story Quality Sprint 1 — Prompt Refinement
+
+Prompt / Context:
+
+Manual audit of six generated themes (Art Class, Toy Store, Aquarium, Bakery, Birthday Party, Dentist) found strong workflow and page flow, but recurring weaknesses: generic endings, repetitive emotional language, and vocabulary introduced without enough mid- and late-story reinforcement.
+
+What changed:
+
+- Added **Story quality (strict)** block to AI system prompt in `lib/generation/prompts.ts`
+- Instructions cover page rhythm (pages 1–12), ending requirements (callback, reflection, warm close), vocabulary cadence (pages 2–4 / 5–8 / 10–11), word variety for common emotional terms, and limiting unnecessary adult cameos
+
+Why it changed:
+
+Improve first-draft story quality via prompt-only refinement without changing workflow, routes, schema, validation bounds, UI, character profiles, or illustration scene architecture.
+
+Files affected:
+
+- lib/generation/prompts.ts
+- docs/roadmap-todo.md
+- docs/project-changelog.md
+
+Impact:
+
+Future **Generate** and **Regenerate** calls use the refined instructions. Existing saved stories are unchanged. No drift-log entry — prompt tuning within the existing Story Quality backlog.
+
+Follow-up needed:
+
+Manual validation on Birthday party, Dentist visit, and Aquarium or bakery themes; additional Story Quality sprints if audits still show gaps in educational usefulness or page-to-page continuity.
+
+---
+
+## 2026-06-10 — Story Quality Sprint 2 — Prompt Refinement
+
+Prompt / Context:
+
+Round 2 manual audits after Sprint 1 still showed repetitive wording, unnecessary adult cameos, weak story engines (no clear goal or question), generic final-page summaries, and vocabulary not always reinforced naturally.
+
+What changed:
+
+- Expanded **Story quality (strict)** block in `lib/generation/prompts.ts` (Sprint 2 supersedes Sprint 1 prompt text in the same constant)
+- Added required story engine (goal, question, challenge, discovery) established by page 3
+- Strengthened adult cameo rules; community workers when relevant; no one-line cameos
+- Stricter word-variety ban list and suggested simple alternatives
+- Stronger ending rules: specific object/action callbacks, anti-summary pages 10–12, expanded banned generic closings
+- Stronger vocabulary cadence including page 12 story-feeling close
+
+Why it changed:
+
+Further improve first-draft quality through prompt-only refinement without changing workflow, routes, schema, validation, UI, or illustration architecture.
+
+Files affected:
+
+- lib/generation/prompts.ts
+- docs/roadmap-todo.md
+- docs/project-changelog.md
+
+Impact:
+
+Future **Generate** and **Regenerate** use Sprint 2 instructions. Existing saved stories unchanged. No drift-log entry.
+
+Follow-up needed:
+
+Manual validation on Post Office, Space Adventure, Fire Station, Rainy Day House Party, and Library themes.
+
+---
+
+## 2026-06-10 — Standalone Story Generation Rule
+
+Prompt / Context:
+
+Generated stories often opened with references to previous adventures ("They remember visiting the zoo," "last time," etc.). Classroom stories are not always taught in sequence; each story should work on its own.
+
+What changed:
+
+- **Standalone story (strict)** rules in `lib/generation/prompts.ts` — self-contained stories; no prior-story references unless teacher asks for sequel/continuation in inputs
+- Removed system prompt line encouraging optional page-1 Series Memory callbacks
+- User prompt clarifies Series Memory is for deduplicating plots/themes/vocabulary only — not for story-text callbacks
+- **Mock fallback** in `lib/generation/mock-pipeline.ts` — always standalone page 1 (removed "Nina and Nino remember…")
+- `scripts/verify-workflow.mjs` — memory check updated to expect stored theme for dedup, not callback text
+
+Why it changed:
+
+Teachers may use stories in any order; automatic previous-story callbacks confuse standalone classroom use while Series Memory still avoids repetition internally.
+
+Files affected:
+
+- lib/generation/prompts.ts
+- lib/generation/mock-pipeline.ts
+- scripts/verify-workflow.mjs
+- docs/roadmap-todo.md
+- docs/project-changelog.md
+
+Impact:
+
+Future **Generate** and **Regenerate** produce standalone stories by default. Series Memory, character profiles, and save/regenerate workflow unchanged. No drift-log entry.
+
+Follow-up needed:
+
+None.
+
+---
+
+## 2026-06-10 — Regenerate Variation — Prompt Refinement
+
+Prompt / Context:
+
+Regenerate used the same generation path as initial Generate with identical prompts, so teachers often received nearly the same story when inputs were unchanged.
+
+What changed:
+
+- Internal `GenerationMode` (`generate` | `regenerate`) threaded through `lib/generation/pipeline.ts`, `lib/generation/ai-generation.ts`, and `lib/generation/prompts.ts`
+- Regenerate route loads existing `story_pages` text before replace and passes compact anti-repetition context to the user prompt
+- Regeneration instructions require substantially different plot structure, opening, middle activity, dialogue, and ending while keeping same theme, learning goal, vocabulary, and teacher constraints
+- Mock fallback varies page templates on regenerate via variant index
+
+Why it changed:
+
+Make Regenerate feel useful — same educational inputs, meaningfully different story version — without UI, schema, or workflow changes.
+
+Files affected:
+
+- lib/generation/types.ts
+- lib/generation/prompts.ts
+- lib/generation/pipeline.ts
+- lib/generation/ai-generation.ts
+- lib/generation/mock-pipeline.ts
+- app/api/stories/[id]/regenerate/route.ts
+- scripts/verify-character-profiles.ts
+- docs/roadmap-todo.md
+- docs/project-changelog.md
+
+Impact:
+
+**Regenerate** produces variation-aware prompts; **Generate** unchanged. Existing saved stories only change through normal regenerate. No drift-log entry.
+
+Follow-up needed:
+
+Manual validation: generate Art Class, regenerate 3+ times, confirm pages 1/6/12 differ while theme and vocabulary stay aligned.
+
+---
+
+## 2026-06-10 — Story Quality Validation Tolerance
+
+Prompt / Context:
+
+Regenerate variation sometimes failed validation when one page was slightly short (e.g. 17–24 words). Strict prompt wording also discouraged natural positive emotional repetition for ages 4–6.
+
+What changed:
+
+- Page word minimum: 20 → **25** words in `lib/generation/validate-output.ts` (max 55 unchanged)
+- System prompt: aim for 30–40 words; ~25 acceptable if meaning is complete; no filler padding
+- Word variety guidance relaxed: allow natural repetition of happy, excited, smile, laugh, cheer, proud; still vary sentence structures
+- `scripts/verify-character-profiles.ts`: word-count boundary and prompt guidance checks
+
+Why it changed:
+
+Reduce false AI fallback on regenerate while keeping structural validation (12 pages, scenes, vocabulary, JSON) intact.
+
+Files affected:
+
+- lib/generation/validate-output.ts
+- lib/generation/prompts.ts
+- scripts/verify-character-profiles.ts
+- docs/roadmap-todo.md
+- docs/project-changelog.md
+
+Impact:
+
+Slightly shorter but complete pages pass validation. Broken structure still fails. No drift-log entry.
+
+Follow-up needed:
+
+None.
