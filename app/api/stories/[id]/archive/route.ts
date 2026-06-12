@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rebuildSeriesMemoryFromActiveStories } from "@/lib/series-memory/update";
 import { createClient } from "@/lib/supabase/server";
 
 type RouteContext = {
@@ -44,5 +45,7 @@ export async function POST(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Failed to archive story" }, { status: 500 });
   }
 
-  return NextResponse.json({ success: true });
+  const { warning } = await rebuildSeriesMemoryFromActiveStories();
+
+  return NextResponse.json({ success: true, warning });
 }

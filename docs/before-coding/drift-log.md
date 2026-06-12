@@ -404,6 +404,29 @@ Status: Accepted
 
 ---
 
+Date: 2026-06-10
+
+Domain: AI Generation / Series Memory
+
+Problem: AI output that failed page-length validation silently fell back to mock/template stories, saved them, and updated Series Memory. Archived stories remained in Series Memory forever and continued to influence generation.
+
+What changed:
+
+* Validation failure is separate from API/key failure — no mock save on validation failure
+* One AI repair pass for repairable short-page failures; revalidate; return 422 if still invalid
+* Archive (soft delete) rebuilds Series Memory from all active saved, non-archived stories
+* Hard delete not added; soft delete/archive retained
+
+Why change is needed: Teachers expect AI-generated stories, not silent template substitution. Removed stories should not steer future generation.
+
+Documents affected: drift-log.md, source-of-truth.md, phase-b-architecture-map.md, project-changelog.md
+
+Decision: Accepted.
+
+Status: Accepted
+
+---
+
 # 9. Current Open Decisions
 
 Use this section for unresolved items.

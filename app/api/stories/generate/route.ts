@@ -37,6 +37,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Generation failed" }, { status: 500 });
   }
 
+  if (!generation.ok) {
+    return NextResponse.json({ error: generation.error }, { status: 422 });
+  }
+
   const { result, warning: generationWarning } = generation;
 
   const { data: story, error: storyError } = await supabase

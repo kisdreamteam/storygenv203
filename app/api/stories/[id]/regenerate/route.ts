@@ -66,6 +66,10 @@ export async function POST(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Regeneration failed" }, { status: 500 });
   }
 
+  if (!generation.ok) {
+    return NextResponse.json({ error: generation.error }, { status: 422 });
+  }
+
   const { result, warning: generationWarning } = generation;
 
   const { error: deleteVocabError } = await supabase

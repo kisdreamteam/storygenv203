@@ -222,10 +222,11 @@ Series Memory updates when:
 
 Series Memory does NOT update when:
 
-* Generation or regeneration fails
-* Story is deleted or archived
+* Generation or regeneration fails (including AI output validation failure — no mock/template save)
 * Teacher edits page text or prompts but has not clicked Save story yet
 * Teacher edits story setup inputs only (pages unchanged until Regenerate)
+
+When a story is archived (soft delete from the home list), Series Memory is **rebuilt from all active saved, non-archived stories** so the archived story no longer influences future generation. Archive does not append to memory — it removes the archived story's influence. Hard delete is not part of V1.
 
 Teachers may intentionally override continuity.
 

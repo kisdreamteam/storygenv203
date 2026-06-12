@@ -25,7 +25,7 @@ Planning only. No production code.
 
 **Spec alignment:**
 
-Generate and Regenerate auto-save (`status = saved`). Series Memory updates on successful auto-save and when the teacher commits later edits via Save story. Memory does not update on failed generation or archive.
+Generate and Regenerate auto-save (`status = saved`). Series Memory updates on successful auto-save and when the teacher commits later edits via Save story. Memory does not update on failed generation. Archive rebuilds memory from active saved stories so archived stories no longer influence generation.
 
 ---
 
@@ -115,7 +115,7 @@ Keep routes minimal. Only what V1 requires.
 * `/stories` lists teacher's own `saved` stories only (`status = saved` and `is_archived = false`)
 * `draft` status is not used after successful generate (schema may retain the value; generate/regenerate write `saved`)
 * After generate, teacher is redirected to `/stories/[id]`; story is auto-saved and appears on home immediately
-* Teachers can archive a saved story from the home list (X on story card); sets `is_archived = true`; story hidden from home; Series Memory does not update on archive
+* Teachers can archive a saved story from the home list (X on story card); sets `is_archived = true`; story hidden from home; Series Memory is rebuilt from remaining active saved stories (archived story excluded from `recent_stories`, `themes_covered`, `vocabulary_history`, and `settings`)
 
 ---
 
@@ -248,7 +248,7 @@ Locked official characters (Nina, Nino, Mom, Dad, Grandpa, Ms. Lee) are always i
 | Regenerate succeeds (auto-save) | Yes |
 | Teacher commits edits via Save story | Yes |
 | Generation or regeneration fails | No |
-| Story archived | No |
+| Story archived | Rebuild from active saved stories (removes archived influence; does not append) |
 | Edit Story Setup only (no Regenerate) | No |
 | Page/prompt edits not yet saved via Save story | No |
 
@@ -379,13 +379,14 @@ flowchart LR
 
 | Failure | Behavior |
 |---------|----------|
-| Generation fails | Show error message + retry; no Series Memory update; do not save partial story |
+| AI output validation fails | One repair pass for short pages when repairable; if still invalid, return error (422); no mock/template save; no Series Memory update |
+| API / key / timeout unavailable | Mock template fallback allowed; auto-save if persist succeeds; warning shown |
 | Series Memory load fails | Proceed with empty memory + static character bible; show non-blocking warning |
 | Save fails (edit commit) | Show error; remain on editor; page edits preserved in DB; memory not updated until Save succeeds |
 
 ## V1 shortcut
 
-Per [v1-scope.md](before-coding/v1-scope.md), mock/fixture generation is acceptable initially. Wire the real LLM after the display and save flows work.
+Per [v1-scope.md](before-coding/v1-scope.md), mock/fixture generation is acceptable when the OpenAI API is unavailable (missing key, timeout, HTTP error). Mock fallback does **not** apply to AI output validation failure.
 
 ---
 

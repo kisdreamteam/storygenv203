@@ -1,5 +1,5 @@
+import { EMPTY_SERIES_MEMORY, type SeriesMemorySummary } from "@/lib/generation/types";
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import type { SeriesMemorySummary } from "@/lib/generation/types";
 
 const SERIES_MEMORY_ID = "nina-nino";
 
@@ -82,6 +82,89 @@ export function mergeSeriesMemorySummary(
     themes_covered: dedupeAppend(current.themes_covered, [story.theme]),
     repetition_notes: current.repetition_notes,
   };
+}
+
+export type StoryMemorySource = {
+  story: StoryForMemoryUpdate;
+  vocabularyWords: string[];
+};
+
+export function buildSeriesMemorySummaryFromStories(
+  sources: StoryMemorySource[]
+): SeriesMemorySummary {
+  let summary: SeriesMemorySummary = { ...EMPTY_SERIES_MEMORY };
+
+  for (const { story, vocabularyWords } of sources) {
+    summary = mergeSeriesMemorySummary(summary, story, vocabularyWords);
+  }
+
+  return summary;
+}
+
+export async function rebuildSeriesMemoryFromActiveStories(): Promise<{
+  warning: string | null;
+}> {
+  const supabase = createServiceRoleClient();
+
+  const { data: stories, error: storiesError } = await supabase
+    .from("stories")
+    .select("id, title, theme, main_events, setting")
+    .eq("status", "saved")
+    .eq("is_archived", false)
+    .order("saved_at", { ascending: true });
+
+  if (storiesError) {
+    return {
+      warning:
+        "Story archived, but series memory could not be rebuilt. Continuity may still reflect removed stories.",
+    };
+  }
+
+  const sources: StoryMemorySource[] = [];
+
+  for (const story of stories ?? []) {
+    const { data: vocabulary, error: vocabularyError } = await supabase
+      .from("story_vocabulary")
+      .select("word")
+      .eq("story_id", story.id)
+      .order("sort_order", { ascending: true });
+
+    if (vocabularyError) {
+      return {
+        warning:
+          "Story archived, but series memory could not be rebuilt. Continuity may still reflect removed stories.",
+      };
+    }
+
+    sources.push({
+      story: {
+        title: story.title,
+        theme: story.theme,
+        main_events: story.main_events,
+        setting: story.setting,
+      },
+      vocabularyWords: (vocabulary ?? []).map((item) => item.word),
+    });
+  }
+
+  const summary = buildSeriesMemorySummaryFromStories(sources);
+
+  const { error: updateError } = await supabase
+    .from("series_memory")
+    .update({
+      summary,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", SERIES_MEMORY_ID);
+
+  if (updateError) {
+    return {
+      warning:
+        "Story archived, but series memory could not be rebuilt. Continuity may still reflect removed stories.",
+    };
+  }
+
+  return { warning: null };
 }
 
 export async function updateSeriesMemoryOnSave(

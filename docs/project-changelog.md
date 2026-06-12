@@ -48,6 +48,37 @@ Follow-up needed:
 
 # Changelog Entries
 
+## 2026-06-10 — Generation Validation + Archive Memory Fixes
+
+Prompt / Context:
+
+Audit of Series Memory lifecycle and generation validation failures.
+
+What changed:
+
+* AI validation failure no longer falls back to mock/template stories or updates Series Memory
+* One repair pass for short pages below the word minimum; 422 error if repair still fails
+* API/key/timeout failures may still use mock fallback with warning
+* Archive rebuilds Series Memory from active saved, non-archived stories (soft delete retained; no hard delete)
+
+Why it changed:
+
+Teachers should get AI stories or a clear error — not silent template substitution. Archived stories should not influence future generation.
+
+Files affected:
+
+`lib/generation/validate-output.ts`, `lib/generation/ai-generation.ts`, `lib/generation/pipeline.ts`, `lib/series-memory/update.ts`, `app/api/stories/generate/route.ts`, `app/api/stories/[id]/regenerate/route.ts`, `app/api/stories/[id]/archive/route.ts`, `scripts/verify-character-profiles.ts`, authority docs
+
+Impact:
+
+Generation validation and archive behavior now match product intent and architecture map error table.
+
+Follow-up needed:
+
+Monitor repair-pass success rate; tune word minimum only if repair remains insufficient.
+
+---
+
 ## 2026-06-09 — Product Roadmap Added
 
 Prompt / Context:

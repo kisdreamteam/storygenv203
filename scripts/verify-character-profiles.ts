@@ -20,8 +20,13 @@ import {
   injectIllustrationContinuityIntoPages,
 } from "@/lib/generation/character-continuity";
 import { buildSystemPrompt, buildUserPrompt } from "@/lib/generation/prompts";
-import { validateGenerationOutput } from "@/lib/generation/validate-output";
+import {
+  getShortPageNumbers,
+  isRepairableShortPageFailure,
+  validateGenerationOutput,
+} from "@/lib/generation/validate-output";
 import { EMPTY_SERIES_MEMORY } from "@/lib/generation/types";
+import { buildSeriesMemorySummaryFromStories } from "@/lib/series-memory/update";
 
 function loadEnv() {
   const text = readFileSync(resolve(process.cwd(), ".env.local"), "utf8").replace(/^\uFEFF/, "");
@@ -222,6 +227,53 @@ record(
     pages: makeValidGenerationPayload(30).pages.slice(0, 11),
   }).ok === false,
   "11 pages fails validation"
+);
+record(
+  "validate_short_pages_repairable",
+  isRepairableShortPageFailure(makeValidGenerationPayload(24)),
+  "24-word pages are repairable short-page failures"
+);
+record(
+  "validate_short_pages_detected",
+  getShortPageNumbers(makeValidGenerationPayload(22)).length === 12,
+  "all 12 pages flagged when below minimum"
+);
+record(
+  "validate_wrong_page_count_not_repairable",
+  !isRepairableShortPageFailure({
+    ...makeValidGenerationPayload(30),
+    pages: makeValidGenerationPayload(30).pages.slice(0, 11),
+  }),
+  "structural page-count failure is not repairable"
+);
+
+const memoryStoryA = {
+  title: "Story A",
+  theme: "sharing",
+  main_events: "Nina shares toys.",
+  setting: "Park",
+};
+const memoryStoryB = {
+  title: "Story B",
+  theme: "art class",
+  main_events: "Nina paints.",
+  setting: null,
+};
+const memoryWithBoth = buildSeriesMemorySummaryFromStories([
+  { story: memoryStoryA, vocabularyWords: ["share", "friend"] },
+  { story: memoryStoryB, vocabularyWords: ["paint", "brush"] },
+]);
+const memoryActiveOnly = buildSeriesMemorySummaryFromStories([
+  { story: memoryStoryB, vocabularyWords: ["paint", "brush"] },
+]);
+record(
+  "memory_rebuild_excludes_archived_story",
+  memoryWithBoth.recent_stories.length === 2 &&
+    memoryActiveOnly.recent_stories.length === 1 &&
+    memoryActiveOnly.recent_stories[0]?.theme === "art class" &&
+    !memoryActiveOnly.themes_covered.includes("sharing") &&
+    !memoryActiveOnly.vocabulary_history.includes("share"),
+  "rebuild from active stories drops archived influence"
 );
 
 const continuityMap = buildCharacterContinuityMap(factory);

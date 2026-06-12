@@ -1,13 +1,17 @@
 import type { MockGenerationResult } from "./types";
 
 const PAGE_COUNT = 12;
-const MIN_WORDS_PER_PAGE = 25;
+export const MIN_WORDS_PER_PAGE = 25;
 const MAX_WORDS_PER_PAGE = 55;
 const MIN_SCENE_WORDS = 10;
 const MAX_SCENE_WORDS = 50;
 const MIN_VOCAB = 1;
 const MAX_VOCAB = 40;
 const MAX_TITLE_LENGTH = 60;
+
+type ValidationOptions = {
+  skipPageWordMin?: boolean;
+};
 
 function wordCount(text: string): number {
   return text.trim().split(/\s+/).filter(Boolean).length;
@@ -21,7 +25,10 @@ export type ValidationResult =
   | { ok: true; result: MockGenerationResult }
   | { ok: false; reason: string };
 
-export function validateGenerationOutput(raw: unknown): ValidationResult {
+function validateGenerationOutputInternal(
+  raw: unknown,
+  options?: ValidationOptions
+): ValidationResult {
   if (!isRecord(raw)) {
     return { ok: false, reason: "response is not a JSON object" };
   }
@@ -72,7 +79,13 @@ export function validateGenerationOutput(raw: unknown): ValidationResult {
       return { ok: false, reason: `page ${pageNumber} text is empty` };
     }
     const words = wordCount(text);
-    if (words < MIN_WORDS_PER_PAGE || words > MAX_WORDS_PER_PAGE) {
+    if (!options?.skipPageWordMin && words < MIN_WORDS_PER_PAGE) {
+      return {
+        ok: false,
+        reason: `page ${pageNumber} has ${words} words (expected ${MIN_WORDS_PER_PAGE}–${MAX_WORDS_PER_PAGE})`,
+      };
+    }
+    if (words > MAX_WORDS_PER_PAGE) {
       return {
         ok: false,
         reason: `page ${pageNumber} has ${words} words (expected ${MIN_WORDS_PER_PAGE}–${MAX_WORDS_PER_PAGE})`,
@@ -145,4 +158,45 @@ export function validateGenerationOutput(raw: unknown): ValidationResult {
       vocabulary,
     },
   };
+}
+
+export function validateGenerationOutput(raw: unknown): ValidationResult {
+  return validateGenerationOutputInternal(raw);
+}
+
+export function getShortPageNumbers(raw: unknown): number[] {
+  if (!isRecord(raw) || !Array.isArray(raw.pages)) {
+    return [];
+  }
+
+  const shortPages: number[] = [];
+  for (const page of raw.pages) {
+    if (!isRecord(page)) continue;
+    const pageNumber = page.page_number;
+    const text = typeof page.text === "string" ? page.text.trim() : "";
+    if (
+      typeof pageNumber === "number" &&
+      pageNumber >= 1 &&
+      pageNumber <= PAGE_COUNT &&
+      text &&
+      wordCount(text) < MIN_WORDS_PER_PAGE
+    ) {
+      shortPages.push(pageNumber);
+    }
+  }
+
+  return shortPages.sort((a, b) => a - b);
+}
+
+export function isRepairableShortPageFailure(raw: unknown): boolean {
+  if (getShortPageNumbers(raw).length === 0) {
+    return false;
+  }
+
+  const relaxed = validateGenerationOutputInternal(raw, { skipPageWordMin: true });
+  if (!relaxed.ok) {
+    return false;
+  }
+
+  return !validateGenerationOutput(raw).ok;
 }
