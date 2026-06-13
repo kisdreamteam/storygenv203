@@ -10,6 +10,8 @@ import {
   storySetupFromStory,
   type StorySetupFormState,
 } from "@/lib/story/setup-form-state";
+import { WeeklyPlanAssistBanner } from "./WeeklyPlanAssistBanner";
+import { useWeeklyPlanSuggestion } from "./useWeeklyPlanSuggestion";
 import { StorySetupFields } from "./StorySetupFields";
 
 export type StorySetupData = {
@@ -54,9 +56,22 @@ export function StorySetupForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const {
+    suggesting,
+    planSuggested,
+    planError,
+    handleSuggest,
+    clearPlanError,
+    deriveBannerState,
+  } = useWeeklyPlanSuggestion(loading);
+
+  const { needsSuggestion, planComplete, emptyWeekCount, canSuggest } =
+    deriveBannerState(form);
+
   function updateField(field: keyof StorySetupFormState, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
     setError(null);
+    clearPlanError();
   }
 
   function handleCharacterToggle(key: OfficialCharacterKey) {
@@ -65,11 +80,13 @@ export function StorySetupForm({
       selected_characters: toggleCharacterSelection(prev.selected_characters, key),
     }));
     setError(null);
+    clearPlanError();
   }
 
   function handleOtherCharactersChange(value: string) {
     setForm((prev) => ({ ...prev, other_characters: value }));
     setError(null);
+    clearPlanError();
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -78,6 +95,7 @@ export function StorySetupForm({
 
     setLoading(true);
     setError(null);
+    clearPlanError();
 
     try {
       const response = await fetch(`/api/stories/${storyId}/setup`, {
@@ -101,7 +119,7 @@ export function StorySetupForm({
     }
   }
 
-  const canSubmit = isStorySetupFormValid(form) && !loading;
+  const canSubmit = isStorySetupFormValid(form) && !loading && !suggesting;
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -110,15 +128,33 @@ export function StorySetupForm({
         onFieldChange={updateField}
         onCharacterToggle={handleCharacterToggle}
         onOtherCharactersChange={handleOtherCharactersChange}
-        disabled={loading}
+        disabled={loading || suggesting}
         showMoreOptions={showMoreOptions}
         onToggleMoreOptions={() => setShowMoreOptions((open) => !open)}
         idPrefix={idPrefix}
+        planAssistBanner={
+          <WeeklyPlanAssistBanner
+            alwaysShow
+            needsSuggestion={needsSuggestion}
+            planSuggested={planSuggested}
+            planComplete={planComplete}
+            suggesting={suggesting}
+            canSuggest={canSuggest}
+            onSuggest={() => handleSuggest(form, setForm)}
+            emptyWeekCount={emptyWeekCount}
+          />
+        }
       />
 
       <p className="text-xs text-gray-500">
         Click Regenerate to apply these changes to story pages.
       </p>
+
+      {planError && (
+        <p className="rounded bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+          {planError}
+        </p>
+      )}
 
       {error && (
         <p className="rounded bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
@@ -138,7 +174,7 @@ export function StorySetupForm({
           <button
             type="button"
             onClick={onCancel}
-            disabled={loading}
+            disabled={loading || suggesting}
             className="text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50"
           >
             Cancel

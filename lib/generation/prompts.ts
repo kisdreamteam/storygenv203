@@ -13,6 +13,12 @@ import type {
   SeriesMemorySummary,
   StoryInputs,
 } from "./types";
+import {
+  FIRST_GENERATE_VARIETY_GUIDANCE,
+  formatSeriesMemoryPlotAvoidance,
+  formatStoryShapeHint,
+  STORY_ANTI_FORMULA_GUIDANCE,
+} from "./story-variety";
 
 const JSON_SCHEMA = `{
   "story": { "title": "string (max 60 chars, from theme)" },
@@ -49,7 +55,9 @@ Planning rules:
 - Do not place a later week's primary content in an earlier page block.
 - Week 4 should include meaningful new learning — not recap-only or goodbye-only pages.
 
-Story engine, vocabulary, endings, and standalone rules same as topic-first guidance.
+Story engine, vocabulary, endings, standalone rules, and anti-formula rules same as topic-first guidance.
+
+${STORY_ANTI_FORMULA_GUIDANCE}
 `.trim();
 
 const TOPIC_FIRST_STORY_QUALITY_GUIDANCE = `
@@ -57,9 +65,9 @@ Story quality (topic-first monthly plan):
 
 The Monthly Topic is the master theme. Plan one connected 12-page story in four 3-page beats:
 - Pages 1–3: introduce the Topic, setting, and a clear goal or question
-- Pages 4–6: explore and practice within the Topic
-- Pages 7–9: a small challenge or deeper learning tied to the Topic
-- Pages 10–12: meaningful resolution or new learning with a warm ending
+- Pages 4–6: deepen the Topic through exploration, making, helping, or hands-on activity (match weekly plan / story shape)
+- Pages 7–9: one focused beat — discovery, helping someone, surprise, wonder, building, OR a small challenge — pick what fits the Topic and weekly plan (do not default to obstacle every time)
+- Pages 10–12: meaningful resolution or new learning with a warm ending shown through action, not summary
 
 When teacher weekly guidance is missing, invent four connected weekly beats from the Topic and Learning Goal.
 When teacher guidance is present, use it as light direction only — expand into full scenes; do not copy verbatim.
@@ -100,6 +108,8 @@ Standalone story (strict):
 
 inferred_weekly_plan (optional in JSON):
 - If included, summarize the four weekly beats used (events + vocabulary per week)
+
+${STORY_ANTI_FORMULA_GUIDANCE}
 `.trim();
 
 const REGENERATE_VARIATION_GUIDANCE = `
@@ -116,6 +126,7 @@ Variation rules:
 - Avoid copying prior page wording
 - Do not contradict teacher inputs; keep classroom safety and standalone story rules
 - Keep the topic-first page blocks (pages 1–3 / 4–6 / 7–9 / 10–12)
+- Follow anti-formula rules: no checklist scenes, no default obstacle-on-pages-7–9, no summary-only endings
 `.trim();
 
 const MAX_PREVIOUS_PAGE_SNIPPET = 120;
@@ -185,9 +196,6 @@ export function buildUserPrompt(
     optionalLines.push(`Words to avoid: ${inputs.words_to_avoid.trim()}`);
   }
   if (inputs.notes?.trim()) optionalLines.push(`Notes: ${inputs.notes.trim()}`);
-  if (inputs.characterHints?.official.length) {
-    optionalLines.push(formatCharacterHintsForPrompt(inputs.characterHints));
-  }
 
   const learningGoalLine = inputs.learning_goal.trim()
     ? inputs.learning_goal.trim()
@@ -205,6 +213,10 @@ export function buildUserPrompt(
   );
 
   const mode = options?.mode ?? "generate";
+  const characterBlock =
+    inputs.characterHints?.official.length
+      ? `\nCharacter guidance:\n${formatCharacterHintsForPrompt(inputs.characterHints)}\n`
+      : "";
   const planBlock = isCompleteWeeklyPlan(inputs.weeklyPlan)
     ? `\n${formatWeeklyPlanForPrompt(inputs.weeklyPlan, inputs.theme, inputs.learning_goal)}\n`
     : `\n${formatTopicFirstPlanForPrompt(
@@ -222,15 +234,18 @@ export function buildUserPrompt(
               : "";
           return `\n\n${REGENERATE_VARIATION_GUIDANCE}${antiRepetition}`;
         })()
-      : "";
+      : `\n\n${FIRST_GENERATE_VARIETY_GUIDANCE}`;
+
+  const shapeBlock = `\n${formatStoryShapeHint(inputs.theme)}\n`;
+  const memoryPlotAvoidance = formatSeriesMemoryPlotAvoidance(memory);
 
   return `Write a 12-page Nina & Nino story.
 
 Required inputs:
 - Topic (master theme): ${inputs.theme}
 - Learning Goal: ${learningGoalLine}
-${inputs.vocabulary_focus.trim() ? `- Combined vocabulary hints (all weeks): ${inputs.vocabulary_focus}\n` : ""}${planBlock}${optionalLines.length ? optionalLines.join("\n") + "\n" : ""}
+${characterBlock}${shapeBlock}${inputs.vocabulary_focus.trim() ? `- Combined vocabulary hints (all weeks): ${inputs.vocabulary_focus}\n` : ""}${planBlock}${optionalLines.length ? optionalLines.join("\n") + "\n" : ""}
 Series Memory (internal continuity only — do NOT reference previous stories in story text):
-Use to avoid repeating plots, themes, and vocabulary. Each story must still read standalone for students who have not read prior stories.
+${memoryPlotAvoidance}
 ${memoryJson}${regenerateBlock}`;
 }

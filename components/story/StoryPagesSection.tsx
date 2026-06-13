@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { CharacterProfileMap } from "@/lib/character-profiles/types";
 import {
   formatIllustrationsForCopy,
@@ -26,6 +26,14 @@ export function StoryPagesSection({
   profiles,
 }: StoryPagesSectionProps) {
   const [livePages, setLivePages] = useState<StoryPage[]>(pages);
+
+  const pagesSignature = pages
+    .map((p) => `${p.id}:${p.text}:${p.illustration_prompt}`)
+    .join("|");
+
+  useEffect(() => {
+    setLivePages(pages);
+  }, [pages, pagesSignature]);
 
   const updateLivePage = useCallback(
     (id: string, data: { text: string; illustration_prompt: string }) => {

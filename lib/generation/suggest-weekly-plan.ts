@@ -1,5 +1,15 @@
 import type { StoryInputs } from "./types";
 import {
+  formatStoryShapeHint,
+  SUGGEST_VARIETY_GUIDANCE,
+} from "./story-variety";
+import {
+  formatCharacterHintsForSuggestPlan,
+  formatCharacterNamesForText,
+  getSupportingCharacterDisplayNames,
+  hasExtendedCharacterCast,
+} from "@/lib/story/character-hints";
+import {
   emptyWeeklyPlan,
   isCompleteWeeklyPlan,
   mergeWeeklyPlans,
@@ -58,7 +68,16 @@ function weeksNeedingSuggestion(plan: WeeklyPlan): WeeklyPlanKey[] {
   return WEEK_PLAN_KEYS.filter((key) => plan[key].events.trim() === "");
 }
 
-function buildSuggestSystemPrompt(): string {
+function buildSuggestSystemPrompt(hasCharacters: boolean): string {
+  const characterRules = hasCharacters
+    ? `
+Character planning rules (strict when a character list is provided):
+- Weekly beats must reflect the teacher's character list.
+- Each week's events field must name at least one listed character by display name.
+- Do not invent unlisted official characters (Mom, Dad, Ms. Lee, Grandpa, Grandma, etc.) unless listed or named in Other.
+- Spread listed characters across weeks where natural.`
+    : "";
+
   return `You are a children's educational story planning assistant for the Nina & Nino series (ages 4–6).
 
 Output rules (strict):
@@ -67,12 +86,14 @@ Output rules (strict):
 - Each week maps to a 3-page block in a 12-page story.
 - All four weeks must connect as ONE continuous arc under the Topic.
 - Week 4 must include meaningful new learning or a final event — not recap-only.
+${SUGGEST_VARIETY_GUIDANCE}
+${characterRules}
 
 JSON schema:
 ${JSON_SCHEMA}`;
 }
 
-function buildSuggestUserPrompt(inputs: StoryInputs): string {
+export function buildSuggestUserPrompt(inputs: StoryInputs): string {
   const emptyWeeks = weeksNeedingSuggestion(inputs.weeklyPlan);
   const teacherBlocks = WEEK_PLAN_KEYS.map((key, index) => {
     const week = inputs.weeklyPlan[key];
@@ -91,6 +112,15 @@ Vocabulary: ${vocabulary || "(none)"}`;
   if (inputs.tone?.trim()) optionalLines.push(`Tone: ${inputs.tone.trim()}`);
   if (inputs.notes?.trim()) optionalLines.push(`Notes: ${inputs.notes.trim()}`);
 
+  const characterBlock =
+    inputs.characterHints?.official.length
+      ? `\n${formatCharacterHintsForSuggestPlan(inputs.characterHints)}\n`
+      : "";
+
+  const characterClosingRule = inputs.characterHints?.official.length
+    ? " For each empty week you propose, the events string must explicitly name which characters from the list above appear in that 3-page block."
+    : "";
+
   const proposeList =
     emptyWeeks.length === 4
       ? "Propose main-idea beats for ALL four weeks."
@@ -98,19 +128,21 @@ Vocabulary: ${vocabulary || "(none)"}`;
           .map((key) => `Week ${WEEK_PLAN_KEYS.indexOf(key) + 1} (${PAGE_BLOCKS[key]})`)
           .join(", ")}.`;
 
+  const shapeHint = formatStoryShapeHint(inputs.theme);
+  const shapeClosingRule =
+    emptyWeeks.length > 0
+      ? " For empty weeks, follow the assigned story shape above — avoid generic 'face a small challenge' unless the shape is Challenge."
+      : "";
+
   return `Plan a topic-centered monthly story outline.
 
 Topic (master theme): ${inputs.theme}
 Learning Goal: ${inputs.learning_goal.trim() || "(not specified — infer educational focus from Topic and weekly plan)"}
+${characterBlock}
+${shapeHint}
 ${optionalLines.length ? optionalLines.join("\n") + "\n" : ""}
-Page blocks:
-- Week 1 / Pages 1–3: introduce Topic, setting, goal
-- Week 2 / Pages 4–6: explore and practice within Topic
-- Week 3 / Pages 7–9: small challenge or deeper learning
-- Week 4 / Pages 10–12: meaningful resolution with warm ending
-
 ${teacherBlocks ? `Teacher guidance already provided:\n${teacherBlocks}\n\n` : ""}${proposeList}
-Return weekly_plan with all four weeks. For teacher-provided weeks, repeat their events/vocabulary exactly. For empty weeks, propose connected beats that fit the Topic and prior weeks.`;
+Return weekly_plan with all four weeks. For teacher-provided weeks, repeat their events/vocabulary exactly. For empty weeks, propose connected beats that fit the Topic, prior weeks, and the assigned story shape.${characterClosingRule}${shapeClosingRule}`;
 }
 
 function validateSuggestedPlan(raw: unknown): WeeklyPlan | null {
@@ -121,29 +153,69 @@ function validateSuggestedPlan(raw: unknown): WeeklyPlan | null {
   return isCompleteWeeklyPlan(plan) ? plan : null;
 }
 
-function mockSuggestedPlan(inputs: StoryInputs): WeeklyPlan {
-  const { theme, learning_goal } = inputs;
-  const goalPhrase = learning_goal.trim()
-    ? `set a goal tied to ${learning_goal}`
-    : `learn about ${theme}`;
-  const defaults: Record<WeeklyPlanKey, { events: string; vocabulary: string }> = {
+function mockWeekEventsWithCast(
+  cast: string,
+  theme: string,
+  goalPhrase: string,
+  inputs: StoryInputs
+): Record<WeeklyPlanKey, { events: string; vocabulary: string }> {
+  const supporting = getSupportingCharacterDisplayNames(inputs.characterHints);
+  const other = inputs.characterHints?.other?.trim();
+  const pick = (index: number) => supporting[index % supporting.length];
+  const otherNote = other ? ` ${other} may join.` : "";
+
+  if (!hasExtendedCharacterCast(inputs.characterHints)) {
+    return {
+      week1: {
+        events: `${cast} begin exploring ${theme} and ${goalPhrase}.`,
+        vocabulary: "learn, explore",
+      },
+      week2: {
+        events: `${cast} practice and discover more about ${theme} through hands-on activities.`,
+        vocabulary: "practice, discover",
+      },
+      week3: {
+        events: `${cast} face a small challenge and work together to solve it within the ${theme} story.`,
+        vocabulary: "help, try",
+      },
+      week4: {
+        events: `${cast} finish with meaningful learning about ${theme} and a warm closing moment.`,
+        vocabulary: "share, proud",
+      },
+    };
+  }
+
+  const week2Support = pick(0);
+  const week3Support = pick(1);
+  const week4Support = pick(2);
+
+  return {
     week1: {
-      events: `Nina and Nino begin exploring ${theme} and ${goalPhrase}.`,
+      events: `${cast} begin exploring ${theme} and ${goalPhrase}.`,
       vocabulary: "learn, explore",
     },
     week2: {
-      events: `They practice and discover more about ${theme} through hands-on activities.`,
+      events: `${cast} practice ${theme} activities.${week2Support ? ` ${week2Support} joins and helps.` : ""}${otherNote}`,
       vocabulary: "practice, discover",
     },
     week3: {
-      events: `A small challenge appears; they work together to solve it within the ${theme} story.`,
+      events: `${cast} face a small challenge.${week3Support ? ` ${week3Support} helps them solve it.` : ` They work together to solve it.`}${otherNote}`,
       vocabulary: "help, try",
     },
     week4: {
-      events: `They finish with meaningful learning about ${theme} and a warm closing moment.`,
+      events: `${cast} finish with meaningful learning about ${theme}.${week4Support ? ` ${week4Support} shares a warm closing moment with them.` : " They share a warm closing moment."}${otherNote}`,
       vocabulary: "share, proud",
     },
   };
+}
+
+function mockSuggestedPlan(inputs: StoryInputs): WeeklyPlan {
+  const { theme, learning_goal } = inputs;
+  const cast = formatCharacterNamesForText(inputs.characterHints);
+  const goalPhrase = learning_goal.trim()
+    ? `set a goal tied to ${learning_goal}`
+    : `learn about ${theme}`;
+  const defaults = mockWeekEventsWithCast(cast, theme, goalPhrase, inputs);
 
   const suggested = emptyWeeklyPlan();
   for (const key of WEEK_PLAN_KEYS) {
@@ -201,23 +273,38 @@ async function requestChatCompletion(
   }
 }
 
-export async function suggestWeeklyPlan(inputs: StoryInputs): Promise<SuggestWeeklyPlanResult> {
-  if (isCompleteWeeklyPlan(inputs.weeklyPlan)) {
+export type SuggestWeeklyPlanOptions = {
+  replaceAll?: boolean;
+};
+
+export async function suggestWeeklyPlan(
+  inputs: StoryInputs,
+  options?: SuggestWeeklyPlanOptions
+): Promise<SuggestWeeklyPlanResult> {
+  const replaceAll = options?.replaceAll === true;
+
+  if (isCompleteWeeklyPlan(inputs.weeklyPlan) && !replaceAll) {
     return { ok: true, weeklyPlan: inputs.weeklyPlan };
   }
 
+  const teacherPlan = replaceAll ? emptyWeeklyPlan() : inputs.weeklyPlan;
+  const suggestInputs: StoryInputs = replaceAll
+    ? { ...inputs, weeklyPlan: emptyWeeklyPlan() }
+    : inputs;
+
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   let suggested: WeeklyPlan;
+  const hasCharacters = Boolean(suggestInputs.characterHints?.official.length);
 
   if (!apiKey) {
-    suggested = mockSuggestedPlan(inputs);
+    suggested = mockSuggestedPlan(suggestInputs);
   } else {
     const model = process.env.OPENAI_MODEL?.trim() || DEFAULT_MODEL;
     const response = await requestChatCompletion(
       apiKey,
       model,
-      buildSuggestSystemPrompt(),
-      buildSuggestUserPrompt(inputs)
+      buildSuggestSystemPrompt(hasCharacters),
+      buildSuggestUserPrompt(suggestInputs)
     );
 
     if (!response.ok) {
@@ -241,7 +328,7 @@ export async function suggestWeeklyPlan(inputs: StoryInputs): Promise<SuggestWee
     suggested = validated;
   }
 
-  const merged = mergeWeeklyPlans(inputs.weeklyPlan, suggested);
+  const merged = mergeWeeklyPlans(teacherPlan, suggested);
   if (!isCompleteWeeklyPlan(merged)) {
     return { ok: false, reason: "Merged weekly plan is incomplete" };
   }

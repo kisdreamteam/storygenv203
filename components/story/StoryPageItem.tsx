@@ -120,6 +120,24 @@ export function StoryPageItem({
 
   useEffect(() => {
 
+    setBaselineText(page.text);
+
+    setCurrentText(page.text);
+
+    setPrompt(initialScene(page, storySetting));
+
+    setIsEditingPrompt(false);
+
+    setRegenError(null);
+
+    setRegenWarning(null);
+
+  }, [page.id, page.text, page.illustration_prompt, page.page_number, storySetting]);
+
+
+
+  useEffect(() => {
+
     onLiveChange?.(page.id, {
 
       text: currentText,

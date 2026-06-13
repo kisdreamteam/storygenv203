@@ -27,7 +27,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: validated.error }, { status: 400 });
   }
 
-  const result = await suggestWeeklyPlan(validated);
+  const replaceAll = body.replaceAll === true;
+
+  const result = await suggestWeeklyPlan(validated, { replaceAll });
   if (!result.ok) {
     return NextResponse.json({ error: result.reason }, { status: 422 });
   }

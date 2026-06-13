@@ -2,6 +2,10 @@ import {
   DEFAULT_ILLUSTRATION_SETTING,
   sceneFromPageText,
 } from "./illustration-prompt";
+import {
+  formatCharacterNamesForText,
+  isCharacterSelected,
+} from "@/lib/story/character-hints";
 import { preferredVocabularyWords, type WeeklyPlan } from "@/lib/story/weekly-plan";
 import type {
   GenerationOptions,
@@ -44,12 +48,13 @@ function resolveVariantIndex(options?: GenerationOptions): number {
 }
 
 function buildInferredWeeklyPlan(inputs: StoryInputs): WeeklyPlan {
-  const { theme, learning_goal, weeklyPlan } = inputs;
+  const { theme, learning_goal, weeklyPlan, characterHints } = inputs;
+  const cast = formatCharacterNamesForText(characterHints);
   const goalPhrase = learning_goal.trim()
     ? `set a goal tied to ${learning_goal}`
     : `learn about ${theme}`;
   const defaultBeats = [
-    `Nina and Nino begin exploring ${theme} and ${goalPhrase}.`,
+    `${cast} begin exploring ${theme} and ${goalPhrase}.`,
     `They practice and discover more about ${theme} through hands-on activities.`,
     `A small challenge appears; they work together to solve it.`,
     `They finish with meaningful learning about ${theme} and a warm closing moment.`,
@@ -76,67 +81,111 @@ function buildInferredWeeklyPlan(inputs: StoryInputs): WeeklyPlan {
   };
 }
 
+function buildDeparturePage(cast: string, setting: string, inputs: StoryInputs): string {
+  const hasMom = isCharacterSelected(inputs.characterHints, "mom");
+  const hasDad = isCharacterSelected(inputs.characterHints, "dad");
+  if (hasMom && hasDad) {
+    return `Mom packs a small snack. Dad waves goodbye. ${cast} walk toward ${setting} with happy steps.`;
+  }
+  if (hasMom) {
+    return `Mom packs a small snack and waves goodbye. ${cast} head toward ${setting} with happy steps.`;
+  }
+  if (hasDad) {
+    return `Dad packs a small snack and waves goodbye. ${cast} head toward ${setting} with happy steps.`;
+  }
+  return `${cast} pack a small snack and head toward ${setting} with happy steps.`;
+}
+
+function buildEndingPage(
+  cast: string,
+  theme: string,
+  variantIndex: number,
+  inputs: StoryInputs
+): string {
+  const hasMom = isCharacterSelected(inputs.characterHints, "mom");
+  const hasDad = isCharacterSelected(inputs.characterHints, "dad");
+  const other = inputs.characterHints?.other?.trim();
+
+  if (hasMom && hasDad) {
+    return `At home, ${cast} tell Mom and Dad about their day. They feel proud, tired, and glad. Tomorrow brings another story.`;
+  }
+  if (hasMom) {
+    return `At home, ${cast} tell Mom about their ${theme} day. They feel proud and glad. Tomorrow brings another story.`;
+  }
+  if (hasDad) {
+    return `At home, ${cast} tell Dad about their ${theme} day. They feel proud and glad. Tomorrow brings another story.`;
+  }
+
+  const endings = [
+    `Later, ${cast} draw a picture about ${theme}. They whisper about what they noticed. The day ends with a warm smile.`,
+    `Before bed, ${cast} talk about one favorite moment from ${theme}. They say, "We helped each other today."`,
+    other
+      ? `${cast} wave to ${other} and share one favorite ${theme} moment. The day ends with a warm smile.`
+      : `${cast} smile about their ${theme} adventure. The day ends with happy, tired steps.`,
+  ];
+  return endings[variantIndex % endings.length];
+}
+
 function buildPageTexts(
   inputs: StoryInputs,
   setting: string,
   variantIndex: number
 ): string[] {
-  const { theme, learning_goal } = inputs;
+  const { theme, learning_goal, characterHints } = inputs;
+  const cast = formatCharacterNamesForText(characterHints);
+  const goalLine = learning_goal.trim()
+    ? learning_goal.trim()
+    : `learn about ${theme}`;
 
   const page1Variants = [
-    `Nina and Nino woke up on a sunny morning. Today they will learn about ${theme} at ${setting}.`,
-    `After breakfast, Nina and Nino get ready for ${theme}. They head to ${setting} with curious steps.`,
-    `Nina finds a note about ${theme}. Nino wonders what they will do today at ${setting}.`,
+    `${cast} woke up on a sunny morning. Today they will learn about ${theme} at ${setting}.`,
+    `After breakfast, ${cast} get ready for ${theme}. They head to ${setting} with curious steps.`,
+    `${cast} find a note about ${theme}. They wonder what they will do today at ${setting}.`,
   ];
 
   const page1Open = page1Variants[variantIndex % page1Variants.length];
 
   const middleVariants = [
     [
-      `A small problem appears. Nino feels unsure for a moment. Nina says, "Let's try again together." They breathe and nod.`,
-      `They use kind words and gentle hands. Nina shares an idea. Nino adds a funny hop. Their ${theme} adventure grows brighter.`,
+      `A small problem appears. Someone feels unsure for a moment. A friend says, "Let's try again together." They breathe and nod.`,
+      `They use kind words and gentle hands. One shares an idea. Another adds a funny hop. Their ${theme} adventure grows brighter.`,
     ],
     [
-      `Something tricky happens. Nino pauses and watches. Nina whispers, "We can figure this out." They try a new way.`,
-      `They test a new plan together. Nina points. Nino copies her careful move. Their ${theme} task starts to work.`,
+      `Something tricky happens. They pause and watch. Someone whispers, "We can figure this out." They try a new way.`,
+      `They test a new plan together. One points. Another copies the careful move. Their ${theme} task starts to work.`,
     ],
     [
-      `A surprise twist shows up. Nino asks a question. Nina thinks, then nods. They choose a fresh approach.`,
-      `They practice step by step. Nina names each part. Nino repeats with a grin. Their ${theme} work moves forward.`,
+      `A surprise twist shows up. Someone asks a question. They think, then nod. They choose a fresh approach.`,
+      `They practice step by step. They name each part and repeat with a grin. Their ${theme} work moves forward.`,
     ],
   ];
 
   const [page6, page7] = middleVariants[variantIndex % middleVariants.length];
 
-  const endingVariants = [
-    `At home, Nina and Nino tell Mom and Dad about their day. They feel proud, tired, and glad. Tomorrow brings another story.`,
-    `Later, Nina and Nino draw a picture about ${theme}. They whisper about what they noticed. The day ends with a warm smile.`,
-    `Before bed, Nina and Nino talk about one favorite moment. Nino yawns. Nina says, "We helped each other today."`,
-  ];
-
   return [
-    `${page1Open} Their goal is simple: ${learning_goal}. Nino smiles. Nina says, "We can do this!"`,
-    `Mom packs a small snack. Dad waves goodbye. Nina holds Nino's hand. They walk toward ${setting} with happy steps.`,
-    `At ${setting}, Nina points and says, "Look!" Nino asks, "What is that?" They notice something new for their ${theme} story.`,
-    `Nina and Nino start their ${theme} adventure. They listen carefully and copy brave smiles.`,
-    `They practice the learning goal: ${learning_goal}. Nina explains with short, clear words. Nino repeats each word with joy.`,
+    `${page1Open} Their goal is simple: ${goalLine}. They smile and say, "We can do this!"`,
+    buildDeparturePage(cast, setting, inputs),
+    `At ${setting}, ${cast} point and say, "Look!" They notice something new for their ${theme} story.`,
+    `${cast} start their ${theme} adventure. They listen carefully and copy brave smiles.`,
+    `They practice their learning goal: ${goalLine}. They explain with short, clear words and repeat each word with joy.`,
     `They explore more of ${theme}. ${page6}`,
     page7,
-    `A new challenge appears in their ${theme} story. Nina and Nino work together with patient steps.`,
-    `Friends nearby cheer them on. Nina and Nino laugh softly. They remember ${learning_goal} and keep going step by step.`,
-    `The hard part is solved with teamwork. Nino says, "We did it!" Nina claps once and gives a proud thumbs up.`,
-    `Their ${theme} story reaches a meaningful moment. Nina names three things. Nino names two more with a grin.`,
-    endingVariants[variantIndex % endingVariants.length],
+    `A new challenge appears in their ${theme} story. ${cast} work together with patient steps.`,
+    `Friends nearby cheer them on. ${cast} laugh softly. They remember ${goalLine} and keep going step by step.`,
+    `The hard part is solved with teamwork. Someone says, "We did it!" Everyone claps once and gives a proud thumbs up.`,
+    `Their ${theme} story reaches a meaningful moment. They name new things they learned with happy grins.`,
+    buildEndingPage(cast, theme, variantIndex, inputs),
   ];
 }
 
 function buildVocabulary(
   words: string[],
-  theme: string
+  theme: string,
+  cast: string
 ): MockGenerationResult["vocabulary"] {
   return words.map((word, index) => ({
     word,
-    definition_or_example: `${word.charAt(0).toUpperCase() + word.slice(1)} is an important word in our story about ${theme}. Nina and Nino use it when they learn together.`,
+    definition_or_example: `${word.charAt(0).toUpperCase() + word.slice(1)} is an important word in our story about ${theme}. ${cast} use it when they learn together.`,
     sort_order: index + 1,
   }));
 }
@@ -147,6 +196,7 @@ export function runMockPipeline(
 ): MockGenerationResult {
   const setting = resolveSetting(inputs);
   const variantIndex = resolveVariantIndex(options);
+  const cast = formatCharacterNamesForText(inputs.characterHints);
   const pageTexts = buildPageTexts(inputs, setting, variantIndex);
   const vocabWords = preferredVocabularyWords(inputs.weeklyPlan, inputs.vocabulary_focus);
   const parsedVocab = parseVocabularyWords(vocabWords.join(", "));
@@ -167,7 +217,7 @@ export function runMockPipeline(
       status: "draft",
     },
     pages,
-    vocabulary: buildVocabulary(parsedVocab, inputs.theme),
+    vocabulary: buildVocabulary(parsedVocab, inputs.theme, cast),
     inferred_weekly_plan: buildInferredWeeklyPlan(inputs),
   };
 }

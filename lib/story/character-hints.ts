@@ -96,17 +96,80 @@ export function needsSingleProtagonistWarning(hints: CharacterHints): boolean {
   return hasNina !== hasNino;
 }
 
-export function formatCharacterHintsForPrompt(hints: CharacterHints): string {
+function displayNamesFromHints(hints: CharacterHints): string[] {
   const profiles = getFactoryCharacterProfiles();
-  const names = hints.official.map((key) => profiles[key].displayName);
+  return hints.official.map((key) => profiles[key].displayName);
+}
+
+/** Natural-language list for story beats, e.g. "Nina, Nino, and Mom". */
+export function formatCharacterNamesForText(hints?: CharacterHints): string {
+  const normalized = normalizeCharacterHints(hints ?? DEFAULT_CHARACTER_HINTS);
+  const names = displayNamesFromHints(normalized);
+  if (names.length === 0) return "Nina and Nino";
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
+}
+
+export function isCharacterSelected(
+  hints: CharacterHints | undefined,
+  key: OfficialCharacterKey
+): boolean {
+  const normalized = normalizeCharacterHints(hints ?? DEFAULT_CHARACTER_HINTS);
+  return normalized.official.includes(key);
+}
+
+export function formatCharacterHintsForPrompt(hints: CharacterHints): string {
+  const names = displayNamesFromHints(hints);
   const lines = [
     `Characters to feature: ${names.join(", ")}.`,
     "Include each selected character meaningfully across the story (multiple scenes; not required on every page).",
+    "Use only characters from this list (and Other names if provided); do not introduce unlisted official characters.",
   ];
   if (hints.other?.trim()) {
     lines.push(`Additional characters if named: ${hints.other.trim()}.`);
   }
   return lines.join(" ");
+}
+
+/** Explicit character block for the Suggest weekly plan step. */
+export function formatCharacterHintsForSuggestPlan(hints: CharacterHints): string {
+  const names = displayNamesFromHints(hints);
+  const bulletList = names.map((name) => `- ${name}`).join("\n");
+  const lines = [
+    "Characters for this story (use ONLY these official characters):",
+    bulletList,
+  ];
+  if (hints.other?.trim()) {
+    lines.push(`Additional characters if named: ${hints.other.trim()}`);
+  }
+  lines.push(
+    "",
+    "Planning rules for characters:",
+    "- Name characters by display name in each week's events field.",
+    "- Spread selected characters across the four weeks where natural.",
+    "- Do NOT add official characters who are not listed above.",
+    '- Do NOT replace listed characters with generic "they" or "the family" only.'
+  );
+  return lines.join("\n");
+}
+
+/** True when cast extends beyond default Nina + Nino only, or Other is set. */
+export function hasExtendedCharacterCast(hints?: CharacterHints): boolean {
+  const normalized = normalizeCharacterHints(hints ?? DEFAULT_CHARACTER_HINTS);
+  if (normalized.other?.trim()) return true;
+  const extras = normalized.official.filter(
+    (key) => key !== "nina" && key !== "nino"
+  );
+  return extras.length > 0;
+}
+
+export function getSupportingCharacterDisplayNames(hints?: CharacterHints): string[] {
+  const normalized = normalizeCharacterHints(hints ?? DEFAULT_CHARACTER_HINTS);
+  const profiles = getFactoryCharacterProfiles();
+  return normalized.official
+    .filter((key) => key !== "nina" && key !== "nino")
+    .map((key) => profiles[key].displayName);
 }
 
 export function toggleCharacterSelection(

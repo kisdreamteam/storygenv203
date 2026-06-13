@@ -25,7 +25,7 @@ export async function POST(_request: Request, context: RouteContext) {
   const { data: story, error: storyError } = await supabase
     .from("stories")
     .select(
-      "id, status, theme, learning_goal, vocabulary_focus, weekly_plan, main_events, setting, tone, words_to_avoid, notes"
+      "id, status, theme, learning_goal, vocabulary_focus, weekly_plan, main_events, character_hints, setting, tone, words_to_avoid, notes"
     )
     .eq("id", storyId)
     .eq("created_by", user.id)

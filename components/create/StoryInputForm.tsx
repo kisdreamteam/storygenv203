@@ -5,9 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { StorySetupFields } from "@/components/story/StorySetupFields";
 import { WeeklyPlanAssistBanner } from "@/components/story/WeeklyPlanAssistBanner";
+import { useWeeklyPlanSuggestion } from "@/components/story/useWeeklyPlanSuggestion";
 import {
   emptyStorySetupForm,
-  formFromWeeklyPlan,
   isStorySetupFormValid,
   storySetupFormToPayload,
   weeklyPlanFromForm,
@@ -19,21 +19,12 @@ import {
   needsSingleProtagonistWarning,
   toggleCharacterSelection,
 } from "@/lib/story/character-hints";
-import {
-  isCompleteWeeklyPlan,
-  needsWeeklyPlanSuggestion,
-  WEEK_PLAN_KEYS,
-} from "@/lib/story/weekly-plan";
+import { isCompleteWeeklyPlan } from "@/lib/story/weekly-plan";
 import {
   logStoryCreatePageOpened,
   logStoryGenerateClicked,
   logStoryGenerateCompleted,
 } from "@/lib/validation/workflow-log";
-
-function countEmptyWeekEvents(form: StorySetupFormState): number {
-  const plan = weeklyPlanFromForm(form);
-  return WEEK_PLAN_KEYS.filter((key) => plan[key].events.trim() === "").length;
-}
 
 export function StoryInputForm() {
   const router = useRouter();
@@ -41,17 +32,22 @@ export function StoryInputForm() {
   const [form, setForm] = useState<StorySetupFormState>(emptyStorySetupForm);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [suggesting, setSuggesting] = useState(false);
-  const [planSuggested, setPlanSuggested] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [planError, setPlanError] = useState<string | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
 
+  const {
+    suggesting,
+    planSuggested,
+    planError,
+    handleSuggest,
+    clearPlanError,
+    deriveBannerState,
+  } = useWeeklyPlanSuggestion(loading);
+
   const plan = weeklyPlanFromForm(form);
-  const needsSuggestion = needsWeeklyPlanSuggestion(plan);
+  const { needsSuggestion, planComplete, emptyWeekCount, canSuggest } =
+    deriveBannerState(form);
   const canGenerate = isStorySetupFormValid(form) && isCompleteWeeklyPlan(plan) && !loading;
-  const canSuggest = isStorySetupFormValid(form) && !loading && !suggesting;
-  const emptyWeekCount = countEmptyWeekEvents(form);
 
   useEffect(() => {
     logStoryCreatePageOpened();
@@ -60,7 +56,7 @@ export function StoryInputForm() {
   function updateField(field: keyof StorySetupFormState, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
     setError(null);
-    setPlanError(null);
+    clearPlanError();
     setWarning(null);
   }
 
@@ -70,50 +66,15 @@ export function StoryInputForm() {
       selected_characters: toggleCharacterSelection(prev.selected_characters, key),
     }));
     setError(null);
-    setPlanError(null);
+    clearPlanError();
     setWarning(null);
   }
 
   function handleOtherCharactersChange(value: string) {
     setForm((prev) => ({ ...prev, other_characters: value }));
     setError(null);
-    setPlanError(null);
+    clearPlanError();
     setWarning(null);
-  }
-
-  async function handleSuggestPlan() {
-    if (!canSuggest) return;
-
-    setSuggesting(true);
-    setPlanError(null);
-    setError(null);
-
-    try {
-      const response = await fetch("/api/stories/suggest-weekly-plan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(storySetupFormToPayload(form)),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setPlanError(data.error ?? "Could not suggest weekly plan. Please try again.");
-        return;
-      }
-
-      if (data.weeklyPlan) {
-        setForm((prev) => ({
-          ...prev,
-          ...formFromWeeklyPlan(data.weeklyPlan),
-        }));
-        setPlanSuggested(true);
-      }
-    } catch {
-      setPlanError("Could not suggest weekly plan. Please try again.");
-    } finally {
-      setSuggesting(false);
-    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -132,7 +93,7 @@ export function StoryInputForm() {
 
     setLoading(true);
     setError(null);
-    setPlanError(null);
+    clearPlanError();
     setWarning(null);
     generateStartedAt.current = Date.now();
     logStoryGenerateClicked();
@@ -187,9 +148,10 @@ export function StoryInputForm() {
           <WeeklyPlanAssistBanner
             needsSuggestion={needsSuggestion}
             planSuggested={planSuggested}
+            planComplete={planComplete}
             suggesting={suggesting}
             canSuggest={canSuggest}
-            onSuggest={handleSuggestPlan}
+            onSuggest={() => handleSuggest(form, setForm)}
             emptyWeekCount={emptyWeekCount}
           />
         }
