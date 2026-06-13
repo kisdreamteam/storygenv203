@@ -1,6 +1,9 @@
 "use client";
 
-import type { StorySetupFormState } from "@/lib/story/setup-form-state";
+import {
+  FORM_WEEK_FIELDS,
+  type StorySetupFormState,
+} from "@/lib/story/setup-form-state";
 
 type StorySetupFieldsProps = {
   form: StorySetupFormState;
@@ -14,6 +17,46 @@ type StorySetupFieldsProps = {
 const inputClass =
   "w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none";
 const labelClass = "mb-1 block text-sm font-medium text-gray-700";
+const helperClass = "mt-1 text-xs text-gray-500";
+
+const WEEK_UI: Array<{
+  eventsField: keyof StorySetupFormState;
+  vocabularyField: keyof StorySetupFormState;
+  weekLabel: string;
+  pageRange: string;
+  eventsHelper: string;
+  vocabHelper: string;
+  eventsPlaceholder: string;
+  vocabPlaceholder: string;
+}> = FORM_WEEK_FIELDS.map(({ eventsField, vocabularyField }, index) => {
+  const weekNumber = index + 1;
+  const pageRanges = ["1–3", "4–6", "7–9", "10–12"];
+  const pageRange = pageRanges[index];
+  return {
+    eventsField,
+    vocabularyField,
+    weekLabel: `Week ${weekNumber}`,
+    pageRange,
+    // eventsHelper: `Brief direction for pages ${pageRange} — not a full script.`,
+    // vocabHelper: `Optional words to include in pages ${pageRange}.`,
+    eventsPlaceholder:
+      index === 0
+        ? "Arrive at the farm, see the animals, feed the animals."
+        : index === 1
+          ? "Tractor ride, see the corn, sunflowers, and beans."
+          : index === 2
+            ? "Find a sheep stuck in the bush, help the sheep."
+            : "Realize the sheep had a lamb, see other baby animals.",
+    vocabPlaceholder:
+      index === 0
+        ? "farm, cow, goat, feed"
+        : index === 1
+          ? "tractor, corn, sunflower, beans"
+          : index === 2
+            ? "sheep, stuck, bush, help"
+            : "lamb, baby animals, ducklings, chicks",
+  };
+});
 
 export function StorySetupFields({
   form,
@@ -29,17 +72,21 @@ export function StorySetupFields({
     <div className="flex flex-col gap-5">
       <div>
         <label htmlFor={id("theme")} className={labelClass}>
-          Theme / Topic <span className="text-red-600">*</span>
+          Monthly Topic <span className="text-red-600">*</span>
         </label>
         <input
           id={id("theme")}
           type="text"
           value={form.theme}
           onChange={(e) => onFieldChange("theme", e.target.value)}
-          placeholder="A park adventure, classroom kindness, visiting the fire station"
+          placeholder="Farm, Fire Station, Zoo, Birthday Party"
           className={inputClass}
           disabled={disabled}
         />
+        <p className={helperClass}>
+          The master theme for this month&apos;s story. The AI plans four weekly beats from this
+          Topic when you leave weekly fields blank.
+        </p>
       </div>
 
       <div>
@@ -57,35 +104,59 @@ export function StorySetupFields({
         />
       </div>
 
-      <div>
-        <label htmlFor={id("vocabulary_focus")} className={labelClass}>
-          Vocabulary Focus <span className="text-red-600">*</span>
-        </label>
-        <input
-          id={id("vocabulary_focus")}
-          type="text"
-          value={form.vocabulary_focus}
-          onChange={(e) => onFieldChange("vocabulary_focus", e.target.value)}
-          placeholder="share, turn, kind, help, together"
-          className={inputClass}
-          disabled={disabled}
-        />
-      </div>
+      <p className="text-sm text-gray-600">
+        Optional weekly guidance — brief hints for each 3-page block, not full story scripts.
+        All four weeks must be filled (manually or via Suggest weekly plan) before Generate.
+      </p>
 
-      <div>
-        <label htmlFor={id("main_events")} className={labelClass}>
-          Main Events <span className="text-red-600">*</span>
-        </label>
-        <textarea
-          id={id("main_events")}
-          rows={3}
-          value={form.main_events}
-          onChange={(e) => onFieldChange("main_events", e.target.value)}
-          placeholder="Nina and Nino play at the park, take turns on the slide, and help a friend."
-          className={inputClass}
-          disabled={disabled}
-        />
-      </div>
+      {WEEK_UI.map(
+        ({
+          eventsField,
+          vocabularyField,
+          weekLabel,
+          pageRange,
+          eventsHelper,
+          vocabHelper,
+          eventsPlaceholder,
+          vocabPlaceholder,
+        }) => (
+          <div key={eventsField} className="flex flex-col gap-4 rounded-lg border border-gray-200 p-4">
+            <h3 className="text-sm font-semibold text-gray-900">
+              {weekLabel} (pages {pageRange})
+            </h3>
+            <div>
+              <label htmlFor={id(eventsField)} className={labelClass}>
+                {weekLabel} guidance
+              </label>
+              <textarea
+                id={id(eventsField)}
+                rows={2}
+                value={form[eventsField]}
+                onChange={(e) => onFieldChange(eventsField, e.target.value)}
+                placeholder={eventsPlaceholder}
+                className={inputClass}
+                disabled={disabled}
+              />
+              <p className={helperClass}>{eventsHelper}</p>
+            </div>
+            <div>
+              <label htmlFor={id(vocabularyField)} className={labelClass}>
+                {weekLabel} Vocabulary
+              </label>
+              <input
+                id={id(vocabularyField)}
+                type="text"
+                value={form[vocabularyField]}
+                onChange={(e) => onFieldChange(vocabularyField, e.target.value)}
+                placeholder={vocabPlaceholder}
+                className={inputClass}
+                disabled={disabled}
+              />
+              <p className={helperClass}>{vocabHelper}</p>
+            </div>
+          </div>
+        )
+      )}
 
       <div>
         <button

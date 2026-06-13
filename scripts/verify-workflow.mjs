@@ -94,7 +94,14 @@ const storyA = {
   theme: "sharing",
   learning_goal: "learn to share",
   vocabulary_focus: "share, friend, help",
-  main_events: "Nina and Nino share toys at the park.",
+  main_events:
+    "Week 1:\nNina and Nino share toys at the park.\n\nWeek 2:\nThey take turns on the slide.\n\nWeek 3:\nThey help a friend.\n\nWeek 4:\nThey talk about sharing at home.",
+  weekly_plan: {
+    week1: "Nina and Nino share toys at the park.",
+    week2: "They take turns on the slide.",
+    week3: "They help a friend.",
+    week4: "They talk about sharing at home.",
+  },
   setting: "Sunny Grove Kindergarten neighborhood",
 };
 

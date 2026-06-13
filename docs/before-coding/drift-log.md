@@ -413,8 +413,9 @@ Problem: AI output that failed page-length validation silently fell back to mock
 What changed:
 
 * Validation failure is separate from API/key failure — no mock save on validation failure
-* One AI repair pass for repairable short-page failures; revalidate; return 422 if still invalid
-* Archive (soft delete) rebuilds Series Memory from all active saved, non-archived stories
+* One AI repair pass (with retry) for repairable short-page failures; revalidate; return 422 if still invalid
+* Invalid or empty AI JSON after a successful API response is treated as validation failure, not mock fallback
+* Archive (soft delete) rebuilds Series Memory from all active saved, non-archived stories; save uses the same rebuild
 * Hard delete not added; soft delete/archive retained
 
 Why change is needed: Teachers expect AI-generated stories, not silent template substitution. Removed stories should not steer future generation.
@@ -422,6 +423,153 @@ Why change is needed: Teachers expect AI-generated stories, not silent template 
 Documents affected: drift-log.md, source-of-truth.md, phase-b-architecture-map.md, project-changelog.md
 
 Decision: Accepted.
+
+Status: Accepted
+
+---
+
+Date: 2026-06-10
+
+Domain: AI Generation / Story Structure
+
+Problem: When teachers provide Main Events as Week 1–4 milestones under a monthly Topic, the generator treated weeks as optional guidance. Stories drifted across page blocks, disconnected from the Topic, completed early, and used pages 10–12 for recap instead of Week 4 learning.
+
+What changed:
+
+* **Topic-centered 4-week structure is a hard requirement** when Main Events list Week 1–4
+* Topic (Theme field) = master monthly umbrella; weeks = Theme 1–4 inside one continuous story
+* Page blocks locked: Week 1 → 1–3, Week 2 → 4–6, Week 3 → 7–9, Week 4 → 10–12
+* Prompts require Topic visibility on every page, week milestones mandatory, Week 4 meaningful new content
+* Validation: keyword matching per week block + Topic anchor per block + recap-heavy Week 4 detection; one repair pass on drift
+
+Why change is needed: Teachers plan by monthly Topic and weekly themes. Out-of-sequence or Topic-disconnected stories weaken pacing, miss educational opportunities, and reduce trust.
+
+Documents affected: drift-log.md, product-spec.md, source-of-truth.md, phase-b-architecture-map.md, project-changelog.md
+
+Decision: Accepted (extends 2026-06-10 four-week structure entry with Topic-centered rules).
+
+Status: Accepted
+
+---
+
+Date: 2026-06-09
+
+Domain: Product / Data Model / AI Generation
+
+Problem: Teachers naturally plan by monthly Topic and Week 1–4 milestones, but the app collected a single Main Events field. This made planning harder and weakened prompt alignment with classroom reading plans.
+
+What changed:
+
+* Replaced Main Events with structured **Monthly Topic + Week 1–4** inputs in UI and API
+* Added `stories.weekly_plan` jsonb column; `main_events` retained as derived sync text for legacy reads and series memory
+* Generation prompts use Topic as master theme and weeks as required milestones (pages 1–3 / 4–6 / 7–9 / 10–12)
+* Week adherence validation and repair **removed from generation pipeline** — deferred to Phase 2 after real-world testing
+
+Why change is needed: Align product data model and prompts with how teachers plan; enable future week adherence validation on structured data.
+
+Documents affected: drift-log.md, product-spec.md, source-of-truth.md, v1-scope.md, phase-b-architecture-map.md, project-changelog.md
+
+Decision: Accepted (Phase 1 — planning model only).
+
+Status: Accepted
+
+---
+
+Date: 2026-06-09
+
+Domain: AI Generation / Story Structure
+
+Problem: Phase 1 structured weekly planning, but generated stories still drifted across page blocks, merged Week 3/4 content, completed early, and leaked internal week language into child-facing text.
+
+What changed:
+
+* **Week adherence validation (Phase 2)** when a complete weekly plan is present
+* Keyword matching per page block against teacher week milestones
+* Week-content leakage detection and week-language leak detection (weeks never shown to readers)
+* Week 4 meaningful-content and timing checks
+* One AI repair pass on week adherence failure
+* Prompts strengthened: weeks are internal planning only
+
+Why change is needed: Teachers plan by week; drift and visible week labels reduce trust and classroom usability.
+
+Documents affected: drift-log.md, product-spec.md, source-of-truth.md, phase-b-architecture-map.md, project-changelog.md
+
+Decision: Accepted.
+
+Status: Accepted
+
+---
+
+Date: 2026-06-09
+
+Domain: Product / Data Model / AI Generation
+
+Problem: Week adherence validation was ambiguous because each week had only a single events string and one global vocabulary field. Teachers plan both **what happens** and **what words to teach** per week; the generator could not tell which vocabulary belonged on which pages.
+
+What changed:
+
+* **`weekly_plan` jsonb shape** is now `{ week1–week4: { events, vocabulary } }` per week
+* UI: **Week N Main Events** + **Week N Vocabulary** (8 fields); global Vocabulary Focus removed from form
+* **Week 1–4 Main Events required**; per-week vocabulary optional (falls back to aggregated legacy `vocabulary_focus` or AI-chosen topic words)
+* **`vocabulary_focus` text column retained** as derived aggregate on save for legacy reads and series memory
+* Prompts pass structured week blocks (events + vocabulary per page range)
+* Week adherence validation checks **events and vocabulary** placement per page block
+* Legacy flat `{ week1: "string" }` plans normalized at read time; old global vocabulary mapped to Week 1 when per-week vocab empty
+
+Why change is needed: Self-contained weekly inputs reduce drift and match teacher classroom planning.
+
+Documents affected: drift-log.md, product-spec.md, source-of-truth.md, v1-scope.md, phase-b-architecture-map.md, project-changelog.md, roadmap-todo.md
+
+Decision: Accepted.
+
+Status: Accepted
+
+---
+
+Date: 2026-06-09
+
+Domain: Product / AI Generation / Validation
+
+Problem: Requiring Week 1–4 Main Events and enforcing strict keyword/vocabulary placement caused high validation failure rates and contradicted the product goal of minimal teacher setup. Teachers should be able to generate from Topic + Learning Goal alone; weekly fields should lightly guide the story, not act as scripts the AI must keyword-match.
+
+What changed:
+
+* **Required inputs reduced to Monthly Topic + Learning Goal only**
+* Week 1–4 Main Events and Vocabulary are **optional guidance hints** — brief direction, not full story scripts
+* AI **always** plans four connected weekly beats (pages 1–3 / 4–6 / 7–9 / 10–12) from the Topic when teacher leaves weeks blank
+* Generation JSON includes **`inferred_weekly_plan`**; after success, empty teacher weeks are filled from AI inference (teacher-filled weeks are never overwritten)
+* **Validation relaxed:** hard fail on structure (12 pages, word counts) and week-language leak in story text only; keyword/vocab placement ratios and Topic-on-10/12 checks removed as hard gates
+* Prompts use a single topic-first guidance block for all generations
+
+Why change is needed: Topic-first generation with optional weekly hints matches teacher workflow, reduces friction, and fixes opaque validation failures on real AI output.
+
+Documents affected: drift-log.md, product-spec.md, source-of-truth.md, v1-scope.md, phase-b-architecture-map.md, project-changelog.md
+
+Decision: Accepted (supersedes strict required-week and keyword-validation requirements from 2026-06-09 and 2026-06-10 entries for new behavior).
+
+Status: Accepted
+
+---
+
+Date: 2026-06-09
+
+Domain: Product / Workflow / AI Generation
+
+Problem: Partial weekly guidance (e.g. Week 1 only) still jumped straight to story generation. The model invented weeks 2–4 during the story write with no teacher review, so page blocks did not reliably align to the teacher's Week 1 intent.
+
+What changed:
+
+* **Two-step create workflow on `/stories/new`:** (1) Suggest weekly plan → (2) teacher reviews/edits → (3) Generate story
+* New API **`POST /api/stories/suggest-weekly-plan`** — lightweight AI call proposes main-idea beats for empty weeks only; teacher-filled weeks are never overwritten
+* **Story generation requires a complete four-week plan** (`isCompleteWeeklyPlan`) — Generate blocked until all four weekly guidance fields have events (manual or after suggest)
+* Topic-only create: suggest all four weeks first, then review, then generate
+* No new page routes; suggest + review stay on the existing create form
+
+Why change is needed: Teachers need to approve the monthly arc before the 12-page story is written, especially when they only specify early-week direction.
+
+Documents affected: drift-log.md, product-spec.md, source-of-truth.md, v1-scope.md, phase-b-architecture-map.md, project-changelog.md
+
+Decision: Accepted (extends topic-first weekly planning with explicit pre-generation plan assist).
 
 Status: Accepted
 

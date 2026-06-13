@@ -1,6 +1,11 @@
 import type { CharacterProfileMap } from "@/lib/character-profiles";
 import { formatOfficialCharacterProfilesForStory } from "@/lib/character-profiles/format-for-story-prompt";
 import { CHARACTER_BIBLE_EXCERPT } from "@/lib/constants/character-bible";
+import {
+  formatTopicFirstPlanForPrompt,
+  formatWeeklyPlanForPrompt,
+  isCompleteWeeklyPlan,
+} from "@/lib/story/weekly-plan";
 import type {
   GenerationOptions,
   PreviousStoryPage,
@@ -15,62 +20,90 @@ const JSON_SCHEMA = `{
   ],
   "vocabulary": [
     { "word": "string", "definition_or_example": "string", "sort_order": 1 }
-  ]
+  ],
+  "inferred_weekly_plan": {
+    "week1": { "events": "string", "vocabulary": "string" },
+    "week2": { "events": "string", "vocabulary": "string" },
+    "week3": { "events": "string", "vocabulary": "string" },
+    "week4": { "events": "string", "vocabulary": "string" }
+  }
 }`;
 
-const STORY_QUALITY_GUIDANCE = `
-Story quality (strict):
+const COMPLETE_PLAN_STORY_QUALITY_GUIDANCE = `
+Story quality (approved four-week plan):
+
+The teacher has approved a complete monthly plan. Follow it strictly by page block:
+- Pages 1–3: primarily Week 1 events and vocabulary
+- Pages 4–6: primarily Week 2 events and vocabulary
+- Pages 7–9: primarily Week 3 events and vocabulary
+- Pages 10–12: primarily Week 4 events and vocabulary — include meaningful new Week 4 content before ending
+
+Weeks are internal planning data only (hard rule):
+- NEVER write "week 1", "week 2", "first week", "second week", or similar in page text
+
+Planning rules:
+- The Topic is the master theme. Every page block must reinforce the Topic.
+- Expand teacher guidance into full scenes — do not copy verbatim.
+- Do not skip, merge, or significantly delay any week's beat.
+- Do not place a later week's primary content in an earlier page block.
+- Week 4 should include meaningful new learning — not recap-only or goodbye-only pages.
+
+Story engine, vocabulary, endings, and standalone rules same as topic-first guidance.
+`.trim();
+
+const TOPIC_FIRST_STORY_QUALITY_GUIDANCE = `
+Story quality (topic-first monthly plan):
+
+The Monthly Topic is the master theme. Plan one connected 12-page story in four 3-page beats:
+- Pages 1–3: introduce the Topic, setting, and a clear goal or question
+- Pages 4–6: explore and practice within the Topic
+- Pages 7–9: a small challenge or deeper learning tied to the Topic
+- Pages 10–12: meaningful resolution or new learning with a warm ending
+
+When teacher weekly guidance is missing, invent four connected weekly beats from the Topic and Learning Goal.
+When teacher guidance is present, use it as light direction only — expand into full scenes; do not copy verbatim.
+
+Weeks are internal planning data only (hard rule):
+- NEVER write "week 1", "week 2", "first week", "second week", "on week three", or similar in page text
+- Students read a continuous story — not a weekly schedule
+
+Topic-centered rules:
+- Every page block must reinforce the Topic
+- The story must read as ONE continuous story — not four disconnected mini-stories
+- Week 4 should include meaningful new learning or a final event — not recap-only, goodbye-only, or summary-only pages
+- Do not complete the story before pages 10–12
 
 Story engine (required):
-- Every story must have at least one clear through-line: a goal, simple question, small challenge, discovery, or something Nina and Nino are trying to complete
-- Establish the goal or question by page 3 — do not wait until the end
-- Examples: "Can they mail the letter?", "How do firefighters help?", "Can they choose books to borrow?", "How can they enjoy a rainy day indoors?"
-- Avoid stories that are only a sequence of unrelated activities — each page should move the goal, question, or challenge forward
-
-Page rhythm (12 pages):
-- Pages 1–3: setup, setting, and clear goal or question
-- Pages 4–8: exploration, practice, small challenge, or discovery tied to the goal
-- Pages 9–10: success or resolution
-- Page 11: reflection with callback to a specific earlier object, action, or moment
-- Page 12: warm final image or action (concrete and visual — not a summary lecture)
-
-Endings (pages 10–12):
-- Do NOT only summarize the lesson — show story feeling through action, dialogue, or a picture the reader can see
-- Callback to a specific earlier object, action, or moment from this story (not vague "today was fun")
-- Simple reflection from Nina or Nino in child language (dialogue or brief thought)
-- Warm final image or action; optional future-facing line is fine
-- Do NOT use generic closings such as "Everyone was happy", "They learned a lot", "It was a wonderful day", "They had fun", "They felt proud of their community", "Great job", or similar vague wrap-ups
+- One continuous through-line tied to the Topic and learning goal
+- Establish the goal or question by page 3
+- Each page should move the story forward
 
 Vocabulary reinforcement:
-- Pages 2–4: introduce key vocabulary from the teacher's focus naturally in context
-- Pages 5–8: reuse words through action or dialogue — not as a list
-- Pages 9–11: recall 1–3 key vocabulary words naturally in the story
-- Page 12: close with story feeling and a warm image — not a vocabulary list or definition dump
+- Introduce vocabulary naturally through action and dialogue — not as a list
 - Do not list vocabulary unnaturally or dump definitions in story text
 
+Endings (pages 10–12):
+- Show story feeling through action, dialogue, or a concrete image — not a summary lecture
+- Callback to a specific earlier object, action, or moment from this story
+- Do NOT use generic closings such as "Everyone was happy", "They learned a lot", or similar vague wrap-ups
+
 Word variety:
-- Vary sentence structures and repeated phrases across pages — avoid copying the same pattern on many pages
-- Positive emotional words (happy, excited, smile, laugh, cheer, proud) may repeat naturally when appropriate for ages 4–6
-- Prefer variety when it sounds natural; do not force awkward synonyms just to avoid repetition
-- Still reduce overuse of look/looked, everyone, great job, wonderful, and filler phrases
-- Keep language simple — do not use advanced vocabulary or complex sentences
+- Vary sentence structures; keep language simple for ages 4–6
 
 Supporting adults:
-- Use only the adults needed for this story — Nina and Nino may lead many scenes alone or with peers
-- Do not force Mom, Dad, Grandpa, Grandma, and Ms. Lee into every story
-- If a helper is needed, choose the most natural adult for the setting
-- Community workers are welcome when relevant: librarian, firefighter, dentist, postal worker, baker, guide, etc.
-- Supporting adults should teach, guide, or move the story forward — not appear only for a one-line cameo
+- Use only adults needed for this story; community workers welcome when relevant
 
 Standalone story (strict):
-- Every story must be self-contained. Assume students have never read any previous Nina & Nino story.
-- Do not mention previous stories, previous adventures, "last time," "remember when," or earlier visits in story text unless the teacher explicitly asks for a sequel, continuation, or callback in Theme, Main Events, or Notes.
-- Series Memory helps avoid repeating plots, themes, and vocabulary — it is NOT a license to open with prior-story references.
+- Every story must be self-contained for students who have never read prior Nina & Nino stories
+- Do not reference previous stories unless the teacher explicitly asks in Topic, weekly guidance, or Notes
+
+inferred_weekly_plan (optional in JSON):
+- If included, summarize the four weekly beats used (events + vocabulary per week)
 `.trim();
 
 const REGENERATE_VARIATION_GUIDANCE = `
 REGENERATION REQUEST (strict):
-This is a regeneration request. Keep the same theme, learning goal, vocabulary focus, characters, age level, and teacher constraints, but create a substantially different story version.
+This is a regeneration request. Keep the same Topic, learning goal, weekly guidance, characters, age level, and teacher constraints, but create a substantially different story version.
 
 Variation rules:
 - Do not reuse the same page-by-page plot structure as the previous version
@@ -81,6 +114,7 @@ Variation rules:
 - Keep vocabulary naturally integrated
 - Avoid copying prior page wording
 - Do not contradict teacher inputs; keep classroom safety and standalone story rules
+- Keep the topic-first page blocks (pages 1–3 / 4–6 / 7–9 / 10–12)
 `.trim();
 
 const MAX_PREVIOUS_PAGE_SNIPPET = 120;
@@ -105,9 +139,18 @@ export function formatPreviousStoryAntiRepetition(pages: PreviousStoryPage[]): s
   return lines.join("\n");
 }
 
-export function buildSystemPrompt(profiles: CharacterProfileMap): string {
-  return `You are a children's educational story writer for the Nina & Nino series (ages 4–6).
+export function buildSystemPrompt(profiles: CharacterProfileMap, inputs?: StoryInputs): string {
+  const topicHeader = inputs?.theme.trim()
+    ? `\nMonthly Topic for this story (master theme — first priority): ${inputs.theme.trim()}\n`
+    : "";
 
+  const useCompletePlan = inputs ? isCompleteWeeklyPlan(inputs.weeklyPlan) : false;
+  const qualityGuidance = useCompletePlan
+    ? COMPLETE_PLAN_STORY_QUALITY_GUIDANCE
+    : TOPIC_FIRST_STORY_QUALITY_GUIDANCE;
+
+  return `You are a children's educational story writer for the Nina & Nino series (ages 4–6).
+${topicHeader}
 ${CHARACTER_BIBLE_EXCERPT}
 
 ${formatOfficialCharacterProfilesForStory(profiles)}
@@ -116,14 +159,14 @@ Output rules (strict):
 - Return ONLY valid JSON matching the schema below. No markdown fences.
 - Exactly 12 pages with page_number 1 through 12.
 - Each page text: aim for 30–40 words, simple sentences, ages 4–6 readability. A page may be slightly shorter (about 25 words) if the meaning is complete. Do not pad with filler just to meet word count.
-- 1–40 vocabulary items from the teacher's vocabulary focus.
+- 1–40 vocabulary items drawn from the Topic, Learning Goal, and weekly vocabulary hints when provided.
 - One illustration_scene per page: a short visual description (10–50 words) of what should appear in the illustration.
 - illustration_scene: who is doing what, key objects, composition hint only — no character clothing or appearance details (the server adds those).
 - Do not include style suffixes, section headers, or JSON inside illustration_scene.
 - Educational usefulness over flashy creativity. Classroom-safe tone.
 - Teacher inputs override Series Memory when they conflict.
 
-${STORY_QUALITY_GUIDANCE}
+${qualityGuidance}
 
 JSON schema:
 ${JSON_SCHEMA}`;
@@ -154,6 +197,13 @@ export function buildUserPrompt(
   );
 
   const mode = options?.mode ?? "generate";
+  const planBlock = isCompleteWeeklyPlan(inputs.weeklyPlan)
+    ? `\n${formatWeeklyPlanForPrompt(inputs.weeklyPlan, inputs.theme, inputs.learning_goal)}\n`
+    : `\n${formatTopicFirstPlanForPrompt(
+        inputs.theme,
+        inputs.learning_goal,
+        inputs.weeklyPlan
+      )}\n`;
   const regenerateBlock =
     mode === "regenerate"
       ? (() => {
@@ -169,11 +219,9 @@ export function buildUserPrompt(
   return `Write a 12-page Nina & Nino story.
 
 Required inputs:
-- Theme / Topic: ${inputs.theme}
+- Topic (master theme): ${inputs.theme}
 - Learning Goal: ${inputs.learning_goal}
-- Vocabulary Focus: ${inputs.vocabulary_focus}
-- Main Events: ${inputs.main_events}
-${optionalLines.length ? optionalLines.join("\n") + "\n" : ""}
+${inputs.vocabulary_focus.trim() ? `- Combined vocabulary hints (all weeks): ${inputs.vocabulary_focus}\n` : ""}${planBlock}${optionalLines.length ? optionalLines.join("\n") + "\n" : ""}
 Series Memory (internal continuity only — do NOT reference previous stories in story text):
 Use to avoid repeating plots, themes, and vocabulary. Each story must still read standalone for students who have not read prior stories.
 ${memoryJson}${regenerateBlock}`;

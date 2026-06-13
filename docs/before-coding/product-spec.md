@@ -139,6 +139,8 @@ Teacher could realistically use it in class tomorrow
 Character continuity remains reasonably consistent
 Story does not unintentionally duplicate previous stories
 
+Teachers generate with **Monthly Topic + Learning Goal** as required inputs. **Story creation is two steps:** (1) **Suggest weekly plan** — AI proposes main-idea beats for empty weeks (or all four when none filled); (2) teacher reviews/edits all four weekly guidance fields; (3) **Generate** — only when every week has guidance. Optional **Week 1–4 guidance** (Main Events + Vocabulary per week) are brief hints, not full scripts. **Weeks are internal planning data — they must never appear in story text.** Post-generation validation enforces structure and week-language leak detection only.
+
 Target Quality:
 
 Appropriate for young learners

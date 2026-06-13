@@ -20,12 +20,14 @@ import {
   injectIllustrationContinuityIntoPages,
 } from "@/lib/generation/character-continuity";
 import { buildSystemPrompt, buildUserPrompt } from "@/lib/generation/prompts";
+import type { AiGenerationFailureKind } from "@/lib/generation/ai-generation";
 import {
   getShortPageNumbers,
   isRepairableShortPageFailure,
   validateGenerationOutput,
 } from "@/lib/generation/validate-output";
-import { EMPTY_SERIES_MEMORY } from "@/lib/generation/types";
+import { EMPTY_SERIES_MEMORY, type StoryInputs } from "@/lib/generation/types";
+import { weeklyPlanToMainEventsText } from "@/lib/story/weekly-plan";
 import { buildSeriesMemorySummaryFromStories } from "@/lib/series-memory/update";
 
 function loadEnv() {
@@ -155,11 +157,18 @@ record(
   "modified Nina appearance in prompt"
 );
 
-const sampleInputs = {
+const sampleWeeklyPlan: import("@/lib/story/weekly-plan").WeeklyPlan = {
+  week1: { events: "Nina and Nino paint at school", vocabulary: "paint, brush" },
+  week2: { events: "They mix colors and try new brushes", vocabulary: "color, mix" },
+  week3: { events: "They help a friend finish a painting", vocabulary: "help, friend" },
+  week4: { events: "They display art for the class", vocabulary: "art, class" },
+};
+const sampleInputs: StoryInputs = {
   theme: "Art Class",
   learning_goal: "Explore colors and shapes",
-  vocabulary_focus: "paint, brush, color",
-  main_events: "Nina and Nino paint at school",
+  vocabulary_focus: "paint, brush, color, mix, help, friend, art, class",
+  weeklyPlan: sampleWeeklyPlan,
+  main_events: weeklyPlanToMainEventsText(sampleWeeklyPlan),
 };
 const generateUserPrompt = buildUserPrompt(sampleInputs, EMPTY_SERIES_MEMORY);
 record(
@@ -245,6 +254,21 @@ record(
     pages: makeValidGenerationPayload(30).pages.slice(0, 11),
   }),
   "structural page-count failure is not repairable"
+);
+
+function pipelineWouldUseMockFallback(failureKind: AiGenerationFailureKind): boolean {
+  return failureKind !== "validation";
+}
+
+record(
+  "pipeline_validation_failure_no_mock",
+  !pipelineWouldUseMockFallback("validation"),
+  "validation failure must not use mock fallback"
+);
+record(
+  "pipeline_unavailable_may_use_mock",
+  pipelineWouldUseMockFallback("unavailable"),
+  "API/key failure may use mock fallback"
 );
 
 const memoryStoryA = {

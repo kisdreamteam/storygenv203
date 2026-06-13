@@ -1,5 +1,10 @@
-import type { MockGenerationResult } from "./types";
-
+import type { MockGenerationResult, StoryInputs } from "./types";
+import {
+  isCompleteWeeklyPlan,
+  normalizeWeeklyPlan,
+  type WeeklyPlan,
+} from "@/lib/story/weekly-plan";
+import { validateNoWeekLanguageInText } from "./week-structure";
 const PAGE_COUNT = 12;
 export const MIN_WORDS_PER_PAGE = 25;
 const MAX_WORDS_PER_PAGE = 55;
@@ -19,6 +24,37 @@ function wordCount(text: string): number {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function parseInferredWeeklyPlan(raw: Record<string, unknown>): WeeklyPlan | undefined {
+  if (raw.inferred_weekly_plan === undefined) {
+    return undefined;
+  }
+  return normalizeWeeklyPlan(raw.inferred_weekly_plan);
+}
+
+function weeklyPlanNeedsInference(plan: WeeklyPlan): boolean {
+  return !isCompleteWeeklyPlan(plan);
+}
+
+function validateInferredWeeklyPlan(
+  raw: Record<string, unknown>,
+  inputs: StoryInputs
+): ValidationResult | null {
+  if (!weeklyPlanNeedsInference(inputs.weeklyPlan)) {
+    return null;
+  }
+
+  const inferred = parseInferredWeeklyPlan(raw);
+  if (!inferred) {
+    return { ok: false, reason: "missing inferred_weekly_plan for topic-first generation" };
+  }
+
+  if (!isCompleteWeeklyPlan(inferred)) {
+    return { ok: false, reason: "inferred_weekly_plan must include events for all four weeks" };
+  }
+
+  return null;
 }
 
 export type ValidationResult =
@@ -150,18 +186,45 @@ function validateGenerationOutputInternal(
 
   vocabulary.sort((a, b) => a.sort_order - b.sort_order);
 
+  const inferred_weekly_plan = isRecord(raw) ? parseInferredWeeklyPlan(raw) : undefined;
+
   return {
     ok: true,
     result: {
       story: { title, status: "draft" },
       pages,
       vocabulary,
+      inferred_weekly_plan,
     },
   };
 }
 
 export function validateGenerationOutput(raw: unknown): ValidationResult {
   return validateGenerationOutputInternal(raw);
+}
+
+export function validateGenerationOutputWithWeeks(
+  raw: unknown,
+  mainEventsOrInputs: string | StoryInputs
+): ValidationResult {
+  const structural = validateGenerationOutputInternal(raw);
+  if (!structural.ok) {
+    return structural;
+  }
+
+  if (typeof mainEventsOrInputs !== "string" && isRecord(raw)) {
+    const inferredCheck = validateInferredWeeklyPlan(raw, mainEventsOrInputs);
+    if (inferredCheck) {
+      return inferredCheck;
+    }
+  }
+
+  const weekLanguageCheck = validateNoWeekLanguageInText(raw);
+  if (!weekLanguageCheck.ok) {
+    return { ok: false, reason: weekLanguageCheck.reason };
+  }
+
+  return structural;
 }
 
 export function getShortPageNumbers(raw: unknown): number[] {
@@ -199,4 +262,12 @@ export function isRepairableShortPageFailure(raw: unknown): boolean {
   }
 
   return !validateGenerationOutput(raw).ok;
+}
+
+export function isRepairableWeekStructureFailure(raw: unknown): boolean {
+  const structural = validateGenerationOutputInternal(raw);
+  if (!structural.ok) {
+    return false;
+  }
+  return !validateNoWeekLanguageInText(raw).ok;
 }

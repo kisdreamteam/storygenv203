@@ -4,10 +4,12 @@ import { SaveButton } from "@/components/story/SaveButton";
 import { StoryActionButtons } from "@/components/story/StoryActionButtons";
 import { StoryEditorShell } from "@/components/story/StoryEditorShell";
 import { StoryPagesSection } from "@/components/story/StoryPagesSection";
+import { StoryPlanSummary } from "@/components/story/StoryPlanSummary";
 import { VocabularyList } from "@/components/story/VocabularyList";
 import { PilotWorkflowStoryView } from "@/components/validation/PilotWorkflowStoryView";
 import { loadCharacterProfiles } from "@/lib/character-profiles";
 import { createClient } from "@/lib/supabase/server";
+import { resolveWeeklyPlan } from "@/lib/story/weekly-plan";
 
 type StoryPageProps = {
   params: Promise<{ id: string }>;
@@ -37,7 +39,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
   const { data: story, error: storyError } = await supabase
     .from("stories")
     .select(
-      "id, title, theme, status, saved_at, learning_goal, vocabulary_focus, main_events, setting, tone, words_to_avoid, notes"
+      "id, title, theme, status, saved_at, learning_goal, vocabulary_focus, weekly_plan, main_events, setting, tone, words_to_avoid, notes"
     )
     .eq("id", id)
     .eq("is_archived", false)
@@ -63,18 +65,20 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
 
   const savedDate = story.saved_at
     ? new Date(story.saved_at).toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    })
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
     : null;
 
   const statusLabel = story.status === "saved" ? "Saved" : "Draft";
+  const weeklyPlan = resolveWeeklyPlan(story);
 
   const setup = {
     theme: story.theme,
     learning_goal: story.learning_goal,
     vocabulary_focus: story.vocabulary_focus,
+    weekly_plan: story.weekly_plan,
     main_events: story.main_events,
     setting: story.setting,
     tone: story.tone,
@@ -86,11 +90,8 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
     <main className="mx-auto min-h-screen max-w-3xl p-5">
       <PilotWorkflowStoryView storyId={story.id} status={story.status} />
       <StoryEditorShell>
-        
-        
-        
         <header className="mb-10 flex flex-col items-start justify-between gap-2">
-          <div className="flex flex-row w-full items-center justify-between gap-5">
+          <div className="flex w-full flex-row items-center justify-between gap-5">
             <Link href="/stories" className="text-sm text-gray-600 hover:text-gray-900">
               ← Back to home
             </Link>
@@ -104,21 +105,22 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
               <SignOutButton />
             </div>
           </div>
-          <div className="flex flex-col w-full items-start gap-1">
-            <h1 className="mt-4 text-xl md:text-2xl font-semibold">{story.title}</h1>
+          <div className="flex w-full flex-col items-start gap-1">
+            <h1 className="mt-4 text-xl font-semibold md:text-2xl">{story.title}</h1>
             <p className="mt-1 text-sm text-gray-600">{story.theme}</p>
-            <div className="mb-3 flex flex-row  justify-between w-full items-center gap-2 items-start">
+            <div className="mb-3 flex w-full flex-row items-center justify-between gap-2">
               <StoryActionButtons storyId={story.id} setup={setup} />
               <SaveButton storyId={story.id} />
             </div>
           </div>
           <div className="flex flex-row items-start gap-2">
-            <div className="mb-3 mt-3 flex flex-wrap items-center gap-2 justify-end">
+            <div className="mb-3 mt-3 flex flex-wrap items-center justify-end gap-2">
               <span
-                className={`rounded px-2 py-0.5 text-xs font-medium ${story.status === "saved"
-                  ? "bg-green-100 text-green-800"
-                  : "bg-amber-100 text-amber-800"
-                  }`}
+                className={`rounded px-2 py-0.5 text-xs font-medium ${
+                  story.status === "saved"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-amber-100 text-amber-800"
+                }`}
               >
                 {statusLabel}
               </span>
@@ -129,7 +131,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
           </div>
         </header>
 
-
+        <StoryPlanSummary topic={story.theme} weeklyPlan={weeklyPlan} />
 
         <StoryPagesSection
           storyId={story.id}

@@ -106,6 +106,7 @@ Status: Implemented 2026-06-10
 - [x] Improve story endings (pages 10–12)
 - [x] Reduce repetitive emotional wording
 - [x] Improve vocabulary reinforcement cadence
+- [x] Per-week vocabulary planning (Week N Main Events + Week N Vocabulary)
 - [x] Page rhythm guidance
 - [x] Limit unnecessary adult cameos
 

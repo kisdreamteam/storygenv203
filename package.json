@@ -12,7 +12,10 @@
     "setup:teacher": "node scripts/setup-teacher.mjs",
     "setup:complete": "node scripts/complete-setup.mjs",
     "verify:debug": "node scripts/verify-debug.mjs",
-    "verify:character-profiles": "npx tsx scripts/verify-character-profiles.ts"
+    "verify:character-profiles": "npx tsx scripts/verify-character-profiles.ts",
+    "verify:week-structure": "npx tsx scripts/verify-week-structure.ts",
+    "verify:week-adherence": "npx tsx scripts/verify-week-adherence.ts",
+    "verify:weekly-plan-suggest": "npx tsx scripts/verify-weekly-plan-suggest.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",

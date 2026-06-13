@@ -2,6 +2,7 @@ import {
   DEFAULT_ILLUSTRATION_SETTING,
   sceneFromPageText,
 } from "./illustration-prompt";
+import { preferredVocabularyWords, type WeeklyPlan } from "@/lib/story/weekly-plan";
 import type {
   GenerationOptions,
   MockGenerationResult,
@@ -42,12 +43,42 @@ function resolveVariantIndex(options?: GenerationOptions): number {
   return seed % 3;
 }
 
+function buildInferredWeeklyPlan(inputs: StoryInputs): WeeklyPlan {
+  const { theme, learning_goal, weeklyPlan } = inputs;
+  const defaultBeats = [
+    `Nina and Nino begin exploring ${theme} and set a goal tied to ${learning_goal}.`,
+    `They practice and discover more about ${theme} through hands-on activities.`,
+    `A small challenge appears; they work together to solve it.`,
+    `They finish with meaningful learning about ${theme} and a warm closing moment.`,
+  ];
+  const defaultVocab = ["learn", "friend", "help", "share", "try"];
+
+  return {
+    week1: {
+      events: weeklyPlan.week1.events.trim() || defaultBeats[0],
+      vocabulary: weeklyPlan.week1.vocabulary.trim() || defaultVocab.slice(0, 2).join(", "),
+    },
+    week2: {
+      events: weeklyPlan.week2.events.trim() || defaultBeats[1],
+      vocabulary: weeklyPlan.week2.vocabulary.trim() || defaultVocab[2],
+    },
+    week3: {
+      events: weeklyPlan.week3.events.trim() || defaultBeats[2],
+      vocabulary: weeklyPlan.week3.vocabulary.trim() || defaultVocab[3],
+    },
+    week4: {
+      events: weeklyPlan.week4.events.trim() || defaultBeats[3],
+      vocabulary: weeklyPlan.week4.vocabulary.trim() || defaultVocab[4],
+    },
+  };
+}
+
 function buildPageTexts(
   inputs: StoryInputs,
   setting: string,
   variantIndex: number
 ): string[] {
-  const { theme, learning_goal, main_events } = inputs;
+  const { theme, learning_goal } = inputs;
 
   const page1Variants = [
     `Nina and Nino woke up on a sunny morning. Today they will learn about ${theme} at ${setting}.`,
@@ -84,14 +115,14 @@ function buildPageTexts(
     `${page1Open} Their goal is simple: ${learning_goal}. Nino smiles. Nina says, "We can do this!"`,
     `Mom packs a small snack. Dad waves goodbye. Nina holds Nino's hand. They walk toward ${setting} with happy steps.`,
     `At ${setting}, Nina points and says, "Look!" Nino asks, "What is that?" They notice something new for their ${theme} story.`,
-    `The main plan begins. ${main_events.split(".")[0] || main_events}. Nina listens carefully. Nino copies her brave smile.`,
+    `Nina and Nino start their ${theme} adventure. They listen carefully and copy brave smiles.`,
     `They practice the learning goal: ${learning_goal}. Nina explains with short, clear words. Nino repeats each word with joy.`,
-    page6,
+    `They explore more of ${theme}. ${page6}`,
     page7,
+    `A new challenge appears in their ${theme} story. Nina and Nino work together with patient steps.`,
     `Friends nearby cheer them on. Nina and Nino laugh softly. They remember ${learning_goal} and keep going step by step.`,
     `The hard part is solved with teamwork. Nino says, "We did it!" Nina claps once and gives a proud thumbs up.`,
-    `They look around ${setting} and talk about what they learned. Nina names three things. Nino names two more with a grin.`,
-    `Before heading home, they review ${theme} one more time. Nina says, "${learning_goal} matters." Nino nods and says, "Me too!"`,
+    `Their ${theme} story reaches a meaningful moment. Nina names three things. Nino names two more with a grin.`,
     endingVariants[variantIndex % endingVariants.length],
   ];
 }
@@ -114,7 +145,8 @@ export function runMockPipeline(
   const setting = resolveSetting(inputs);
   const variantIndex = resolveVariantIndex(options);
   const pageTexts = buildPageTexts(inputs, setting, variantIndex);
-  const vocabWords = parseVocabularyWords(inputs.vocabulary_focus);
+  const vocabWords = preferredVocabularyWords(inputs.weeklyPlan, inputs.vocabulary_focus);
+  const parsedVocab = parseVocabularyWords(vocabWords.join(", "));
 
   const pages = pageTexts.map((text, index) => {
     const pageNumber = index + 1;
@@ -132,6 +164,7 @@ export function runMockPipeline(
       status: "draft",
     },
     pages,
-    vocabulary: buildVocabulary(vocabWords, inputs.theme),
+    vocabulary: buildVocabulary(parsedVocab, inputs.theme),
+    inferred_weekly_plan: buildInferredWeeklyPlan(inputs),
   };
 }

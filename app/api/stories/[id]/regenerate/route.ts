@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateStory } from "@/lib/generation/pipeline";
-import type { StoryInputs } from "@/lib/generation/types";
 import { combineWarnings, commitStorySave } from "@/lib/story/commit-save";
+import { storyInputsFromRecord, resolvePersistedWeeklyPlan } from "@/lib/story/weekly-plan";
+import { validateGenerateStoryInputsFromRecord } from "@/lib/story/validate-inputs";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -24,7 +25,7 @@ export async function POST(_request: Request, context: RouteContext) {
   const { data: story, error: storyError } = await supabase
     .from("stories")
     .select(
-      "id, status, theme, learning_goal, vocabulary_focus, main_events, setting, tone, words_to_avoid, notes"
+      "id, status, theme, learning_goal, vocabulary_focus, weekly_plan, main_events, setting, tone, words_to_avoid, notes"
     )
     .eq("id", storyId)
     .eq("created_by", user.id)
@@ -35,16 +36,11 @@ export async function POST(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Story not found" }, { status: 404 });
   }
 
-  const inputs: StoryInputs = {
-    theme: story.theme,
-    learning_goal: story.learning_goal,
-    vocabulary_focus: story.vocabulary_focus,
-    main_events: story.main_events,
-    setting: story.setting ?? undefined,
-    tone: story.tone ?? undefined,
-    words_to_avoid: story.words_to_avoid ?? undefined,
-    notes: story.notes ?? undefined,
-  };
+  const inputsResult = validateGenerateStoryInputsFromRecord(storyInputsFromRecord(story));
+  if ("error" in inputsResult) {
+    return NextResponse.json({ error: inputsResult.error }, { status: 400 });
+  }
+  const inputs = inputsResult;
 
   const { data: existingPages, error: pagesLoadError } = await supabase
     .from("story_pages")
@@ -71,6 +67,13 @@ export async function POST(_request: Request, context: RouteContext) {
   }
 
   const { result, warning: generationWarning } = generation;
+
+  const persisted = resolvePersistedWeeklyPlan(
+    inputs.weeklyPlan,
+    result.inferred_weekly_plan,
+    inputs.theme,
+    inputs.vocabulary_focus
+  );
 
   const { error: deleteVocabError } = await supabase
     .from("story_vocabulary")
@@ -121,6 +124,9 @@ export async function POST(_request: Request, context: RouteContext) {
     .from("stories")
     .update({
       title: result.story.title,
+      vocabulary_focus: persisted.vocabulary_focus,
+      main_events: persisted.main_events,
+      weekly_plan: persisted.weeklyPlan,
       updated_at: now,
     })
     .eq("id", storyId);

@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateStory } from "@/lib/generation/pipeline";
 import { combineWarnings, commitStorySave } from "@/lib/story/commit-save";
-import { validateStoryInputs } from "@/lib/story/validate-inputs";
+import { validateGenerateStoryInputs } from "@/lib/story/validate-inputs";
+import { resolvePersistedWeeklyPlan } from "@/lib/story/weekly-plan";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const validated = validateStoryInputs(body);
+  const validated = validateGenerateStoryInputs(body);
   if ("error" in validated) {
     return NextResponse.json({ error: validated.error }, { status: 400 });
   }
@@ -43,6 +44,13 @@ export async function POST(request: Request) {
 
   const { result, warning: generationWarning } = generation;
 
+  const persisted = resolvePersistedWeeklyPlan(
+    inputs.weeklyPlan,
+    result.inferred_weekly_plan,
+    inputs.theme,
+    inputs.vocabulary_focus
+  );
+
   const { data: story, error: storyError } = await supabase
     .from("stories")
     .insert({
@@ -51,8 +59,9 @@ export async function POST(request: Request) {
       title: result.story.title,
       theme: inputs.theme,
       learning_goal: inputs.learning_goal,
-      vocabulary_focus: inputs.vocabulary_focus,
-      main_events: inputs.main_events,
+      vocabulary_focus: persisted.vocabulary_focus,
+      main_events: persisted.main_events,
+      weekly_plan: persisted.weeklyPlan,
       setting: inputs.setting ?? null,
       tone: inputs.tone ?? null,
       words_to_avoid: inputs.words_to_avoid ?? null,

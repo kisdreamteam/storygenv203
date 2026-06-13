@@ -216,9 +216,9 @@ The V1 character rules above remain the **historical baseline**. Post-V1 **Phase
 
 Series Memory updates when:
 
-* Generate completes successfully (story auto-saved)
-* Regenerate completes successfully (story auto-saved)
-* Teacher commits later edits via Save story (page text, illustration prompts, or setup changes that were applied)
+* Generate completes successfully (story auto-saved) — memory rebuilt from active saved stories
+* Regenerate completes successfully (story auto-saved) — memory rebuilt from active saved stories
+* Teacher commits later edits via Save story — memory rebuilt from active saved stories
 
 Series Memory does NOT update when:
 
@@ -226,7 +226,7 @@ Series Memory does NOT update when:
 * Teacher edits page text or prompts but has not clicked Save story yet
 * Teacher edits story setup inputs only (pages unchanged until Regenerate)
 
-When a story is archived (soft delete from the home list), Series Memory is **rebuilt from all active saved, non-archived stories** so the archived story no longer influences future generation. Archive does not append to memory — it removes the archived story's influence. Hard delete is not part of V1.
+When a story is archived (soft delete from the home list), Series Memory is **rebuilt from all active saved, non-archived stories** so the archived story no longer influences future generation. Archive does not append to memory — it removes the archived story's influence. Save uses the same rebuild strategy so archived stories cannot linger in deduped lists. Hard delete is not part of V1.
 
 Teachers may intentionally override continuity.
 
@@ -266,12 +266,22 @@ Educational usefulness is prioritized over creativity alone.
 * 12 pages default
 * ~30–40 words per page
 * Ages 4–6 readability
+* **Topic-centered monthly planning model (locked):**
+  * **Topic** (Theme field) = monthly master theme / umbrella — first priority for generation
+  * **Learning Goal** = required educational intent alongside Topic
+  * **Week 1–4 guidance** (Main Events + Vocabulary per week) = brief hints — filled manually or via **Suggest weekly plan** before story generation
+  * **Complete four-week plan required before Generate** — suggest API fills empty weeks; teacher reviews; teacher-filled weeks never overwritten
+  * Week 1 → pages 1–3; Week 2 → pages 4–6; Week 3 → pages 7–9; Week 4 → pages 10–12
+  * Every week must reinforce the Topic; the story reads as one continuous Topic-centered arc
+  * Week 4 should include meaningful new content — not recap-only, goodbye, or summary pages (prompt guidance)
+  * Weeks are **internal teacher planning data** — story text must never mention weeks to readers
+  * Post-generation validation: structural checks + week-language leak detection only (no keyword/vocab placement hard fails)
 
 ## V1 Edit Scope (Locked)
 
 * Edit story text per page
 * Edit illustration scenes per page (stored in `illustration_prompt` column)
-* Edit story setup inputs (theme, learning goal, vocabulary focus, main events, optional fields)
+* Edit story setup inputs (topic, learning goal, per-week events and vocabulary, optional fields)
 * Regenerate story from stored setup inputs (replaces pages, prompts, and vocabulary; auto-saves)
 * Save story — commit later edits only; not required after first generation
 

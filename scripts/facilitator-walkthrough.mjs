@@ -45,10 +45,10 @@ async function main() {
     await page.fill("#theme", THEME1);
     await page.fill("#learning_goal", "Students practice sharing and taking turns.");
     await page.fill("#vocabulary_focus", "share, turn, kind, help");
-    await page.fill(
-      "#main_events",
-      "Nina and Nino play at the park, take turns on the slide, and help a friend."
-    );
+    await page.fill("#week1", "Nina and Nino play at the park and share toys.");
+    await page.fill("#week2", "They take turns on the slide.");
+    await page.fill("#week3", "They help a friend find a lost ball.");
+    await page.fill("#week4", "They talk about sharing on the way home.");
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/stories\/[0-9a-f-]+$/, { timeout: 30000 });
     story1Url = page.url();
@@ -160,10 +160,10 @@ async function main() {
     await page.fill("#theme", THEME2);
     await page.fill("#learning_goal", "Students learn kindness in the classroom.");
     await page.fill("#vocabulary_focus", "kind, friend, smile, help");
-    await page.fill(
-      "#main_events",
-      "Nina and Nino help a classmate find a lost crayon and say kind words."
-    );
+    await page.fill("#week1", "Nina and Nino welcome a new classmate.");
+    await page.fill("#week2", "They practice kind words at circle time.");
+    await page.fill("#week3", "They help a classmate find a lost crayon.");
+    await page.fill("#week4", "They celebrate kindness before going home.");
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/stories\/[0-9a-f-]+$/, { timeout: 30000 });
     const story2Url = page.url();

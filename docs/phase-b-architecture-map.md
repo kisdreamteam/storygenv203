@@ -74,7 +74,9 @@ This workflow must work end-to-end. If any step fails, V1 fails.
 flowchart TD
     openApp[Teacher opens app] --> loadMemory[Load global Series Memory]
     loadMemory --> enterInputs[Enter 4 required inputs]
-    enterInputs --> generate[Click Generate]
+    enterInputs --> suggestPlan[Suggest weekly plan if incomplete]
+    suggestPlan --> reviewPlan[Review and edit four weeks]
+    reviewPlan --> generate[Click Generate]
     generate --> autoSave1[Auto-save + update Series Memory]
     autoSave1 --> receiveOutput[Story on home + editor]
     receiveOutput --> optionalEdit[Optional: edit pages prompts or setup]
@@ -98,7 +100,7 @@ Keep routes minimal. Only what V1 requires.
 |-------|---------|
 | `/` | Public landing page; existing `LoginForm` entry (invite-only sign-in) |
 | `/stories` | Authenticated story list (teacher's own saved stories) + "New Story" action |
-| `/stories/new` | Input form (4 required + optional fields) + Generate |
+| `/stories/new` | Input form + **Suggest weekly plan** + Generate (Generate enabled only when four weekly guidance fields are complete) |
 | `/stories/[id]` | Story viewer/editor: 12 pages, illustration scenes (show/hide + copy for full prompt), vocabulary, Edit Story Setup, Regenerate, Save story (edits only) |
 
 **Auth behavior:**
@@ -137,8 +139,9 @@ Story metadata and teacher inputs.
 | `title` | text | Short label (derived from theme or generated) |
 | `theme` | text | Required input |
 | `learning_goal` | text | Required input |
-| `vocabulary_focus` | text | Required input |
-| `main_events` | text | Required input |
+| `vocabulary_focus` | text | Derived aggregate of per-week vocabulary (legacy fallback for old stories) |
+| `weekly_plan` | jsonb | Required structured plan: `{ week1–week4: { events, vocabulary } }` |
+| `main_events` | text | Legacy sync text derived from `weekly_plan`; kept for series memory and legacy reads |
 | `setting` | text | Optional, nullable |
 | `tone` | text | Optional, nullable |
 | `words_to_avoid` | text | Optional, nullable |
@@ -277,24 +280,24 @@ Priority order per spec:
 
 Teacher inputs take precedence over memory hints:
 
-* `theme`, `learning_goal`, `vocabulary_focus`, `main_events` define the current story
+* `theme`, `learning_goal`, `vocabulary_focus`, `weekly_plan` define the current story
 * `notes`, `words_to_avoid`, `setting`, `tone` can explicitly override continuity suggestions
 
 Continuity guides generation. Continuity does not block generation.
 
-## On save — memory merge (server-side)
+## On save — memory rebuild (server-side)
 
-When a story is auto-saved (generate/regenerate) or manually saved (teacher commits edits):
+When a story is auto-saved (generate/regenerate) or manually saved (teacher commits edits), Series Memory is **rebuilt from all active saved, non-archived stories** — not incrementally appended. This keeps `recent_stories`, `themes_covered`, `vocabulary_history`, and `settings` aligned with visible stories only.
 
-1. Generate a short summary from the saved story (plot, theme, vocab, characters, setting)
-2. Append to `recent_stories` (enforce cap)
-3. Update `vocabulary_history` with words from this story
-4. Update `themes_covered`
-5. Update `characters` and `settings` if new Tier 2/3 entities or locations appeared
-6. Update `repetition_notes` if useful for future variation
-7. Set `updated_at`
+Per story, the rebuild includes:
 
-All teachers share this single global memory row.
+1. Short summary (plot, theme, vocab, characters, setting)
+2. `recent_stories` entry (cap 15)
+3. `vocabulary_history` words from that story
+4. `themes_covered` theme
+5. `settings` when the story has a setting
+
+Archive uses the same rebuild path (see When memory updates above).
 
 ---
 
@@ -324,10 +327,9 @@ flowchart LR
 
 **Required** (from [v1-scope.md](before-coding/v1-scope.md)):
 
-* Theme / Topic
+* Monthly Topic (Theme)
 * Learning Goal
-* Vocabulary Focus
-* Main Events
+* Week 1–4 guidance (optional): Main Events + Vocabulary per week — brief hints, not scripts
 
 **Optional:**
 
@@ -352,7 +354,7 @@ flowchart LR
 |--------|------|
 | Story pages | 12 pages, ~30–40 words each, ages 4–6 readability |
 | Illustration scenes | 1 per page; short scene stored (10–50 words); full copy-ready production prompt assembled on copy from profiles + scene + style suffix |
-| Vocabulary support | Words from vocabulary focus + context; child-friendly definitions or examples |
+| Vocabulary support | Words from per-week vocabulary (preferred) or derived aggregate; child-friendly definitions or examples |
 
 ## Save behavior
 
@@ -379,7 +381,7 @@ flowchart LR
 
 | Failure | Behavior |
 |---------|----------|
-| AI output validation fails | One repair pass for short pages when repairable; if still invalid, return error (422); no mock/template save; no Series Memory update |
+| AI output validation fails | One repair pass for short pages when repairable; one repair pass for week adherence drift when a complete weekly plan is present; if still invalid, return error (422); no mock/template save; no Series Memory update |
 | API / key / timeout unavailable | Mock template fallback allowed; auto-save if persist succeeds; warning shown |
 | Series Memory load fails | Proceed with empty memory + static character bible; show non-blocking warning |
 | Save fails (edit commit) | Show error; remain on editor; page edits preserved in DB; memory not updated until Save succeeds |
@@ -387,6 +389,24 @@ flowchart LR
 ## V1 shortcut
 
 Per [v1-scope.md](before-coding/v1-scope.md), mock/fixture generation is acceptable when the OpenAI API is unavailable (missing key, timeout, HTTP error). Mock fallback does **not** apply to AI output validation failure.
+
+## Topic-centered weekly planning (Phase 1)
+
+Teachers plan stories with **Monthly Topic + Week 1–4** fields (not a single Main Events textarea).
+
+| Page block | Weekly milestone |
+|------------|------------------|
+| 1–3 | Week 1 |
+| 4–6 | Week 2 |
+| 7–9 | Week 3 |
+| 10–12 | Week 4 |
+
+* Topic = master monthly umbrella; weeks are parts of one continuous Topic-centered story
+* Stored in `stories.weekly_plan` (jsonb); `main_events` kept as derived sync text for legacy reads and series memory
+* **Pre-generation:** `POST /api/stories/suggest-weekly-plan` proposes main-idea beats for empty weeks; teacher reviews on create form
+* **Generate gate:** complete four-week plan required (`isCompleteWeeklyPlan`)
+* Generation prompts use approved weekly milestones when plan is complete
+* Post-generation: merge `inferred_weekly_plan` if present; validation is structural + week-language leak only
 
 ---
 
@@ -502,8 +522,10 @@ No unresolved spec conflicts.
 |-------|----------|
 | Theme / Topic | Yes |
 | Learning Goal | Yes |
-| Vocabulary Focus | Yes |
-| Main Events | Yes |
+| Week 1 guidance (Pages 1–3) | No |
+| Week 2 guidance (Pages 4–6) | No |
+| Week 3 guidance (Pages 7–9) | No |
+| Week 4 guidance (Pages 10–12) | No |
 | Setting | No |
 | Tone | No |
 | Words to avoid | No |

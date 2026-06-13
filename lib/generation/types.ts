@@ -1,7 +1,11 @@
+import type { WeeklyPlan } from "@/lib/story/weekly-plan";
+
 export interface StoryInputs {
   theme: string;
   learning_goal: string;
   vocabulary_focus: string;
+  weeklyPlan: WeeklyPlan;
+  /** Legacy sync text derived from weeklyPlan for DB column and series memory. */
   main_events: string;
   setting?: string;
   tone?: string;
@@ -60,4 +64,5 @@ export interface MockGenerationResult {
     definition_or_example: string;
     sort_order: number;
   }>;
+  inferred_weekly_plan?: WeeklyPlan;
 }

@@ -48,6 +48,161 @@ Follow-up needed:
 
 # Changelog Entries
 
+## 2026-06-09 — AI-Assisted Weekly Plan Step (Pre-Generation)
+
+Prompt / Context:
+
+Partial weekly guidance jumped straight to story generation without teacher review of weeks 2–4.
+
+What changed:
+
+* Two-step create: Suggest weekly plan → review → Generate
+* New API `POST /api/stories/suggest-weekly-plan`
+* Generate requires complete four-week plan
+
+Why it changed:
+
+Teachers need to approve the monthly arc before the 12-page story is written.
+
+Files affected:
+
+`suggest-weekly-plan` route and lib, `validate-inputs.ts`, `StoryInputForm.tsx`, authority docs
+
+Impact:
+
+Week 1-only input gets AI proposals for weeks 2–4 before story write.
+
+Follow-up needed:
+
+Edit Story Setup suggest button on existing stories (optional).
+
+---
+
+## 2026-06-09 — Topic-First Weekly Planning (Optional Guidance)
+
+Prompt / Context:
+
+Shift from required Week 1–4 Main Events + strict keyword validation to topic-first generation with optional weekly hints.
+
+What changed:
+
+* Required inputs: Monthly Topic + Learning Goal only; weekly fields optional guidance
+* Prompts always derive four 3-page weekly beats from Topic; teacher hints steer lightly
+* Generation JSON includes `inferred_weekly_plan`; merged into `weekly_plan` after success
+* Validation relaxed: structure + week-language leak only; keyword placement hard fails removed
+
+Why it changed:
+
+Minimal setup and real AI output were blocked by mandatory weekly milestones and strict placement checks.
+
+Files affected:
+
+`lib/story/validate-inputs.ts`, `lib/story/weekly-plan.ts`, `lib/generation/prompts.ts`, `lib/generation/validate-output.ts`, `lib/generation/week-structure.ts`, `lib/generation/ai-generation.ts`, generate/regenerate routes, `StorySetupFields.tsx`, authority docs
+
+Impact:
+
+Teachers can generate from Topic alone; inferred weekly plan appears in Edit Setup for review.
+
+Follow-up needed:
+
+Monitor story quality on topic-only generations in teacher pilot.
+
+---
+
+## 2026-06-09 — Week-Specific Events + Vocabulary Planning Model
+
+Prompt / Context:
+
+Replace ambiguous global vocabulary + flat week strings with self-contained weekly planning blocks.
+
+What changed:
+
+* UI: Week 1–4 Main Events + Week 1–4 Vocabulary; global Vocabulary Focus removed from form
+* Data: `weekly_plan` jsonb `{ weekN: { events, vocabulary } }`; `vocabulary_focus` derived on save
+* Prompts: structured week blocks with events and vocabulary per page range
+* Validation: week vocabulary placement checks alongside event adherence
+* Legacy: flat week strings and global vocabulary normalized at read time
+
+Why it changed:
+
+Teachers plan both weekly events and weekly vocabulary; a single global vocabulary box caused adherence ambiguity.
+
+Files affected:
+
+`lib/story/weekly-plan.ts`, `lib/story/setup-form-state.ts`, `StorySetupFields.tsx`, `lib/generation/prompts.ts`, `lib/generation/week-structure.ts`, `lib/generation/mock-pipeline.ts`, verification scripts, authority docs, `006_weekly_plan_events_vocabulary_shape.sql`
+
+Impact:
+
+Each 3-page block should primarily cover its week's events and vocabulary when provided.
+
+Follow-up needed:
+
+Monitor shared vocabulary words across weeks (e.g. safety, student) for false positives.
+
+---
+
+## 2026-06-09 — Week Adherence Validation and Repair (Phase 2)
+
+Prompt / Context:
+
+Phase 2 — enforce weekly plan page blocks without exposing week labels to readers.
+
+What changed:
+
+* Week adherence validation: keyword matching per block, leakage detection, week-language leak detection
+* Week 4 meaningful-content and timing checks
+* One AI repair pass on week adherence failure
+* Prompts: weeks are internal teacher planning only — never in story text
+
+Why it changed:
+
+Story audits showed week drift, early Week 4 content, and planning language leaking into child-facing text.
+
+Files affected:
+
+`lib/generation/week-structure.ts`, `lib/generation/validate-output.ts`, `lib/generation/ai-generation.ts`, `lib/generation/prompts.ts`, `lib/story/weekly-plan.ts`, `scripts/verify-week-structure.ts`, authority docs
+
+Impact:
+
+Complete weekly plans now require page-block adherence or validation failure with one repair attempt.
+
+Follow-up needed:
+
+Monitor false positives on keyword matching for multi-word or abstract week milestones.
+
+---
+
+## 2026-06-09 — Topic + Weekly Story Planning (Phase 1)
+
+Prompt / Context:
+
+Replace single Main Events field with Monthly Topic + Week 1–4 structured planning model.
+
+What changed:
+
+* UI: Monthly Topic + Week 1–4 fields; Main Events removed
+* Data: `weekly_plan` jsonb column; legacy `main_events` synced for reads and series memory
+* Prompts: Topic = master theme; weeks = milestones (pages 1–3 / 4–6 / 7–9 / 10–12)
+* Week adherence validation/repair removed from generation pipeline (Phase 2)
+
+Why it changed:
+
+Teachers plan by month and week; structured inputs match classroom planning and enable future validation.
+
+Files affected:
+
+`lib/story/weekly-plan.ts`, story setup UI/components, API routes, `lib/generation/prompts.ts`, migration `005_stories_weekly_plan.sql`, authority docs
+
+Impact:
+
+New stories require Topic + four weekly milestones. Legacy stories load via `resolveWeeklyPlan()`.
+
+Follow-up needed:
+
+Phase 2 — week adherence validation after real-world testing.
+
+---
+
 ## 2026-06-10 — Generation Validation + Archive Memory Fixes
 
 Prompt / Context:
@@ -57,9 +212,10 @@ Audit of Series Memory lifecycle and generation validation failures.
 What changed:
 
 * AI validation failure no longer falls back to mock/template stories or updates Series Memory
-* One repair pass for short pages below the word minimum; 422 error if repair still fails
+* One repair pass (with retry) for short pages below the word minimum; 422 error if repair still fails
+* Invalid/empty AI JSON after successful API response treated as validation failure (no mock)
 * API/key/timeout failures may still use mock fallback with warning
-* Archive rebuilds Series Memory from active saved, non-archived stories (soft delete retained; no hard delete)
+* Archive and save rebuild Series Memory from active saved, non-archived stories (soft delete retained; no hard delete)
 
 Why it changed:
 
@@ -76,6 +232,66 @@ Generation validation and archive behavior now match product intent and architec
 Follow-up needed:
 
 Monitor repair-pass success rate; tune word minimum only if repair remains insufficient.
+
+---
+
+## 2026-06-10 — Topic-Centered 4-Week Structure Enforcement
+
+Prompt / Context:
+
+Story quality audit — generator treated Week 1–4 as optional; stories drifted from Topic and used Week 4 for recap.
+
+What changed:
+
+* Topic (Theme) = master monthly umbrella; weeks = Theme 1–4 in one continuous story
+* Prompts + validation enforce Topic visibility, week page blocks, and meaningful Week 4 content
+* Topic-centered 4-week structure documented as hard requirement
+
+Why it changed:
+
+Teachers plan by monthly Topic and weekly themes; disconnected or early-ending stories reduce trust.
+
+Files affected:
+
+`lib/generation/week-structure.ts`, `lib/generation/prompts.ts`, `lib/generation/validate-output.ts`, `lib/generation/ai-generation.ts`, `scripts/verify-week-structure.ts`, authority docs
+
+Impact:
+
+Week 1–4 Main Events now require Topic-centered milestone adherence or validation failure with repair attempt.
+
+Follow-up needed:
+
+Monitor false positives on Topic keyword matching for multi-word themes.
+
+---
+
+## 2026-06-10 — Four-Week Story Structure Enforcement
+
+Prompt / Context:
+
+Story quality audit — generator treated Week 1–4 Main Events as optional guidance.
+
+What changed:
+
+* Week 1–4 page-milestone map enforced in prompts and post-generation validation
+* Keyword matching per 3-page block; one repair pass on week drift
+* Four-week story structure documented as hard requirement in authority docs
+
+Why it changed:
+
+Teachers plan by week; out-of-sequence stories weaken pacing and trust.
+
+Files affected:
+
+`lib/generation/week-structure.ts`, `lib/generation/prompts.ts`, `lib/generation/validate-output.ts`, `lib/generation/ai-generation.ts`, `scripts/verify-week-structure.ts`, authority docs
+
+Impact:
+
+Stories with Week 1–4 Main Events must align page blocks to weekly milestones or fail validation with repair attempt.
+
+Follow-up needed:
+
+Monitor week-validation false positives on freeform Main Events (validation skipped when Week 1–4 not detected).
 
 ---
 

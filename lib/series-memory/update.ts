@@ -104,6 +104,22 @@ export function buildSeriesMemorySummaryFromStories(
 export async function rebuildSeriesMemoryFromActiveStories(): Promise<{
   warning: string | null;
 }> {
+  let lastWarning: string | null = null;
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const result = await rebuildSeriesMemoryFromActiveStoriesOnce();
+    if (!result.warning) {
+      return { warning: null };
+    }
+    lastWarning = result.warning;
+  }
+
+  return { warning: lastWarning };
+}
+
+async function rebuildSeriesMemoryFromActiveStoriesOnce(): Promise<{
+  warning: string | null;
+}> {
   const supabase = createServiceRoleClient();
 
   const { data: stories, error: storiesError } = await supabase
@@ -171,38 +187,15 @@ export async function updateSeriesMemoryOnSave(
   story: StoryForMemoryUpdate,
   vocabularyWords: string[]
 ): Promise<{ warning: string | null }> {
-  const supabase = createServiceRoleClient();
+  void story;
+  void vocabularyWords;
 
-  const { data: row, error: loadError } = await supabase
-    .from("series_memory")
-    .select("summary")
-    .eq("id", SERIES_MEMORY_ID)
-    .single();
-
-  if (loadError || !row?.summary) {
-    return {
-      warning:
-        "Story saved, but series memory could not be loaded. Continuity may not reflect this story.",
-    };
-  }
-
-  const current = row.summary as SeriesMemorySummary;
-  const merged = mergeSeriesMemorySummary(current, story, vocabularyWords);
-
-  const { error: updateError } = await supabase
-    .from("series_memory")
-    .update({
-      summary: merged,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", SERIES_MEMORY_ID);
-
-  if (updateError) {
+  const { warning } = await rebuildSeriesMemoryFromActiveStories();
+  if (warning) {
     return {
       warning:
         "Story saved, but series memory could not be updated. Continuity may not reflect this story.",
     };
   }
-
   return { warning: null };
 }

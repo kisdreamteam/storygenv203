@@ -13,7 +13,8 @@ export type StorySetupData = {
   theme: string;
   learning_goal: string;
   vocabulary_focus: string;
-  main_events: string;
+  weekly_plan?: unknown;
+  main_events?: string | null;
   setting: string | null;
   tone: string | null;
   words_to_avoid: string | null;
