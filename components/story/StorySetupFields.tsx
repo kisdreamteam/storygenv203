@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import {
   FORM_WEEK_FIELDS,
   type StorySetupFormState,
@@ -12,6 +13,7 @@ type StorySetupFieldsProps = {
   showMoreOptions: boolean;
   onToggleMoreOptions: () => void;
   idPrefix?: string;
+  planAssistBanner?: ReactNode;
 };
 
 const inputClass =
@@ -24,8 +26,8 @@ const WEEK_UI: Array<{
   vocabularyField: keyof StorySetupFormState;
   weekLabel: string;
   pageRange: string;
-  eventsHelper: string;
-  vocabHelper: string;
+  eventsHelper?: string;
+  vocabHelper?: string;
   eventsPlaceholder: string;
   vocabPlaceholder: string;
 }> = FORM_WEEK_FIELDS.map(({ eventsField, vocabularyField }, index) => {
@@ -65,6 +67,7 @@ export function StorySetupFields({
   showMoreOptions,
   onToggleMoreOptions,
   idPrefix = "",
+  planAssistBanner,
 }: StorySetupFieldsProps) {
   const id = (name: string) => (idPrefix ? `${idPrefix}-${name}` : name);
 
@@ -103,6 +106,7 @@ export function StorySetupFields({
         />
       </div>
 
+      {planAssistBanner}
 
       <p className="text-sm text-gray-600">
         Optional weekly guidance

@@ -148,15 +148,16 @@ export function StoryInputForm() {
         disabled={loading || suggesting}
         showMoreOptions={showMoreOptions}
         onToggleMoreOptions={() => setShowMoreOptions((open) => !open)}
-      />
-
-      <WeeklyPlanAssistBanner
-        needsSuggestion={needsSuggestion}
-        planSuggested={planSuggested}
-        suggesting={suggesting}
-        canSuggest={canSuggest}
-        onSuggest={handleSuggestPlan}
-        emptyWeekCount={emptyWeekCount}
+        planAssistBanner={
+          <WeeklyPlanAssistBanner
+            needsSuggestion={needsSuggestion}
+            planSuggested={planSuggested}
+            suggesting={suggesting}
+            canSuggest={canSuggest}
+            onSuggest={handleSuggestPlan}
+            emptyWeekCount={emptyWeekCount}
+          />
+        }
       />
 
       {!needsSuggestion && isCompleteWeeklyPlan(plan) && (
