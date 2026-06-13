@@ -216,7 +216,7 @@ export function EditCharactersModal({ onClose }: EditCharactersModalProps) {
     if (busy) return;
 
     const confirmed = window.confirm(
-      "Reset all six official characters to factory defaults? This cannot be undone."
+      "Reset all seven official characters to factory defaults? This cannot be undone."
     );
     if (!confirmed) return;
 

@@ -1,4 +1,5 @@
 import type { WeeklyPlan } from "@/lib/story/weekly-plan";
+import type { CharacterHints } from "@/lib/story/character-hints";
 
 export interface StoryInputs {
   theme: string;
@@ -7,6 +8,7 @@ export interface StoryInputs {
   weeklyPlan: WeeklyPlan;
   /** Legacy sync text derived from weeklyPlan for DB column and series memory. */
   main_events: string;
+  characterHints?: CharacterHints;
   setting?: string;
   tone?: string;
   words_to_avoid?: string;

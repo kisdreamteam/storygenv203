@@ -575,6 +575,31 @@ Status: Accepted
 
 ---
 
+Date: 2026-06-09
+
+Domain: Product / Characters / Required Inputs
+
+Problem: Learning Goal as a required field adds friction for teachers who only have a monthly Topic. There is no way to hint which official characters (or other names) should appear in a story before generation.
+
+What changed:
+
+* **Required input reduced to Monthly Topic only** — Learning Goal is optional; empty goal stored as `""`; prompts infer educational focus from Topic and weekly plan when omitted
+* **Optional character hint toggles** on create/edit setup: Nina + Nino default ON; Mom, Dad, Ms. Lee, Grandpa, Grandma OFF by default; free-text **Other characters** for Tier 2/3 names
+* At least one of Nina or Nino must remain selected; if only one protagonist is selected, UI warns and requires confirm before Generate
+* Selected characters guide generation at **medium strength** — feature meaningfully across the story, not on every page
+* **Grandma added as 7th official Tier 1 character** with locked factory appearance (soft lavender áo dài)
+* New `stories.character_hints` jsonb column: `{ "official": ["nina", "nino"], "other": "Sam" }`
+
+Why change is needed: Faster minimal setup and better story direction when teachers know who should appear, without requiring full scripts or learning goals.
+
+Documents affected: drift-log.md, v1-scope.md, source-of-truth.md, phase-b-architecture-map.md, character-bible.md, project-changelog.md
+
+Decision: Accepted.
+
+Status: Accepted
+
+---
+
 # 9. Current Open Decisions
 
 Use this section for unresolved items.

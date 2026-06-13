@@ -101,7 +101,7 @@ Vocabulary: ${vocabulary || "(none)"}`;
   return `Plan a topic-centered monthly story outline.
 
 Topic (master theme): ${inputs.theme}
-Learning Goal: ${inputs.learning_goal}
+Learning Goal: ${inputs.learning_goal.trim() || "(not specified — infer educational focus from Topic and weekly plan)"}
 ${optionalLines.length ? optionalLines.join("\n") + "\n" : ""}
 Page blocks:
 - Week 1 / Pages 1–3: introduce Topic, setting, goal
@@ -123,9 +123,12 @@ function validateSuggestedPlan(raw: unknown): WeeklyPlan | null {
 
 function mockSuggestedPlan(inputs: StoryInputs): WeeklyPlan {
   const { theme, learning_goal } = inputs;
+  const goalPhrase = learning_goal.trim()
+    ? `set a goal tied to ${learning_goal}`
+    : `learn about ${theme}`;
   const defaults: Record<WeeklyPlanKey, { events: string; vocabulary: string }> = {
     week1: {
-      events: `Nina and Nino begin exploring ${theme} and set a goal tied to ${learning_goal}.`,
+      events: `Nina and Nino begin exploring ${theme} and ${goalPhrase}.`,
       vocabulary: "learn, explore",
     },
     week2: {

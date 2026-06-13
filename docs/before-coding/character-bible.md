@@ -30,7 +30,7 @@ Rules (historical V1 baseline):
 * Copy-assembled production illustration prompts must use locked visual descriptors for every official character on the page (from `character_profiles` when available, factory fallback from this bible); LLM `illustration_scene` output does not include appearance details
 * Unknown characters introduced by teachers (friends, classmates, visitors, etc.) may appear in stories when the plot requires them, but are **not** persisted as character profiles
 
-**Post-V1 Phase 1 (implemented 2026-06-10):** Teachers may edit global default appearance and personality for the six official characters in-app. Saved profiles override factory defaults for future generation; reset restores this document's factory values. See section 16. Phase 2/3 remain out of scope.
+**Post-V1 Phase 1 (implemented 2026-06-10):** Teachers may edit global default appearance and personality for the seven official characters in-app. Saved profiles override factory defaults for future generation; reset restores this document's factory values. See section 16. Phase 2/3 remain out of scope.
 
 When uncertain:
 
@@ -167,13 +167,30 @@ These six characters have **locked** visual definitions. Clothing, hair, and fac
 
 **Personality / voice:** Kind, organized, enthusiastic about learning
 
+## Grandma
+
+**Role:** Grandmother
+
+**Locked appearance:**
+
+* Medium skin tone
+* Gray hair in a neat bun
+* Warm smile
+* Soft lavender áo dài (always)
+* Friendly grandmother appearance
+* Consistent appearance across stories
+
+**Critical rule:** Grandma **ALWAYS** wears the soft lavender áo dài.
+
+**Personality / voice:** Warm, nurturing, patient; gentle encouragement; shares family stories with Nina and Nino
+
 ---
 
 # 4. Character Tiers
 
 ## Tier 1 — Core Characters (always prioritized)
 
-Official locked characters: **Nina, Nino, Mom, Dad, Grandpa, Ms. Lee**
+Official locked characters: **Nina, Nino, Mom, Dad, Grandpa, Grandma, Ms. Lee**
 
 These characters anchor Series Memory continuity and must use locked appearances in all illustration prompts.
 
@@ -215,6 +232,8 @@ Dad ──┬── Nina
 
 Grandpa ── grandfather of ── Nina and Nino
 
+Grandma ── grandmother of ── Nina and Nino
+
 Nina ── older sister of ── Nino
 Nino ── younger brother of ── Nina
 
@@ -226,8 +245,8 @@ Family ── owns ── Biscuit
 Family dynamics:
 
 * Nina and Nino cooperate more often than they compete
-* Disagreements resolve through talking, sharing, or asking a parent, teacher, or Grandpa
-* Parents, Ms. Lee, and Grandpa guide rather than punish
+* Disagreements resolve through talking, sharing, or asking a parent, teacher, Grandpa, or Grandma
+* Parents, Ms. Lee, Grandpa, and Grandma guide rather than punish
 * No character is mocked for mistakes
 
 ---
@@ -236,7 +255,7 @@ Family dynamics:
 
 ## Locked official characters
 
-For Nina, Nino, Mom, Dad, Grandpa, and Ms. Lee:
+For Nina, Nino, Mom, Dad, Grandpa, Grandma, and Ms. Lee:
 
 * Skin tone, hair, clothing, and distinguishing features remain **fixed** across all stories
 * Ages do not change (Nina stays ~6, Nino stays ~4)
@@ -403,6 +422,7 @@ Use these compact descriptors in every illustration prompt that includes the cha
 * **Mom:** woman, medium skin tone, dark hair, warm smile, yellow áo dài (always)
 * **Dad:** man, medium skin tone, short dark hair, friendly face, casual neutral clothing
 * **Grandpa:** grandfather, white beard, brown cap, denim overalls, warm smile
+* **Grandma:** grandmother, medium skin tone, gray hair in a neat bun, warm smile, soft lavender áo dài (always)
 * **Ms. Lee:** adult female teacher, medium skin tone, dark hair, friendly expression, consistent teacher clothing
 
 **Tier 2 (when present, not locked):**
@@ -433,7 +453,7 @@ This document remains the **factory default** source for official character appe
 
 **Shipped Phase 1 behavior:**
 
-* **Edit Characters** button on `/stories` opens a modal (no new route) for Nina, Nino, Mom, Dad, Grandpa, Ms. Lee
+* **Edit Characters** button on `/stories` opens a modal (no new route) for Nina, Nino, Mom, Dad, Grandpa, Grandma, Ms. Lee
 * Teachers edit global `appearance_description` and `personality_description`; **Save** persists to `character_profiles`
 * Saved profiles override factory defaults in story generation and copy-assembled illustration prompts
 * **Reset this character** / **Reset all characters** restore factory defaults from this bible

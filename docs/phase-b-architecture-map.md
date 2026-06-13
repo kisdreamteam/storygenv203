@@ -138,7 +138,8 @@ Story metadata and teacher inputs.
 | `status` | text | `draft` or `saved` |
 | `title` | text | Short label (derived from theme or generated) |
 | `theme` | text | Required input |
-| `learning_goal` | text | Required input |
+| `learning_goal` | text | Optional input (empty string when omitted) |
+| `character_hints` | jsonb | Optional `{ official: string[], other?: string }` — teacher character toggles |
 | `vocabulary_focus` | text | Derived aggregate of per-week vocabulary (legacy fallback for old stories) |
 | `weekly_plan` | jsonb | Required structured plan: `{ week1–week4: { events, vocabulary } }` |
 | `main_events` | text | Legacy sync text derived from `weekly_plan`; kept for series memory and legacy reads |
@@ -328,11 +329,12 @@ flowchart LR
 **Required** (from [v1-scope.md](before-coding/v1-scope.md)):
 
 * Monthly Topic (Theme)
-* Learning Goal
-* Week 1–4 guidance (optional): Main Events + Vocabulary per week — brief hints, not scripts
 
 **Optional:**
 
+* Learning Goal
+* Character hints (official toggles + Other text)
+* Week 1–4 guidance: Main Events + Vocabulary per week — brief hints, not scripts
 * Setting
 * Tone
 * Words to avoid
@@ -521,7 +523,8 @@ No unresolved spec conflicts.
 | Field | Required |
 |-------|----------|
 | Theme / Topic | Yes |
-| Learning Goal | Yes |
+| Learning Goal | No |
+| Character hints | No |
 | Week 1 guidance (Pages 1–3) | No |
 | Week 2 guidance (Pages 4–6) | No |
 | Week 3 guidance (Pages 7–9) | No |

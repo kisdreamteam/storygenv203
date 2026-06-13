@@ -1,6 +1,12 @@
 "use client";
 
 import type { ReactNode } from "react";
+import type { OfficialCharacterKey } from "@/lib/character-profiles";
+import {
+  CHARACTER_TOGGLE_OPTIONS,
+  characterHintsFromForm,
+  needsSingleProtagonistWarning,
+} from "@/lib/story/character-hints";
 import {
   FORM_WEEK_FIELDS,
   type StorySetupFormState,
@@ -9,6 +15,8 @@ import {
 type StorySetupFieldsProps = {
   form: StorySetupFormState;
   onFieldChange: (field: keyof StorySetupFormState, value: string) => void;
+  onCharacterToggle: (key: OfficialCharacterKey) => void;
+  onOtherCharactersChange: (value: string) => void;
   disabled?: boolean;
   showMoreOptions: boolean;
   onToggleMoreOptions: () => void;
@@ -39,8 +47,6 @@ const WEEK_UI: Array<{
     vocabularyField,
     weekLabel: `Week ${weekNumber}`,
     pageRange,
-    // eventsHelper: `Brief direction for pages ${pageRange} — not a full script.`,
-    // vocabHelper: `Optional words to include in pages ${pageRange}.`,
     eventsPlaceholder:
       index === 0
         ? "Arrive at the farm, see the animals, feed the animals."
@@ -63,6 +69,8 @@ const WEEK_UI: Array<{
 export function StorySetupFields({
   form,
   onFieldChange,
+  onCharacterToggle,
+  onOtherCharactersChange,
   disabled = false,
   showMoreOptions,
   onToggleMoreOptions,
@@ -70,9 +78,14 @@ export function StorySetupFields({
   planAssistBanner,
 }: StorySetupFieldsProps) {
   const id = (name: string) => (idPrefix ? `${idPrefix}-${name}` : name);
+  const characterHints = characterHintsFromForm(
+    form.selected_characters,
+    form.other_characters
+  );
+  const showSingleProtagonistWarning = needsSingleProtagonistWarning(characterHints);
+  const missingProtagonist = characterHints.official.includes("nina") ? "Nino" : "Nina";
 
   return (
-
     <div className="flex flex-col gap-4 ">
       <div className="flex flex-col gap-4 rounded-lg border-1 border-gray-200 p-4 drop-shadow-lg">
         <div>
@@ -92,25 +105,78 @@ export function StorySetupFields({
 
         <div>
           <label htmlFor={id("learning_goal")} className={labelClass}>
-            Learning Goal <span className="text-red-600">*</span>
+            Learning Goal
           </label>
+          <input
+            id={id("learning_goal")}
+            type="text"
+            value={form.learning_goal}
+            onChange={(e) => onFieldChange("learning_goal", e.target.value)}
+            placeholder="Students practice sharing, taking turns, or naming classroom objects."
+            className={inputClass}
+            disabled={disabled}
+          />
+          <p className={helperClass}>Optional — leave blank to infer from your topic.</p>
         </div>
-        <input
-          id={id("learning_goal")}
-          type="text"
-          value={form.learning_goal}
-          onChange={(e) => onFieldChange("learning_goal", e.target.value)}
-          placeholder="Students practice sharing, taking turns, or naming classroom objects."
-          className={inputClass}
-          disabled={disabled}
-        />
+
+        <div>
+          <p className={labelClass}>Characters (optional)</p>
+          <p className={helperClass}>
+            Nina and Nino are selected by default. Choose who should appear in this story.
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {CHARACTER_TOGGLE_OPTIONS.map(({ key, label }) => {
+              const selected = form.selected_characters.includes(key);
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => onCharacterToggle(key)}
+                  disabled={disabled}
+                  aria-pressed={selected}
+                  className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                    selected
+                      ? "border-gray-900 bg-gray-900 text-white"
+                      : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+          {showSingleProtagonistWarning && (
+            <p className="mt-2 text-xs text-amber-700" role="status">
+              Only one sibling is selected — {missingProtagonist} will not appear unless you
+              add them back.
+            </p>
+          )}
+          {!characterHints.official.some((key) => key === "nina" || key === "nino") && (
+            <p className="mt-2 text-xs text-red-700" role="alert">
+              Select at least Nina or Nino to generate a story.
+            </p>
+          )}
+          <div className="mt-3">
+            <label htmlFor={id("other_characters")} className={labelClass}>
+              Other characters
+            </label>
+            <input
+              id={id("other_characters")}
+              type="text"
+              value={form.other_characters}
+              onChange={(e) => onOtherCharactersChange(e.target.value)}
+              placeholder="Sam, Biscuit"
+              className={inputClass}
+              disabled={disabled}
+            />
+            <p className={helperClass}>Optional names to include when they fit the story.</p>
+          </div>
+        </div>
       </div>
 
       {planAssistBanner}
 
-      <p className="text-sm text-gray-600">
-        Optional weekly guidance
-      </p>
+      <p className="text-sm text-gray-600">Optional weekly guidance</p>
 
       {WEEK_UI.map(
         ({
@@ -134,7 +200,7 @@ export function StorySetupFields({
               <textarea
                 id={id(eventsField)}
                 rows={2}
-                value={form[eventsField]}
+                value={form[eventsField] as string}
                 onChange={(e) => onFieldChange(eventsField, e.target.value)}
                 placeholder={eventsPlaceholder}
                 className={inputClass}
@@ -149,7 +215,7 @@ export function StorySetupFields({
               <input
                 id={id(vocabularyField)}
                 type="text"
-                value={form[vocabularyField]}
+                value={form[vocabularyField] as string}
                 onChange={(e) => onFieldChange(vocabularyField, e.target.value)}
                 placeholder={vocabPlaceholder}
                 className={inputClass}

@@ -62,6 +62,7 @@ export async function POST(request: Request) {
       vocabulary_focus: persisted.vocabulary_focus,
       main_events: persisted.main_events,
       weekly_plan: persisted.weeklyPlan,
+      character_hints: inputs.characterHints ?? null,
       setting: inputs.setting ?? null,
       tone: inputs.tone ?? null,
       words_to_avoid: inputs.words_to_avoid ?? null,

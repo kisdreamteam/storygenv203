@@ -100,10 +100,11 @@ Teachers should generate stories with minimal setup.
 Required:
 
 * Monthly Topic (Theme)
-* Learning Goal
 
 Optional:
 
+* Learning Goal
+* Character hints (toggle official characters; Nina + Nino default ON; free-text Other characters)
 * Week 1 guidance (Pages 1–3): Main Events + Vocabulary — brief hints only, not full scripts
 * Week 2 guidance (Pages 4–6): Main Events + Vocabulary
 * Week 3 guidance (Pages 7–9): Main Events + Vocabulary
@@ -119,7 +120,7 @@ Rule:
 
 Create workflow:
 
-1. Enter Topic + Learning Goal (+ optional partial weekly hints)
+1. Enter Topic (+ optional Learning Goal, character hints, partial weekly hints)
 2. Click **Suggest weekly plan** (AI fills empty weeks)
 3. Review and edit all four weekly guidance fields
 4. Click **Generate**

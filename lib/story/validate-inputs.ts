@@ -1,5 +1,9 @@
 import type { StoryInputs } from "@/lib/generation/types";
 import {
+  hasRequiredProtagonist,
+  normalizeCharacterHints,
+} from "./character-hints";
+import {
   aggregateVocabularyFocus,
   deriveMainEventsText,
   isCompleteWeeklyPlan,
@@ -15,6 +19,9 @@ function optionalField(value: unknown): string | null {
 const INCOMPLETE_WEEKLY_PLAN_ERROR =
   "Complete all four weekly guidance fields or use Suggest weekly plan first.";
 
+const MISSING_PROTAGONIST_ERROR =
+  "Select at least Nina or Nino before generating a story.";
+
 function buildStoryInputs(
   body: Record<string, unknown>,
   weeklyPlan: ReturnType<typeof normalizeWeeklyPlan>,
@@ -22,12 +29,14 @@ function buildStoryInputs(
   legacyVocabularyFocus: string
 ): StoryInputs {
   const vocabulary_focus = aggregateVocabularyFocus(weeklyPlan, legacyVocabularyFocus);
+  const characterHints = normalizeCharacterHints(body.characterHints);
   return {
     theme,
     learning_goal: typeof body.learning_goal === "string" ? body.learning_goal.trim() : "",
     vocabulary_focus,
     weeklyPlan,
     main_events: deriveMainEventsText(weeklyPlan, theme),
+    characterHints,
     setting: optionalField(body.setting) ?? undefined,
     tone: optionalField(body.tone) ?? undefined,
     words_to_avoid: optionalField(body.words_to_avoid) ?? undefined,
@@ -39,17 +48,20 @@ export function validateStoryInputs(
   body: Record<string, unknown>
 ): StoryInputs | { error: string } {
   const theme = typeof body.theme === "string" ? body.theme.trim() : "";
-  const learning_goal =
-    typeof body.learning_goal === "string" ? body.learning_goal.trim() : "";
   const legacyVocabularyFocus =
     typeof body.vocabulary_focus === "string" ? body.vocabulary_focus.trim() : "";
 
   const weeklyPlan = normalizeWeeklyPlan(body.weeklyPlan);
+  const characterHints = normalizeCharacterHints(body.characterHints);
 
-  if (!theme || !learning_goal) {
+  if (!theme) {
     return {
-      error: "Missing required fields: theme and learning_goal are required.",
+      error: "Missing required field: theme is required.",
     };
+  }
+
+  if (!hasRequiredProtagonist(characterHints)) {
+    return { error: MISSING_PROTAGONIST_ERROR };
   }
 
   return buildStoryInputs(body, weeklyPlan, theme, legacyVocabularyFocus);
@@ -73,6 +85,9 @@ export function validateGenerateStoryInputs(
 export function validateGenerateStoryInputsFromRecord(inputs: StoryInputs): StoryInputs | { error: string } {
   if (!isCompleteWeeklyPlan(inputs.weeklyPlan)) {
     return { error: INCOMPLETE_WEEKLY_PLAN_ERROR };
+  }
+  if (inputs.characterHints && !hasRequiredProtagonist(inputs.characterHints)) {
+    return { error: MISSING_PROTAGONIST_ERROR };
   }
   return inputs;
 }

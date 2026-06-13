@@ -55,6 +55,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       vocabulary_focus: validated.vocabulary_focus,
       main_events: validated.main_events,
       weekly_plan: validated.weeklyPlan,
+      character_hints: validated.characterHints ?? null,
       setting: validated.setting ?? null,
       tone: validated.tone ?? null,
       words_to_avoid: validated.words_to_avoid ?? null,

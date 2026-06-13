@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import type { OfficialCharacterKey } from "@/lib/character-profiles";
+import type { CharacterHints } from "@/lib/story/character-hints";
+import { toggleCharacterSelection } from "@/lib/story/character-hints";
 import {
   isStorySetupFormValid,
   storySetupFormToPayload,
@@ -15,6 +18,7 @@ export type StorySetupData = {
   vocabulary_focus: string;
   weekly_plan?: unknown;
   main_events?: string | null;
+  character_hints?: CharacterHints | null;
   setting: string | null;
   tone: string | null;
   words_to_avoid: string | null;
@@ -55,6 +59,19 @@ export function StorySetupForm({
     setError(null);
   }
 
+  function handleCharacterToggle(key: OfficialCharacterKey) {
+    setForm((prev) => ({
+      ...prev,
+      selected_characters: toggleCharacterSelection(prev.selected_characters, key),
+    }));
+    setError(null);
+  }
+
+  function handleOtherCharactersChange(value: string) {
+    setForm((prev) => ({ ...prev, other_characters: value }));
+    setError(null);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!isStorySetupFormValid(form)) return;
@@ -91,6 +108,8 @@ export function StorySetupForm({
       <StorySetupFields
         form={form}
         onFieldChange={updateField}
+        onCharacterToggle={handleCharacterToggle}
+        onOtherCharactersChange={handleOtherCharactersChange}
         disabled={loading}
         showMoreOptions={showMoreOptions}
         onToggleMoreOptions={() => setShowMoreOptions((open) => !open)}

@@ -268,7 +268,8 @@ Educational usefulness is prioritized over creativity alone.
 * Ages 4–6 readability
 * **Topic-centered monthly planning model (locked):**
   * **Topic** (Theme field) = monthly master theme / umbrella — first priority for generation
-  * **Learning Goal** = required educational intent alongside Topic
+  * **Learning Goal** = optional educational intent; when omitted, AI infers focus from Topic and weekly plan
+  * **Character hints** = optional toggles for official characters (Nina + Nino default ON) plus free-text Other; at least one protagonist required; medium-strength guidance in prompts
   * **Week 1–4 guidance** (Main Events + Vocabulary per week) = brief hints — filled manually or via **Suggest weekly plan** before story generation
   * **Complete four-week plan required before Generate** — suggest API fills empty weeks; teacher reviews; teacher-filled weeks never overwritten
   * Week 1 → pages 1–3; Week 2 → pages 4–6; Week 3 → pages 7–9; Week 4 → pages 10–12
@@ -298,7 +299,7 @@ These must NOT drift accidentally:
 * Small scope philosophy
 * English-first generation
 * Nina & Nino continuity
-* Locked official character appearances (Nina, Nino, Mom, Dad, Grandpa, Ms. Lee)
+* Locked official character appearances (Nina, Nino, Mom, Dad, Grandpa, Grandma, Ms. Lee)
 * V1 illustration continuity suffix and 16:9 framing standard
 * Series Memory continuity
 * V1 illustration prompts only (no in-app image generation)

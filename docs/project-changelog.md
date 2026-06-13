@@ -78,6 +78,37 @@ Edit Story Setup suggest button on existing stories (optional).
 
 ---
 
+## 2026-06-09 — Optional Learning Goal + Character Hint Toggles
+
+Prompt / Context:
+
+Reduce create-form friction and let teachers hint which characters should appear in a story.
+
+What changed:
+
+* Required input: Monthly Topic only; Learning Goal optional
+* Character hint toggles (Nina + Nino default ON) + Other characters text field on create/edit setup
+* Grandma added as 7th official character with locked factory appearance
+* `stories.character_hints` jsonb column for persistence through regenerate
+
+Why it changed:
+
+Teachers often have a Topic but no explicit learning goal; character toggles improve story direction without full scripts.
+
+Files affected:
+
+`StorySetupFields.tsx`, `StoryInputForm.tsx`, `lib/story/character-hints.ts`, `lib/story/validate-inputs.ts`, generate/setup routes, character bible, authority docs
+
+Impact:
+
+Topic-only create works; selected characters guide generation at medium strength.
+
+Follow-up needed:
+
+Monitor whether topic-only stories need stronger default educational framing in prompts.
+
+---
+
 ## 2026-06-09 — Topic-First Weekly Planning (Optional Guidance)
 
 Prompt / Context:

@@ -77,6 +77,20 @@ const FACTORY_PROFILE_LIST: CharacterProfile[] = [
     isOfficial: true,
   },
   {
+    characterKey: "grandma",
+    displayName: "Grandma",
+    role: "Grandmother",
+    appearanceDescription:
+      "grandmother, medium skin tone, gray hair in a neat bun, warm smile, soft lavender áo dài (always), friendly grandmother appearance",
+    personalityDescription:
+      "Warm, nurturing, patient; gentle encouragement; shares family stories with Nina and Nino",
+    factoryAppearance:
+      "grandmother, medium skin tone, gray hair in a neat bun, warm smile, soft lavender áo dài (always), friendly grandmother appearance",
+    factoryPersonality:
+      "Warm, nurturing, patient; gentle encouragement; shares family stories with Nina and Nino",
+    isOfficial: true,
+  },
+  {
     characterKey: "ms_lee",
     displayName: "Ms. Lee",
     role: "Teacher",

@@ -1,3 +1,11 @@
+import type { OfficialCharacterKey } from "@/lib/character-profiles";
+import {
+  characterHintsFromForm,
+  DEFAULT_CHARACTER_HINTS,
+  formFromCharacterHints,
+  hasRequiredProtagonist,
+  type CharacterHints,
+} from "./character-hints";
 import {
   aggregateVocabularyFocus,
   normalizeWeeklyPlan,
@@ -9,6 +17,8 @@ import {
 export type StorySetupFormState = {
   theme: string;
   learning_goal: string;
+  selected_characters: OfficialCharacterKey[];
+  other_characters: string;
   week1_events: string;
   week1_vocabulary: string;
   week2_events: string;
@@ -26,6 +36,8 @@ export type StorySetupFormState = {
 export const emptyStorySetupForm: StorySetupFormState = {
   theme: "",
   learning_goal: "",
+  selected_characters: [...DEFAULT_CHARACTER_HINTS.official],
+  other_characters: "",
   week1_events: "",
   week1_vocabulary: "",
   week2_events: "",
@@ -96,16 +108,22 @@ export function formFromWeeklyPlan(plan: WeeklyPlan): Pick<
 }
 
 export function isStorySetupFormValid(form: StorySetupFormState): boolean {
-  return form.theme.trim() !== "" && form.learning_goal.trim() !== "";
+  const hints = characterHintsFromForm(form.selected_characters, form.other_characters);
+  return form.theme.trim() !== "" && hasRequiredProtagonist(hints);
 }
 
 export function storySetupFormToPayload(form: StorySetupFormState) {
   const weeklyPlan = weeklyPlanFromForm(form);
+  const characterHints = characterHintsFromForm(
+    form.selected_characters,
+    form.other_characters
+  );
   return {
     theme: form.theme.trim(),
     learning_goal: form.learning_goal.trim(),
     vocabulary_focus: aggregateVocabularyFocus(weeklyPlan),
     weeklyPlan,
+    characterHints,
     setting: form.setting.trim() || undefined,
     tone: form.tone.trim() || undefined,
     words_to_avoid: form.words_to_avoid.trim() || undefined,
@@ -119,15 +137,21 @@ export function storySetupFromStory(story: {
   vocabulary_focus: string;
   weekly_plan?: unknown;
   main_events?: string | null;
+  character_hints?: CharacterHints | null;
   setting: string | null;
   tone: string | null;
   words_to_avoid: string | null;
   notes: string | null;
 }): StorySetupFormState {
   const plan = resolveWeeklyPlan(story);
+  const { selected_characters, other_characters } = formFromCharacterHints(
+    story.character_hints
+  );
   return {
     theme: story.theme,
     learning_goal: story.learning_goal,
+    selected_characters,
+    other_characters,
     ...formFromWeeklyPlan(plan),
     setting: story.setting ?? "",
     tone: story.tone ?? "",

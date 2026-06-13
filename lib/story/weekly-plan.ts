@@ -1,4 +1,5 @@
 import type { StoryInputs } from "@/lib/generation/types";
+import { normalizeCharacterHints } from "./character-hints";
 
 export type WeeklyPlanWeek = {
   events: string;
@@ -372,6 +373,7 @@ export function storyInputsFromRecord(story: {
   vocabulary_focus: string;
   weekly_plan?: unknown;
   main_events?: string | null;
+  character_hints?: unknown;
   setting?: string | null;
   tone?: string | null;
   words_to_avoid?: string | null;
@@ -389,6 +391,7 @@ export function storyInputsFromRecord(story: {
     vocabulary_focus,
     weeklyPlan,
     main_events: syncedMainEvents,
+    characterHints: normalizeCharacterHints(story.character_hints),
     setting: story.setting?.trim() || undefined,
     tone: story.tone?.trim() || undefined,
     words_to_avoid: story.words_to_avoid?.trim() || undefined,

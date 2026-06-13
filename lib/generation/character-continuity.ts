@@ -22,6 +22,7 @@ export const NINO_DESCRIPTOR = CHARACTER_CONTINUITY.nino;
 export const MOM_DESCRIPTOR = CHARACTER_CONTINUITY.mom;
 export const DAD_DESCRIPTOR = CHARACTER_CONTINUITY.dad;
 export const GRANDPA_DESCRIPTOR = CHARACTER_CONTINUITY.grandpa;
+export const GRANDMA_DESCRIPTOR = CHARACTER_CONTINUITY.grandma;
 export const MS_LEE_DESCRIPTOR = CHARACTER_CONTINUITY.ms_lee;
 
 export const OFFICIAL_CHARACTER_DESCRIPTORS: Record<OfficialCharacterId, string> =
@@ -33,6 +34,7 @@ export const OFFICIAL_CHARACTER_DETECTION_ORDER: OfficialCharacterId[] = [
   "mom",
   "dad",
   "grandpa",
+  "grandma",
   "ms_lee",
 ];
 
@@ -42,6 +44,7 @@ const CHARACTER_NAME_PATTERNS: Record<OfficialCharacterId, RegExp> = {
   mom: /\bMom\b/i,
   dad: /\bDad\b/i,
   grandpa: /\bGrandpa\b/i,
+  grandma: /\bGrandma\b/i,
   ms_lee: /\bMs\.?\s*Lee\b/i,
 };
 

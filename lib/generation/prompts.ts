@@ -1,6 +1,7 @@
 import type { CharacterProfileMap } from "@/lib/character-profiles";
 import { formatOfficialCharacterProfilesForStory } from "@/lib/character-profiles/format-for-story-prompt";
 import { CHARACTER_BIBLE_EXCERPT } from "@/lib/constants/character-bible";
+import { formatCharacterHintsForPrompt } from "@/lib/story/character-hints";
 import {
   formatTopicFirstPlanForPrompt,
   formatWeeklyPlanForPrompt,
@@ -184,6 +185,13 @@ export function buildUserPrompt(
     optionalLines.push(`Words to avoid: ${inputs.words_to_avoid.trim()}`);
   }
   if (inputs.notes?.trim()) optionalLines.push(`Notes: ${inputs.notes.trim()}`);
+  if (inputs.characterHints?.official.length) {
+    optionalLines.push(formatCharacterHintsForPrompt(inputs.characterHints));
+  }
+
+  const learningGoalLine = inputs.learning_goal.trim()
+    ? inputs.learning_goal.trim()
+    : "(not specified — infer educational focus from Topic and weekly plan)";
 
   const memoryJson = JSON.stringify(
     {
@@ -220,7 +228,7 @@ export function buildUserPrompt(
 
 Required inputs:
 - Topic (master theme): ${inputs.theme}
-- Learning Goal: ${inputs.learning_goal}
+- Learning Goal: ${learningGoalLine}
 ${inputs.vocabulary_focus.trim() ? `- Combined vocabulary hints (all weeks): ${inputs.vocabulary_focus}\n` : ""}${planBlock}${optionalLines.length ? optionalLines.join("\n") + "\n" : ""}
 Series Memory (internal continuity only — do NOT reference previous stories in story text):
 Use to avoid repeating plots, themes, and vocabulary. Each story must still read standalone for students who have not read prior stories.

@@ -5,6 +5,7 @@ export type OfficialCharacterId =
   | "mom"
   | "dad"
   | "grandpa"
+  | "grandma"
   | "ms_lee";
 
 export type OfficialCharacterKey = OfficialCharacterId;
@@ -15,6 +16,7 @@ export const OFFICIAL_CHARACTER_KEYS: OfficialCharacterKey[] = [
   "mom",
   "dad",
   "grandpa",
+  "grandma",
   "ms_lee",
 ];
 

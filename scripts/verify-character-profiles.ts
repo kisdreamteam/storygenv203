@@ -51,7 +51,7 @@ const factory = getFactoryCharacterProfiles();
 
 record(
   "factory_profile_count",
-  Object.keys(factory).length === 6,
+  Object.keys(factory).length === 7,
   `count=${Object.keys(factory).length}`
 );
 
@@ -69,14 +69,14 @@ for (const key of OFFICIAL_KEYS) {
 const nullResolved = resolveCharacterProfilesMap(null);
 record(
   "fallback_null_rows",
-  nullResolved.fallbackKeys.length === 6,
+  nullResolved.fallbackKeys.length === 7,
   `fallback=${nullResolved.fallbackKeys.length}`
 );
 
 const emptyResolved = resolveCharacterProfilesMap([]);
 record(
   "fallback_empty_rows",
-  emptyResolved.fallbackKeys.length === 6,
+  emptyResolved.fallbackKeys.length === 7,
   `fallback=${emptyResolved.fallbackKeys.length}`
 );
 
@@ -99,7 +99,7 @@ record(
 );
 
 record(
-  "resolved_map_has_six_keys",
+  "resolved_map_has_seven_keys",
   OFFICIAL_KEYS.every((k) => nullResolved.profiles[k]),
   `keys=${Object.keys(nullResolved.profiles).length}`
 );
@@ -111,7 +111,7 @@ record(
   "header present"
 );
 record(
-  "story_prompt_formatter_six_characters",
+  "story_prompt_formatter_seven_characters",
   OFFICIAL_KEYS.every((key) => formatted.includes(factory[key].displayName)),
   "all display names"
 );
@@ -302,7 +302,7 @@ record(
 
 const continuityMap = buildCharacterContinuityMap(factory);
 record(
-  "illustration_continuity_map_six",
+  "illustration_continuity_map_seven",
   OFFICIAL_KEYS.every((key) => continuityMap[key]?.includes(factory[key].displayName)),
   `keys=${Object.keys(continuityMap).length}`
 );
@@ -393,7 +393,7 @@ async function main() {
     record("load_profiles_source", loaded.source === "database", loaded.source);
     record(
       "load_profiles_count",
-      Object.keys(loaded.profiles).length === 6,
+      Object.keys(loaded.profiles).length === 7,
       `count=${Object.keys(loaded.profiles).length}`
     );
 

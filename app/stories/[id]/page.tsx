@@ -39,7 +39,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
   const { data: story, error: storyError } = await supabase
     .from("stories")
     .select(
-      "id, title, theme, status, saved_at, learning_goal, vocabulary_focus, weekly_plan, main_events, setting, tone, words_to_avoid, notes"
+      "id, title, theme, status, saved_at, learning_goal, vocabulary_focus, weekly_plan, main_events, character_hints, setting, tone, words_to_avoid, notes"
     )
     .eq("id", id)
     .eq("is_archived", false)
@@ -80,6 +80,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
     vocabulary_focus: story.vocabulary_focus,
     weekly_plan: story.weekly_plan,
     main_events: story.main_events,
+    character_hints: story.character_hints,
     setting: story.setting,
     tone: story.tone,
     words_to_avoid: story.words_to_avoid,

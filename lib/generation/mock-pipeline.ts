@@ -45,8 +45,11 @@ function resolveVariantIndex(options?: GenerationOptions): number {
 
 function buildInferredWeeklyPlan(inputs: StoryInputs): WeeklyPlan {
   const { theme, learning_goal, weeklyPlan } = inputs;
+  const goalPhrase = learning_goal.trim()
+    ? `set a goal tied to ${learning_goal}`
+    : `learn about ${theme}`;
   const defaultBeats = [
-    `Nina and Nino begin exploring ${theme} and set a goal tied to ${learning_goal}.`,
+    `Nina and Nino begin exploring ${theme} and ${goalPhrase}.`,
     `They practice and discover more about ${theme} through hands-on activities.`,
     `A small challenge appears; they work together to solve it.`,
     `They finish with meaningful learning about ${theme} and a warm closing moment.`,

@@ -13,6 +13,12 @@ import {
   weeklyPlanFromForm,
   type StorySetupFormState,
 } from "@/lib/story/setup-form-state";
+import type { OfficialCharacterKey } from "@/lib/character-profiles";
+import {
+  characterHintsFromForm,
+  needsSingleProtagonistWarning,
+  toggleCharacterSelection,
+} from "@/lib/story/character-hints";
 import {
   isCompleteWeeklyPlan,
   needsWeeklyPlanSuggestion,
@@ -58,6 +64,23 @@ export function StoryInputForm() {
     setWarning(null);
   }
 
+  function handleCharacterToggle(key: OfficialCharacterKey) {
+    setForm((prev) => ({
+      ...prev,
+      selected_characters: toggleCharacterSelection(prev.selected_characters, key),
+    }));
+    setError(null);
+    setPlanError(null);
+    setWarning(null);
+  }
+
+  function handleOtherCharactersChange(value: string) {
+    setForm((prev) => ({ ...prev, other_characters: value }));
+    setError(null);
+    setPlanError(null);
+    setWarning(null);
+  }
+
   async function handleSuggestPlan() {
     if (!canSuggest) return;
 
@@ -96,6 +119,16 @@ export function StoryInputForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canGenerate) return;
+
+    const hints = characterHintsFromForm(form.selected_characters, form.other_characters);
+    if (needsSingleProtagonistWarning(hints)) {
+      const onlyName = hints.official.includes("nina") ? "Nina" : "Nino";
+      const missingName = hints.official.includes("nina") ? "Nino" : "Nina";
+      const confirmed = window.confirm(
+        `Only ${onlyName} is selected — ${missingName} will not appear in this story. Continue anyway?`
+      );
+      if (!confirmed) return;
+    }
 
     setLoading(true);
     setError(null);
@@ -145,6 +178,8 @@ export function StoryInputForm() {
       <StorySetupFields
         form={form}
         onFieldChange={updateField}
+        onCharacterToggle={handleCharacterToggle}
+        onOtherCharactersChange={handleOtherCharactersChange}
         disabled={loading || suggesting}
         showMoreOptions={showMoreOptions}
         onToggleMoreOptions={() => setShowMoreOptions((open) => !open)}
