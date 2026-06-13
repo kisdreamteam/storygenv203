@@ -69,30 +69,29 @@ export function StorySetupFields({
   const id = (name: string) => (idPrefix ? `${idPrefix}-${name}` : name);
 
   return (
-    <div className="flex flex-col gap-5">
-      <div>
-        <label htmlFor={id("theme")} className={labelClass}>
-          Monthly Topic <span className="text-red-600">*</span>
-        </label>
-        <input
-          id={id("theme")}
-          type="text"
-          value={form.theme}
-          onChange={(e) => onFieldChange("theme", e.target.value)}
-          placeholder="Farm, Fire Station, Zoo, Birthday Party"
-          className={inputClass}
-          disabled={disabled}
-        />
-        <p className={helperClass}>
-          The master theme for this month&apos;s story. The AI plans four weekly beats from this
-          Topic when you leave weekly fields blank.
-        </p>
-      </div>
 
-      <div>
-        <label htmlFor={id("learning_goal")} className={labelClass}>
-          Learning Goal <span className="text-red-600">*</span>
-        </label>
+    <div className="flex flex-col gap-4 ">
+      <div className="flex flex-col gap-4 rounded-lg border-1 border-gray-200 p-4 drop-shadow-lg">
+        <div>
+          <label htmlFor={id("theme")} className={labelClass}>
+            Monthly Topic <span className="text-red-600">*</span>
+          </label>
+          <input
+            id={id("theme")}
+            type="text"
+            value={form.theme}
+            onChange={(e) => onFieldChange("theme", e.target.value)}
+            placeholder="Farm, Fire Station, Zoo, Birthday Party"
+            className={inputClass}
+            disabled={disabled}
+          />
+        </div>
+
+        <div>
+          <label htmlFor={id("learning_goal")} className={labelClass}>
+            Learning Goal <span className="text-red-600">*</span>
+          </label>
+        </div>
         <input
           id={id("learning_goal")}
           type="text"
@@ -104,9 +103,9 @@ export function StorySetupFields({
         />
       </div>
 
+
       <p className="text-sm text-gray-600">
-        Optional weekly guidance — brief hints for each 3-page block, not full story scripts.
-        All four weeks must be filled (manually or via Suggest weekly plan) before Generate.
+        Optional weekly guidance
       </p>
 
       {WEEK_UI.map(
