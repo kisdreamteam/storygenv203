@@ -22,6 +22,7 @@ type StorySetupFieldsProps = {
   onToggleMoreOptions: () => void;
   idPrefix?: string;
   planAssistBanner?: ReactNode;
+  mode?: "basics" | "legacy";
 };
 
 const inputClass =
@@ -76,6 +77,7 @@ export function StorySetupFields({
   onToggleMoreOptions,
   idPrefix = "",
   planAssistBanner,
+  mode = "basics",
 }: StorySetupFieldsProps) {
   const id = (name: string) => (idPrefix ? `${idPrefix}-${name}` : name);
   const characterHints = characterHintsFromForm(
@@ -87,7 +89,7 @@ export function StorySetupFields({
 
   return (
     <div className="flex flex-col gap-4 ">
-      <div className="flex flex-col gap-4 rounded-lg border-1 border-gray-200 p-4 drop-shadow-lg">
+      <div className="flex flex-col gap-4 rounded-xl border-1 border-gray-200 p-4 drop-shadow-lg">
         <div>
           <label htmlFor={id("theme")} className={labelClass}>
             Monthly Topic <span className="text-red-600">*</span>
@@ -122,7 +124,7 @@ export function StorySetupFields({
         <div>
           <p className={labelClass}>Characters (optional)</p>
           <p className={helperClass}>
-            Nina and Nino are selected by default. Choose who should appear in this story.
+            Nina and Nino are selected by default.
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
             {CHARACTER_TOGGLE_OPTIONS.map(({ key, label }) => {
@@ -134,11 +136,10 @@ export function StorySetupFields({
                   onClick={() => onCharacterToggle(key)}
                   disabled={disabled}
                   aria-pressed={selected}
-                  className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                    selected
-                      ? "border-gray-900 bg-gray-900 text-white"
-                      : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
-                  }`}
+                  className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${selected
+                    ? "border-gray-900 bg-gray-900 text-white"
+                    : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
+                    }`}
                 >
                   {label}
                 </button>
@@ -176,55 +177,59 @@ export function StorySetupFields({
 
       {planAssistBanner}
 
-      <p className="text-sm text-gray-600">Optional weekly guidance</p>
+      {mode === "legacy" && (
+        <>
+          <p className="text-sm text-gray-600">Optional weekly guidance</p>
 
-      {WEEK_UI.map(
-        ({
-          eventsField,
-          vocabularyField,
-          weekLabel,
-          pageRange,
-          eventsHelper,
-          vocabHelper,
-          eventsPlaceholder,
-          vocabPlaceholder,
-        }) => (
-          <div key={eventsField} className="flex flex-col gap-4 rounded-lg border border-gray-200 p-4">
-            <h3 className="text-sm font-semibold text-gray-900">
-              {weekLabel} (pages {pageRange})
-            </h3>
-            <div>
-              <label htmlFor={id(eventsField)} className={labelClass}>
-                {weekLabel} guidance
-              </label>
-              <textarea
-                id={id(eventsField)}
-                rows={2}
-                value={form[eventsField] as string}
-                onChange={(e) => onFieldChange(eventsField, e.target.value)}
-                placeholder={eventsPlaceholder}
-                className={inputClass}
-                disabled={disabled}
-              />
-              <p className={helperClass}>{eventsHelper}</p>
-            </div>
-            <div>
-              <label htmlFor={id(vocabularyField)} className={labelClass}>
-                {weekLabel} Vocabulary
-              </label>
-              <input
-                id={id(vocabularyField)}
-                type="text"
-                value={form[vocabularyField] as string}
-                onChange={(e) => onFieldChange(vocabularyField, e.target.value)}
-                placeholder={vocabPlaceholder}
-                className={inputClass}
-                disabled={disabled}
-              />
-              <p className={helperClass}>{vocabHelper}</p>
-            </div>
-          </div>
-        )
+          {WEEK_UI.map(
+            ({
+              eventsField,
+              vocabularyField,
+              weekLabel,
+              pageRange,
+              eventsHelper,
+              vocabHelper,
+              eventsPlaceholder,
+              vocabPlaceholder,
+            }) => (
+              <div key={eventsField} className="flex flex-col gap-4 rounded-lg border border-gray-200 p-4">
+                <h3 className="text-sm font-semibold text-gray-900">
+                  {weekLabel} (pages {pageRange})
+                </h3>
+                <div>
+                  <label htmlFor={id(eventsField)} className={labelClass}>
+                    {weekLabel} guidance
+                  </label>
+                  <textarea
+                    id={id(eventsField)}
+                    rows={2}
+                    value={form[eventsField] as string}
+                    onChange={(e) => onFieldChange(eventsField, e.target.value)}
+                    placeholder={eventsPlaceholder}
+                    className={inputClass}
+                    disabled={disabled}
+                  />
+                  <p className={helperClass}>{eventsHelper}</p>
+                </div>
+                <div>
+                  <label htmlFor={id(vocabularyField)} className={labelClass}>
+                    {weekLabel} Vocabulary
+                  </label>
+                  <input
+                    id={id(vocabularyField)}
+                    type="text"
+                    value={form[vocabularyField] as string}
+                    onChange={(e) => onFieldChange(vocabularyField, e.target.value)}
+                    placeholder={vocabPlaceholder}
+                    className={inputClass}
+                    disabled={disabled}
+                  />
+                  <p className={helperClass}>{vocabHelper}</p>
+                </div>
+              </div>
+            )
+          )}
+        </>
       )}
 
       <div>

@@ -271,10 +271,10 @@ Educational usefulness is prioritized over creativity alone.
   * **Topic** (Theme field) = monthly master theme / umbrella — first priority for generation
   * **Learning Goal** = optional educational intent; when omitted, AI infers focus from Topic and weekly plan
   * **Character hints** = optional toggles for official characters (Nina + Nino default ON; Mom, Dad, Grandpa, Grandma, Ms. Lee optional) plus free-text Other; at least one protagonist required; medium-strength guidance in suggest and generate prompts
-  * **Week 1–4 guidance** (events + vocabulary per week) = brief hints — filled manually or via **Suggest weekly plan** before story generation
-  * **Create workflow (locked):** Suggest weekly plan → teacher reviews/edits all four weeks → Generate (not direct Generate with an incomplete plan)
-  * **Suggest weekly plan** remains available whenever Topic is valid (including after all four weeks are filled) so teachers can re-suggest with confirm to replace all weeks
-  * **Complete four-week plan required before Generate** — suggest API fills empty weeks; `replaceAll` re-suggests all weeks when plan is already complete; teacher-filled weeks are never overwritten except via explicit re-suggest
+  * **Week 1–4 guidance** (events + optional vocabulary per week) = brief hints — built via **Choose Your Story Path** wizard before story generation
+  * **Create workflow (locked):** Topic + characters → **Choose Your Story Path** (8 options per week, teacher selects) → final review → Generate (not direct Generate with an incomplete plan)
+  * **Per-week suggest:** `POST /api/stories/suggest-week-options` returns 8 tailored options; prior approved weeks are context only — no fixed narrative arc labels
+  * **Complete four-week plan required before Generate** — teacher-approved choices collapse to `weekly_plan.weekN.events`; optional vocabulary on review screen
   * Week 1 → pages 1–3; Week 2 → pages 4–6; Week 3 → pages 7–9; Week 4 → pages 10–12
   * Every week must reinforce the Topic; the story reads as one continuous Topic-centered arc
   * Week 4 should include meaningful new content — not recap-only, goodbye, or summary pages (prompt guidance)
@@ -285,7 +285,7 @@ Educational usefulness is prioritized over creativity alone.
 
 * Edit story text per page
 * Edit illustration scenes per page (stored in `illustration_prompt` column)
-* Edit story setup inputs (topic, learning goal, per-week events and vocabulary, character hints, optional fields) — includes **Suggest weekly plan** in the Edit Story Setup modal
+* Edit story setup inputs (topic, learning goal, per-week events and vocabulary, character hints, optional fields) — includes **Choose Your Story Path** wizard in the Edit Story Setup modal
 * Regenerate story from stored setup inputs (replaces pages, prompts, and vocabulary; auto-saves)
 * Save story — commit later edits only; not required after first generation
 

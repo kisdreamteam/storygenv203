@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { OfficialCharacterKey } from "@/lib/character-profiles";
 import type { CharacterHints } from "@/lib/story/character-hints";
 import { toggleCharacterSelection } from "@/lib/story/character-hints";
@@ -8,11 +8,17 @@ import {
   isStorySetupFormValid,
   storySetupFormToPayload,
   storySetupFromStory,
+  weeklyPlanFromForm,
   type StorySetupFormState,
 } from "@/lib/story/setup-form-state";
-import { WeeklyPlanAssistBanner } from "./WeeklyPlanAssistBanner";
-import { useWeeklyPlanSuggestion } from "./useWeeklyPlanSuggestion";
+import {
+  firstIncompleteWeekStep,
+  pathStateFromForm,
+} from "@/lib/story/story-path-planning";
+import { isCompleteWeeklyPlan, WEEK_PLAN_KEYS } from "@/lib/story/weekly-plan";
+import { StoryPathWizard } from "./StoryPathWizard";
 import { StorySetupFields } from "./StorySetupFields";
+import { useStoryPathPlanning } from "./useStoryPathPlanning";
 
 export type StorySetupData = {
   theme: string;
@@ -42,9 +48,17 @@ export function StorySetupForm({
   onCancel,
   idPrefix = "edit-setup",
 }: StorySetupFormProps) {
-  const [form, setForm] = useState<StorySetupFormState>(() =>
-    storySetupFromStory(initialSetup)
-  );
+  const initialForm = useMemo(() => storySetupFromStory(initialSetup), [initialSetup]);
+  const initialStep = useMemo(() => {
+    const fromForm = pathStateFromForm(initialForm);
+    if (fromForm.step === "review") return "review";
+    const plan = weeklyPlanFromForm(initialForm);
+    const hasAnyWeek = WEEK_PLAN_KEYS.some((key) => plan[key].events.trim() !== "");
+    if (!hasAnyWeek) return "setup";
+    return firstIncompleteWeekStep(initialForm);
+  }, [initialForm]);
+
+  const [form, setForm] = useState<StorySetupFormState>(initialForm);
   const [showMoreOptions, setShowMoreOptions] = useState(
     Boolean(
       initialSetup.setting ||
@@ -57,21 +71,35 @@ export function StorySetupForm({
   const [error, setError] = useState<string | null>(null);
 
   const {
-    suggesting,
-    planSuggested,
-    planError,
-    handleSuggest,
-    clearPlanError,
-    deriveBannerState,
-  } = useWeeklyPlanSuggestion(loading);
+    pathState,
+    fetchingWeek,
+    pathError,
+    clearPathError,
+    startPathPlanning,
+    goToStep,
+    toggleOption,
+    setManualOption,
+    continueFromWeek,
+    backFromWeek,
+    refreshWeekOptions,
+    editWeekFromReview,
+    updateReviewWeekPlan,
+    updateReviewVocabulary,
+    commitReviewToForm,
+  } = useStoryPathPlanning({
+    form,
+    setForm,
+    disabled: loading,
+    initialStep,
+  });
 
-  const { needsSuggestion, planComplete, emptyWeekCount, canSuggest } =
-    deriveBannerState(form);
+  const plan = weeklyPlanFromForm(form);
+  const planComplete = isCompleteWeeklyPlan(plan);
 
   function updateField(field: keyof StorySetupFormState, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
     setError(null);
-    clearPlanError();
+    clearPathError();
   }
 
   function handleCharacterToggle(key: OfficialCharacterKey) {
@@ -80,22 +108,32 @@ export function StorySetupForm({
       selected_characters: toggleCharacterSelection(prev.selected_characters, key),
     }));
     setError(null);
-    clearPlanError();
+    clearPathError();
   }
 
   function handleOtherCharactersChange(value: string) {
     setForm((prev) => ({ ...prev, other_characters: value }));
     setError(null);
-    clearPlanError();
+    clearPathError();
+  }
+
+  function openStoryPath() {
+    if (planComplete) {
+      goToStep("review");
+    } else {
+      startPathPlanning();
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!isStorySetupFormValid(form)) return;
 
+    commitReviewToForm();
+
     setLoading(true);
     setError(null);
-    clearPlanError();
+    clearPathError();
 
     try {
       const response = await fetch(`/api/stories/${storyId}/setup`, {
@@ -119,7 +157,11 @@ export function StorySetupForm({
     }
   }
 
-  const canSubmit = isStorySetupFormValid(form) && !loading && !suggesting;
+  const canSubmit =
+    isStorySetupFormValid(form) &&
+    planComplete &&
+    !loading &&
+    !fetchingWeek;
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -128,31 +170,56 @@ export function StorySetupForm({
         onFieldChange={updateField}
         onCharacterToggle={handleCharacterToggle}
         onOtherCharactersChange={handleOtherCharactersChange}
-        disabled={loading || suggesting}
+        disabled={loading || fetchingWeek}
         showMoreOptions={showMoreOptions}
         onToggleMoreOptions={() => setShowMoreOptions((open) => !open)}
         idPrefix={idPrefix}
-        planAssistBanner={
-          <WeeklyPlanAssistBanner
-            alwaysShow
-            needsSuggestion={needsSuggestion}
-            planSuggested={planSuggested}
-            planComplete={planComplete}
-            suggesting={suggesting}
-            canSuggest={canSuggest}
-            onSuggest={() => handleSuggest(form, setForm)}
-            emptyWeekCount={emptyWeekCount}
-          />
-        }
+        mode="basics"
       />
 
+      {pathState.step === "setup" && (
+        <button
+          type="button"
+          onClick={openStoryPath}
+          disabled={!isStorySetupFormValid(form) || loading}
+          className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {planComplete ? "Review story path" : "Choose story path"}
+        </button>
+      )}
+
+      {pathState.step !== "setup" && (
+        <StoryPathWizard
+          pathState={pathState}
+          form={form}
+          fetchingWeek={fetchingWeek}
+          disabled={loading}
+          onToggleOption={toggleOption}
+          onManualOptionChange={setManualOption}
+          onRefreshOptions={refreshWeekOptions}
+          onBackFromWeek={backFromWeek}
+          onContinueFromWeek={continueFromWeek}
+          onEditWeekFromReview={editWeekFromReview}
+          onReviewWeekPlanChange={updateReviewWeekPlan}
+          onReviewVocabularyChange={updateReviewVocabulary}
+          onBackFromReview={() => goToStep("week4")}
+        />
+      )}
+
       <p className="text-xs text-gray-500">
-        Click Regenerate to apply these changes to story pages.
+        Save setup to store topic, characters, and weekly plan. Click Regenerate to apply
+        changes to story pages.
       </p>
 
-      {planError && (
+      {!planComplete && pathState.step === "setup" && (
+        <p className="text-xs text-amber-700">
+          Complete all four weeks in Choose story path before saving setup.
+        </p>
+      )}
+
+      {pathError && (
         <p className="rounded bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
-          {planError}
+          {pathError}
         </p>
       )}
 
@@ -174,7 +241,7 @@ export function StorySetupForm({
           <button
             type="button"
             onClick={onCancel}
-            disabled={loading || suggesting}
+            disabled={loading || fetchingWeek}
             className="text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50"
           >
             Cancel

@@ -22,7 +22,7 @@ export default async function StoriesPage() {
   const savedStories: SavedStory[] = stories ?? [];
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl p-8">
+    <main className="mx-auto min-h-screen max-w-2xl px-4 pt-2">
       <header className="mb-8 flex flex-col items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">StoryGen</h1>
@@ -41,7 +41,7 @@ export default async function StoriesPage() {
           <SignOutButton />
         </div>
       </header>
-      <div className="rounded-2xl border border-gray-400 p-2 text-xs text-gray-500 drop-shadow-lg">
+      <div className="rounded-2xl border border-gray-200 p-2 text-xs text-gray-500 drop-shadow-lg">
         <StoryList stories={savedStories} />
       </div>
     </main>

@@ -86,15 +86,19 @@ System loads Nina & Nino Series Memory
 
 ↓
 
-Teacher enters **Monthly Topic** (required) and optional inputs (Learning Goal, character hints, weekly guidance, etc.)
+Teacher enters **Monthly Topic** (required) and optional inputs (Learning Goal, character hints, etc.)
 
 ↓
 
-Teacher clicks **Suggest weekly plan** (available whenever Topic is valid — including when all four weeks are already filled)
+Teacher clicks **Choose story path** (enabled when Topic + at least one protagonist are valid)
 
 ↓
 
-Teacher reviews and edits all four weekly guidance fields (events + vocabulary per week)
+For each week (1–4): AI suggests **8 tailored event options**; teacher selects one or more, may add a manual idea, then continues
+
+↓
+
+Teacher reviews all four approved week plans on a final review screen (optional vocabulary per week)
 
 ↓
 
@@ -149,7 +153,7 @@ Story does not unintentionally duplicate previous stories
 
 Teachers generate with **Monthly Topic** as the only required input. **Learning Goal is optional** — when omitted, AI infers educational focus from Topic and the weekly plan.
 
-**Story creation flow:** (1) **Suggest weekly plan** — AI proposes main-idea beats and vocabulary hints for empty weeks (or all four when re-suggesting with confirm); (2) teacher reviews/edits all four weekly guidance fields; (3) **Generate** — only when every week has events filled. Optional **Week 1–4 guidance** (events + vocabulary per week) are brief hints, not full scripts; vocabulary may be suggested, reviewed, and adjusted before Generate. **Weeks are internal planning data — they must never appear in story text.** Post-generation validation enforces structure and week-language leak detection only (not strict keyword or vocabulary placement matching).
+**Story creation flow:** (1) **Choose Your Story Path** — per week, AI proposes 8 varied event options tailored to Topic and character hints; teacher selects one or more plus optional manual idea; (2) teacher reviews all four approved week plans on a final screen (optional vocabulary per week); (3) **Generate** — only when every week has events filled. **Week 1–4 guidance** (events + optional vocabulary per week) are brief hints, not full scripts. **Weeks are internal planning data — they must never appear in story text.** Post-generation validation enforces structure and week-language leak detection only (not strict keyword or vocabulary placement matching). Edit Story Setup uses the same path wizard; existing saved stories pre-fill review from stored `weekly_plan`.
 
 Target Quality:
 

@@ -17,7 +17,7 @@ function optionalField(value: unknown): string | null {
 }
 
 const INCOMPLETE_WEEKLY_PLAN_ERROR =
-  "Complete all four weekly guidance fields or use Suggest weekly plan first.";
+  "Complete all four weekly guidance fields using Choose story path first.";
 
 const MISSING_PROTAGONIST_ERROR =
   "Select at least Nina or Nino before generating a story.";

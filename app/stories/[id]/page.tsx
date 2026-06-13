@@ -65,10 +65,10 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
 
   const savedDate = story.saved_at
     ? new Date(story.saved_at).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })
     : null;
 
   const statusLabel = story.status === "saved" ? "Saved" : "Draft";
@@ -117,11 +117,10 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
           <div className="flex flex-row items-start gap-2">
             <div className="mb-3 mt-3 flex flex-wrap items-center justify-end gap-2">
               <span
-                className={`rounded px-2 py-0.5 text-xs font-medium ${
-                  story.status === "saved"
+                className={`rounded px-2 py-0.5 text-xs font-medium ${story.status === "saved"
                     ? "bg-green-100 text-green-800"
                     : "bg-amber-100 text-amber-800"
-                }`}
+                  }`}
               >
                 {statusLabel}
               </span>

@@ -48,6 +48,37 @@ Follow-up needed:
 
 # Changelog Entries
 
+## 2026-06-13 — Choose Your Story Path (Per-Week Planning Wizard)
+
+Prompt / Context:
+
+Stories followed a repetitive hidden template (arrival → practice → challenge → reflection) despite anti-formula prompts.
+
+What changed:
+
+* Per-week wizard: 8 tailored AI options, multi-select + manual idea, final review
+* New API `POST /api/stories/suggest-week-options`
+* Create and Edit Story Setup use the wizard; generation pipeline unchanged
+* `weekly_plan` jsonb stores approved `events` + optional `vocabulary` as before
+
+Why it changed:
+
+Give teachers agency over weekly beats and reduce formulaic story structure.
+
+Files affected:
+
+`lib/story/story-path-planning.ts`, `lib/generation/suggest-week-options.ts`, `app/api/stories/suggest-week-options/route.ts`, `components/story/useStoryPathPlanning.ts`, `StoryPathWeekPanel.tsx`, `StoryPathReview.tsx`, `StoryInputForm.tsx`, `StorySetupForm.tsx`, `StorySetupFields.tsx`, authority docs
+
+Impact:
+
+Create/edit planning UX replaced; existing saved stories compatible via review pre-fill.
+
+Follow-up needed:
+
+Optional `path` metadata in `weekly_plan`; generation prompt updates to use richer planning context.
+
+---
+
 ## 2026-06-09 — AI-Assisted Weekly Plan Step (Pre-Generation)
 
 Prompt / Context:

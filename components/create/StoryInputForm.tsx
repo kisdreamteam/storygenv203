@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { StoryPathWizard } from "@/components/story/StoryPathWizard";
 import { StorySetupFields } from "@/components/story/StorySetupFields";
-import { WeeklyPlanAssistBanner } from "@/components/story/WeeklyPlanAssistBanner";
-import { useWeeklyPlanSuggestion } from "@/components/story/useWeeklyPlanSuggestion";
+import { useStoryPathPlanning } from "@/components/story/useStoryPathPlanning";
 import {
   emptyStorySetupForm,
   isStorySetupFormValid,
@@ -36,18 +36,29 @@ export function StoryInputForm() {
   const [warning, setWarning] = useState<string | null>(null);
 
   const {
-    suggesting,
-    planSuggested,
-    planError,
-    handleSuggest,
-    clearPlanError,
-    deriveBannerState,
-  } = useWeeklyPlanSuggestion(loading);
+    pathState,
+    fetchingWeek,
+    pathError,
+    clearPathError,
+    startPathPlanning,
+    goToStep,
+    toggleOption,
+    setManualOption,
+    continueFromWeek,
+    backFromWeek,
+    refreshWeekOptions,
+    editWeekFromReview,
+    updateReviewWeekPlan,
+    updateReviewVocabulary,
+    commitReviewToForm,
+  } = useStoryPathPlanning({ form, setForm, disabled: loading });
 
   const plan = weeklyPlanFromForm(form);
-  const { needsSuggestion, planComplete, emptyWeekCount, canSuggest } =
-    deriveBannerState(form);
-  const canGenerate = isStorySetupFormValid(form) && isCompleteWeeklyPlan(plan) && !loading;
+  const canGenerate =
+    pathState.step === "review" &&
+    isStorySetupFormValid(form) &&
+    isCompleteWeeklyPlan(plan) &&
+    !loading;
 
   useEffect(() => {
     logStoryCreatePageOpened();
@@ -56,7 +67,7 @@ export function StoryInputForm() {
   function updateField(field: keyof StorySetupFormState, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
     setError(null);
-    clearPlanError();
+    clearPathError();
     setWarning(null);
   }
 
@@ -66,20 +77,22 @@ export function StoryInputForm() {
       selected_characters: toggleCharacterSelection(prev.selected_characters, key),
     }));
     setError(null);
-    clearPlanError();
+    clearPathError();
     setWarning(null);
   }
 
   function handleOtherCharactersChange(value: string) {
     setForm((prev) => ({ ...prev, other_characters: value }));
     setError(null);
-    clearPlanError();
+    clearPathError();
     setWarning(null);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canGenerate) return;
+
+    commitReviewToForm();
 
     const hints = characterHintsFromForm(form.selected_characters, form.other_characters);
     if (needsSingleProtagonistWarning(hints)) {
@@ -93,7 +106,7 @@ export function StoryInputForm() {
 
     setLoading(true);
     setError(null);
-    clearPlanError();
+    clearPathError();
     setWarning(null);
     generateStartedAt.current = Date.now();
     logStoryGenerateClicked();
@@ -131,54 +144,75 @@ export function StoryInputForm() {
     }
   }
 
+  const showSetup = pathState.step === "setup";
+  const showWizard = pathState.step !== "setup";
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex max-w-xl flex-col gap-5 rounded-md border border-gray-200 p-5"
+      className="flex max-w-xl flex-col gap-5 rounded-xl"
     >
-      <StorySetupFields
-        form={form}
-        onFieldChange={updateField}
-        onCharacterToggle={handleCharacterToggle}
-        onOtherCharactersChange={handleOtherCharactersChange}
-        disabled={loading || suggesting}
-        showMoreOptions={showMoreOptions}
-        onToggleMoreOptions={() => setShowMoreOptions((open) => !open)}
-        planAssistBanner={
-          <WeeklyPlanAssistBanner
-            alwaysShow={isStorySetupFormValid(form)}
-            needsSuggestion={needsSuggestion}
-            planSuggested={planSuggested}
-            planComplete={planComplete}
-            suggesting={suggesting}
-            canSuggest={canSuggest}
-            onSuggest={() => handleSuggest(form, setForm)}
-            emptyWeekCount={emptyWeekCount}
+      {showSetup && (
+        <>
+          <StorySetupFields
+            form={form}
+            onFieldChange={updateField}
+            onCharacterToggle={handleCharacterToggle}
+            onOtherCharactersChange={handleOtherCharactersChange}
+            disabled={loading || fetchingWeek}
+            showMoreOptions={showMoreOptions}
+            onToggleMoreOptions={() => setShowMoreOptions((open) => !open)}
+            mode="basics"
           />
-        }
-      />
 
-      {!needsSuggestion && isCompleteWeeklyPlan(plan) && (
+          <button
+            type="button"
+            onClick={startPathPlanning}
+            disabled={!isStorySetupFormValid(form) || loading}
+            className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Choose story path
+          </button>
+        </>
+      )}
+
+      {showWizard && (
+        <StoryPathWizard
+          pathState={pathState}
+          form={form}
+          fetchingWeek={fetchingWeek}
+          disabled={loading}
+          onToggleOption={toggleOption}
+          onManualOptionChange={setManualOption}
+          onRefreshOptions={refreshWeekOptions}
+          onBackFromWeek={backFromWeek}
+          onContinueFromWeek={continueFromWeek}
+          onEditWeekFromReview={editWeekFromReview}
+          onReviewWeekPlanChange={updateReviewWeekPlan}
+          onReviewVocabularyChange={updateReviewVocabulary}
+          onBackFromReview={() => goToStep("week4")}
+          reviewActions={
+            <button
+              type="submit"
+              disabled={!canGenerate}
+              className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {loading ? "Generating…" : "Generate"}
+            </button>
+          }
+        />
+      )}
+
+      {showSetup && (
         <p className="text-xs text-gray-500">
-          All four weekly guidance fields are complete. You can Generate the story.
+          Complete your topic and characters, then choose a story path week by week before
+          generating.
         </p>
       )}
 
-      {needsSuggestion && !planSuggested && (
-        <p className="text-xs text-gray-500">
-          Generate is disabled until all four weekly guidance fields are filled. Use Suggest
-          weekly plan or fill them manually.
-        </p>
-      )}
-
-      <p className="text-xs text-gray-500">
-        Prototype note: story wording may still feel template-like while real AI
-        generation is being prepared.
-      </p>
-
-      {planError && (
+      {pathError && (
         <p className="rounded bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
-          {planError}
+          {pathError}
         </p>
       )}
 
@@ -194,18 +228,24 @@ export function StoryInputForm() {
         </p>
       )}
 
-      <div className="flex items-center gap-4">
+      {showSetup && (
+        <div className="flex items-center gap-4">
+          <Link href="/stories" className="text-sm text-gray-600 hover:text-gray-900">
+            Cancel
+          </Link>
+        </div>
+      )}
+
+      {showWizard && pathState.step !== "review" && (
         <button
-          type="submit"
-          disabled={!canGenerate}
-          className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+          type="button"
+          onClick={() => goToStep("setup")}
+          disabled={loading}
+          className="self-start text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50"
         >
-          {loading ? "Generating…" : "Generate"}
+          Back to topic setup
         </button>
-        <Link href="/stories" className="text-sm text-gray-600 hover:text-gray-900">
-          Cancel
-        </Link>
-      </div>
+      )}
     </form>
   );
 }

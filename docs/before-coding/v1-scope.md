@@ -116,14 +116,15 @@ Optional:
 
 Rule:
 
-**Two-step create: Suggest weekly plan → review all four weeks → Generate story**
+**Choose Your Story Path → review all four weeks → Generate story**
 
 Create workflow:
 
-1. Enter Topic (+ optional Learning Goal, character hints, partial weekly hints)
-2. Click **Suggest weekly plan** (AI fills empty weeks)
-3. Review and edit all four weekly guidance fields
-4. Click **Generate**
+1. Enter Topic (+ optional Learning Goal, character hints)
+2. Click **Choose story path**
+3. For each week: select from 8 AI options, optionally add manual idea, continue
+4. Review all four approved week plans (optional vocabulary per week)
+5. Click **Generate**
 
 ---
 

@@ -623,6 +623,35 @@ Status: Accepted
 
 ---
 
+---
+
+Date: 2026-06-13
+
+Domain: Product / Workflow
+
+Problem: One-shot **Suggest weekly plan** produced repetitive four-week arcs (excited arrival → practice → small challenge → warm reflection) despite anti-formula prompt guidance. Teachers had no way to choose varied beats per week before Generate.
+
+What changed:
+
+* **Choose Your Story Path** wizard replaces one-shot suggest on create (`/stories/new`) and in the Edit Story Setup modal
+* Per-week flow: AI returns **8 tailored event options** for the current week; teacher multi-selects, may add a manual idea, then continues
+* Prior approved weeks passed as context only — not as a fixed narrative template
+* Final review screen shows all four approved week plans; optional vocabulary per week; Generate unchanged
+* New API **`POST /api/stories/suggest-week-options`** — one week → 8 options; no fixed arc labels
+* **`POST /api/stories/suggest-weekly-plan`** retained for scripts; removed from create/edit UI
+* **No DB schema change** — approved choices collapse to existing `weekly_plan.weekN.events` (+ optional `vocabulary`)
+* **Generation pipeline unchanged** in this phase
+
+Why change is needed: Reduce repetitive story structure; give teachers agency over weekly beats without increasing required inputs.
+
+Documents affected: drift-log.md, product-spec.md, source-of-truth.md, v1-scope.md, project-changelog.md
+
+Decision: Accepted
+
+Status: Accepted
+
+---
+
 # 9. Current Open Decisions
 
 Use this section for unresolved items.
@@ -630,3 +659,4 @@ Use this section for unresolved items.
 | Item | Status |
 |------|--------|
 | Store per-story cast lists in Series Memory `recent_stories` (e.g. `characters_used` from `character_hints`) | **Deferred** — not implemented; plot avoidance uses `key_events` and prompt guidance only |
+| Persist `path` planning metadata inside `weekly_plan` jsonb for audit/re-edit | **Deferred** — phase 1 persists `events` + `vocabulary` only |
