@@ -1061,3 +1061,43 @@ Slightly shorter but complete pages pass validation. Broken structure still fail
 Follow-up needed:
 
 None.
+
+---
+
+## 2026-06-09 — Post–Manual Changes Documentation Sync
+
+Prompt / Context:
+
+Documentation audit after manual flow and generation changes (character hints, suggest UX, story variety prompts, regenerate fixes). Authority docs and architecture map were stale relative to implementation.
+
+What changed:
+
+* **source-of-truth.md** — seven official characters (Grandma included); Phase 1 shipped wording; Suggest → Review → Generate; persistent/re-suggest Suggest; Edit Story Setup suggest
+* **product-spec.md** — Learning Goal optional; core workflow includes Suggest weekly plan; Generate requires Topic + complete four-week events
+* **phase-b-architecture-map.md** — full teacher flow diagram; `character_profiles` + `character_hints` shipped; validation = structure + week-language leak only; Phase 1 no longer "future"
+* **drift-log.md** — entry clarifying superseded topic-first / strict validation language; Series Memory cast tracking deferred
+* **story-generation-flow.md** — new practical flow reference
+
+Implementation shipped (same release window, documented here):
+
+* Character hint toggles + Grandma as 7th official character (`character_hints` column)
+* Explicit character cast in Suggest weekly plan prompts
+* Story variety prompt layer (rotating story shapes + anti-formula guidance)
+* Persistent / re-suggest Suggest button on create and Edit Story Setup (`replaceAll` API)
+* Regenerate loads `character_hints`; story page UI syncs after regenerate
+
+Why it changed:
+
+Bring fixed project documents back in sync with the current app after manual changes.
+
+Files affected:
+
+docs listed above; minimal UI alignment: `StoryInputForm.tsx` (`alwaysShow` on suggest banner when Topic valid)
+
+Impact:
+
+Readers and agents should treat source-of-truth + story-generation-flow as the current flow reference. No schema or generation logic changes in this doc pass.
+
+Follow-up needed:
+
+Manual smoke test checklist (see story-generation-flow.md). Close changelog follow-up on 2026-06-09 AI-Assisted Weekly Plan ("Edit Story Setup suggest" — now shipped).

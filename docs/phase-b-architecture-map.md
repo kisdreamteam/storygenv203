@@ -55,39 +55,37 @@ This workflow must work end-to-end. If any step fails, V1 fails.
 
 1. Teacher opens the app (authenticated via Supabase Auth)
 2. System loads global Nina & Nino Series Memory
-3. Teacher enters minimal inputs (4 required, optional fields as needed)
-4. Teacher clicks Generate
-5. System auto-saves and teacher receives:
+3. Teacher enters **Monthly Topic** (required) and optional inputs (Learning Goal, character hints, weekly guidance, etc.)
+4. Teacher uses **Suggest weekly plan** whenever Topic is valid — on create and in Edit Story Setup
+5. Teacher reviews and edits all four weekly guidance fields (events + vocabulary per week)
+6. Teacher clicks **Generate** (requires complete four-week event plan)
+7. System auto-saves and teacher receives:
    * 12 story pages
    * 12 illustration scenes (one per page; full prompts on copy)
    * Vocabulary support / flashcards
    * Story on home / recent stories list
    * Series Memory updated
-6. Teacher optionally edits page text, illustration scenes, or story setup inputs
-7. If edited, teacher clicks **Save story** to commit changes (updates Series Memory)
-8. Teacher may **Regenerate** from stored setup inputs (replaces content; auto-saves)
-9. Teacher reopens the story later
+8. Teacher optionally edits page text, illustration scenes, or story setup inputs
+9. If edited, teacher clicks **Save story** to commit changes (updates Series Memory)
+10. Teacher may **Regenerate** from stored setup inputs (replaces content; auto-saves)
+11. Teacher reopens the story later
 
 **Important:** **Save story** is not part of first-generation workflow. It is enabled only after the teacher makes edits (dirty state).
 
 ```mermaid
 flowchart TD
-    openApp[Teacher opens app] --> loadMemory[Load global Series Memory]
-    loadMemory --> enterInputs[Enter 4 required inputs]
-    enterInputs --> suggestPlan[Suggest weekly plan if incomplete]
-    suggestPlan --> reviewPlan[Review and edit four weeks]
-    reviewPlan --> generate[Click Generate]
-    generate --> autoSave1[Auto-save + update Series Memory]
-    autoSave1 --> receiveOutput[Story on home + editor]
-    receiveOutput --> optionalEdit[Optional: edit pages prompts or setup]
-    optionalEdit --> hasEdits{Teacher made edits?}
-    hasEdits -->|Yes| saveStory[Save story commits edits]
-    saveStory --> updateMemory[Update Series Memory]
-    hasEdits -->|Regenerate| regen[Regenerate from setup]
-    regen --> autoSave2[Auto-save + update Series Memory]
-    receiveOutput --> reopenLater[Reopen story later]
-    updateMemory --> reopenLater
-    autoSave2 --> reopenLater
+    landing["Landing / Login"] --> stories["Stories list"]
+    stories --> create["Create story /stories/new"]
+    create --> enterTopic["Enter Topic + optional inputs"]
+    enterTopic --> suggestPlan["Suggest weekly plan"]
+    suggestPlan --> reviewPlan["Review and edit four weeks"]
+    reviewPlan --> generate["Generate"]
+    generate --> workspace["Story workspace /stories/id"]
+    workspace --> optionalEdit["Edit pages prompts or setup"]
+    optionalEdit --> saveStory["Save story if edited"]
+    optionalEdit --> regen["Regenerate"]
+    saveStory --> workspace
+    regen --> workspace
 ```
 
 ---
@@ -99,9 +97,9 @@ Keep routes minimal. Only what V1 requires.
 | Route | Purpose |
 |-------|---------|
 | `/` | Public landing page; existing `LoginForm` entry (invite-only sign-in) |
-| `/stories` | Authenticated story list (teacher's own saved stories) + "New Story" action |
-| `/stories/new` | Input form + **Suggest weekly plan** + Generate (Generate enabled only when four weekly guidance fields are complete) |
-| `/stories/[id]` | Story viewer/editor: 12 pages, illustration scenes (show/hide + copy for full prompt), vocabulary, Edit Story Setup, Regenerate, Save story (edits only) |
+| `/stories` | Authenticated story list + **New Story** + **Edit Characters** (modal) |
+| `/stories/new` | Input form + **Suggest weekly plan** (visible when Topic valid) + Generate (enabled only when four weekly event fields are complete) |
+| `/stories/[id]` | Story workspace: 12 pages, illustration scenes (show/hide + copy for full prompt), vocabulary, **Edit Story Setup** (includes Suggest), Regenerate, Save story (edits only) |
 
 **Auth behavior:**
 
@@ -123,9 +121,11 @@ Keep routes minimal. Only what V1 requires.
 
 # 4. Proposed Data Model
 
-Supabase tables for V1. Five tables — no over-engineering.
+Supabase tables: **five V1 core tables** (`stories`, `story_pages`, `story_vocabulary`, `series_memory`) plus **`character_profiles`** (Post-V1 Phase 1 — shipped 2026-06-10).
 
-Locked official character definitions (Nina, Nino, Mom, Dad, Grandpa, Ms. Lee) come from static [character-bible.md](before-coding/character-bible.md) at generation time. They are not duplicated in the database for V1; teachers cannot edit profiles in V1.
+Official character **factory** definitions come from [character-bible.md](before-coding/character-bible.md). **`character_profiles`** stores editable global defaults for the seven official characters (Nina, Nino, Mom, Dad, Grandpa, Grandma, Ms. Lee); generation and copy-assembled illustration prompts use saved profiles with factory fallback.
+
+**Character hints** on each story (`stories.character_hints` jsonb) record teacher toggles for which official characters should appear; persisted through regenerate.
 
 ## `stories`
 
@@ -242,7 +242,7 @@ Per [source-of-truth.md](before-coding/source-of-truth.md), Series Memory tracks
 * Vocabulary history
 * Repetition patterns
 
-Locked official characters (Nina, Nino, Mom, Dad, Grandpa, Ms. Lee) are always injected from [character-bible.md](before-coding/character-bible.md) at generation time.
+Locked official characters (Nina, Nino, Mom, Dad, Grandpa, Grandma, Ms. Lee) are injected from [character-bible.md](before-coding/character-bible.md) / `character_profiles` at generation time.
 
 ## When memory updates
 
@@ -383,7 +383,7 @@ flowchart LR
 
 | Failure | Behavior |
 |---------|----------|
-| AI output validation fails | One repair pass for short pages when repairable; one repair pass for week adherence drift when a complete weekly plan is present; if still invalid, return error (422); no mock/template save; no Series Memory update |
+| AI output validation fails | One repair pass for short pages when repairable; one repair pass for week-**language** leak in story text when repairable; if still invalid, return error (422); no mock/template save; no Series Memory update |
 | API / key / timeout unavailable | Mock template fallback allowed; auto-save if persist succeeds; warning shown |
 | Series Memory load fails | Proceed with empty memory + static character bible; show non-blocking warning |
 | Save fails (edit commit) | Show error; remain on editor; page edits preserved in DB; memory not updated until Save succeeds |
@@ -405,7 +405,7 @@ Teachers plan stories with **Monthly Topic + Week 1–4** fields (not a single M
 
 * Topic = master monthly umbrella; weeks are parts of one continuous Topic-centered story
 * Stored in `stories.weekly_plan` (jsonb); `main_events` kept as derived sync text for legacy reads and series memory
-* **Pre-generation:** `POST /api/stories/suggest-weekly-plan` proposes main-idea beats for empty weeks; teacher reviews on create form
+* **Pre-generation:** `POST /api/stories/suggest-weekly-plan` proposes beats for empty weeks; `replaceAll` replaces all weeks when teacher re-suggests a complete plan; Suggest available on create and Edit Story Setup when Topic is valid
 * **Generate gate:** complete four-week plan required (`isCompleteWeeklyPlan`)
 * Generation prompts use approved weekly milestones when plan is complete
 * Post-generation: merge `inferred_weekly_plan` if present; validation is structural + week-language leak only
@@ -427,7 +427,7 @@ app/                          # or pages/ — route files
 components/
   auth/                       # LoginForm, AuthGuard
   stories/                    # StoryList, StoryCard
-  create/                     # StoryInputForm (4 required + optional)
+  create/                     # StoryInputForm (Topic + suggest + generate)
   story/                      # StoryPageView, PageEditor, PromptCopyButton, VocabularyList
   ui/                         # LoadingState, ErrorMessage, Button
 
@@ -523,6 +523,7 @@ No unresolved spec conflicts.
 | Field | Required |
 |-------|----------|
 | Theme / Topic | Yes |
+| Complete four-week event plan (all week events filled) | Yes — before Generate |
 | Learning Goal | No |
 | Character hints | No |
 | Week 1 guidance (Pages 1–3) | No |
@@ -544,21 +545,19 @@ No unresolved spec conflicts.
 
 ---
 
-# 11. Post-V1 Approved Future: Editable Characters Phase 1
+# 11. Post-V1: Editable Characters Phase 1 (Shipped)
 
-**Status:** Approved for future implementation — **not yet built**. Sections 1–10 above describe the frozen V1 architecture and remain unchanged until Phase 1 ships.
+**Status:** **Shipped 2026-06-10.** Sections 1–10 above remain the frozen V1 baseline; this section documents the approved post-V1 extension now in production.
 
 **Direction:** [docs/character-editing-decision-record.md](character-editing-decision-record.md)
 
-## Future table: `character_profiles`
+## Table: `character_profiles`
 
 | Purpose | Notes |
 |---------|--------|
-| Store editable **global default** profiles | Official characters only: Nina, Nino, Mom, Dad, Grandpa, Ms. Lee |
+| Store editable **global default** profiles | Official characters only: Nina, Nino, Mom, Dad, Grandpa, Grandma, Ms. Lee |
 | Seed from Character Bible | Factory defaults from [character-bible.md](before-coding/character-bible.md) |
 | Reset-to-default | Restore one character, all characters, or full factory set from bible |
-
-Suggested columns (implementation detail — not finalized): character id/key, appearance text, personality text, updated_at. Exact schema to be defined at implementation time.
 
 ## Character profiles in generation (implemented)
 
@@ -568,10 +567,10 @@ Suggested columns (implementation detail — not finalized): character id/key, a
 4. OpenAI returns short `illustration_scene` per page; stored in `illustration_prompt`
 5. Copy-assembled production prompts use the same profile source + locked illustration continuity suffix
 
-## Future UI (minimal)
+## UI (shipped)
 
-* **Edit Characters** button — single entry point on authenticated teacher surfaces (exact placement TBD; no new route required unless explicitly approved later)
-* **Edit Characters** modal — edit appearance and personality; save and reset actions
+* **Edit Characters** button on `/stories` — opens modal (no new route)
+* **Edit Characters** modal — edit appearance and personality; save and reset actions; unsaved-changes guard
 
 ## Explicitly not in Phase 1
 

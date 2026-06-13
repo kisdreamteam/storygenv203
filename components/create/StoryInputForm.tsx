@@ -146,6 +146,7 @@ export function StoryInputForm() {
         onToggleMoreOptions={() => setShowMoreOptions((open) => !open)}
         planAssistBanner={
           <WeeklyPlanAssistBanner
+            alwaysShow={isStorySetupFormValid(form)}
             needsSuggestion={needsSuggestion}
             planSuggested={planSuggested}
             planComplete={planComplete}

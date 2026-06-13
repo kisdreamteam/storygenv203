@@ -168,13 +168,13 @@ Purpose:
 
 Rules (historical V1 baseline — frozen at original V1 ship):
 
-* Official locked characters: Nina, Nino, Mom, Dad, Grandpa, Ms. Lee
+* Official locked characters: Nina, Nino, Mom, Dad, Grandpa, Ms. Lee (Grandma added as 7th official character in 2026-06-09 — see Tier 1 list below)
 * Teachers could not edit character profiles in frozen V1
 * Locked clothing, hair, and facial appearance remain the same across all stories unless a teacher Note requests a one-story exception
 * Mom always wears the yellow áo dài
 * Teacher-introduced characters (friends, classmates, visitors) may appear in stories but are not persisted as character profiles
 
-**Post-V1 update:** Editable Characters **Phase 1** is implemented (2026-06-10). Teachers may edit global default appearance and personality for the six official characters via the Edit Characters modal. Factory defaults remain in [character-bible.md](character-bible.md); reset restores them. Phase 2/3 (story overrides, teacher-created character persistence) remain deferred — see [Post-V1 Character Editing](#post-v1-character-editing-approved-future-phase-1) below.
+**Post-V1 update:** Editable Characters **Phase 1** is implemented (2026-06-10). Teachers may edit global default appearance and personality for the **seven** official characters via the Edit Characters modal. Factory defaults remain in [character-bible.md](character-bible.md); reset restores them. Phase 2/3 (story overrides, teacher-created character persistence) remain deferred — see [Post-V1 Character Editing](#post-v1-character-editing-approved-future-phase-1) below.
 
 Character priority:
 
@@ -185,6 +185,7 @@ Tier 1 (locked official):
 * Mom
 * Dad
 * Grandpa
+* Grandma
 * Ms. Lee
 
 Tier 2 (recurring, not locked):
@@ -202,7 +203,7 @@ The V1 character rules above remain the **historical baseline**. Post-V1 **Phase
 **Shipped behavior (Phase 1 — 2026-06-10):**
 
 * Official characters still **start from** [character-bible.md](character-bible.md) factory defaults; reset restores factory values
-* Teachers edit global default **appearance** and **personality** for Nina, Nino, Mom, Dad, Grandpa, Ms. Lee via **Edit Characters** on `/stories` (modal only; no new route)
+* Teachers edit global default **appearance** and **personality** for Nina, Nino, Mom, Dad, Grandpa, Grandma, and Ms. Lee via **Edit Characters** on `/stories` (modal only; no new route)
 * Saved profiles in `character_profiles` override factory defaults during **future** story generation and copy-assembled illustration prompts
 * **Reset-to-default:** reset one character, reset all characters (with confirm)
 * **Unsaved-changes guard:** switching characters or closing the modal with unsaved edits prompts Save, Discard, or Cancel
@@ -269,9 +270,11 @@ Educational usefulness is prioritized over creativity alone.
 * **Topic-centered monthly planning model (locked):**
   * **Topic** (Theme field) = monthly master theme / umbrella — first priority for generation
   * **Learning Goal** = optional educational intent; when omitted, AI infers focus from Topic and weekly plan
-  * **Character hints** = optional toggles for official characters (Nina + Nino default ON) plus free-text Other; at least one protagonist required; medium-strength guidance in prompts
-  * **Week 1–4 guidance** (Main Events + Vocabulary per week) = brief hints — filled manually or via **Suggest weekly plan** before story generation
-  * **Complete four-week plan required before Generate** — suggest API fills empty weeks; teacher reviews; teacher-filled weeks never overwritten
+  * **Character hints** = optional toggles for official characters (Nina + Nino default ON; Mom, Dad, Grandpa, Grandma, Ms. Lee optional) plus free-text Other; at least one protagonist required; medium-strength guidance in suggest and generate prompts
+  * **Week 1–4 guidance** (events + vocabulary per week) = brief hints — filled manually or via **Suggest weekly plan** before story generation
+  * **Create workflow (locked):** Suggest weekly plan → teacher reviews/edits all four weeks → Generate (not direct Generate with an incomplete plan)
+  * **Suggest weekly plan** remains available whenever Topic is valid (including after all four weeks are filled) so teachers can re-suggest with confirm to replace all weeks
+  * **Complete four-week plan required before Generate** — suggest API fills empty weeks; `replaceAll` re-suggests all weeks when plan is already complete; teacher-filled weeks are never overwritten except via explicit re-suggest
   * Week 1 → pages 1–3; Week 2 → pages 4–6; Week 3 → pages 7–9; Week 4 → pages 10–12
   * Every week must reinforce the Topic; the story reads as one continuous Topic-centered arc
   * Week 4 should include meaningful new content — not recap-only, goodbye, or summary pages (prompt guidance)
@@ -282,7 +285,7 @@ Educational usefulness is prioritized over creativity alone.
 
 * Edit story text per page
 * Edit illustration scenes per page (stored in `illustration_prompt` column)
-* Edit story setup inputs (topic, learning goal, per-week events and vocabulary, optional fields)
+* Edit story setup inputs (topic, learning goal, per-week events and vocabulary, character hints, optional fields) — includes **Suggest weekly plan** in the Edit Story Setup modal
 * Regenerate story from stored setup inputs (replaces pages, prompts, and vocabulary; auto-saves)
 * Save story — commit later edits only; not required after first generation
 

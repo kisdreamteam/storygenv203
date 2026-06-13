@@ -86,11 +86,19 @@ System loads Nina & Nino Series Memory
 
 ↓
 
-Teacher provides minimal inputs
+Teacher enters **Monthly Topic** (required) and optional inputs (Learning Goal, character hints, weekly guidance, etc.)
 
 ↓
 
-Teacher clicks Generate
+Teacher clicks **Suggest weekly plan** (available whenever Topic is valid — including when all four weeks are already filled)
+
+↓
+
+Teacher reviews and edits all four weekly guidance fields (events + vocabulary per week)
+
+↓
+
+Teacher clicks **Generate** (enabled only when all four weekly event fields are complete)
 
 ↓
 
@@ -139,7 +147,9 @@ Teacher could realistically use it in class tomorrow
 Character continuity remains reasonably consistent
 Story does not unintentionally duplicate previous stories
 
-Teachers generate with **Monthly Topic + Learning Goal** as required inputs. **Story creation is two steps:** (1) **Suggest weekly plan** — AI proposes main-idea beats for empty weeks (or all four when none filled); (2) teacher reviews/edits all four weekly guidance fields; (3) **Generate** — only when every week has guidance. Optional **Week 1–4 guidance** (Main Events + Vocabulary per week) are brief hints, not full scripts. **Weeks are internal planning data — they must never appear in story text.** Post-generation validation enforces structure and week-language leak detection only.
+Teachers generate with **Monthly Topic** as the only required input. **Learning Goal is optional** — when omitted, AI infers educational focus from Topic and the weekly plan.
+
+**Story creation flow:** (1) **Suggest weekly plan** — AI proposes main-idea beats and vocabulary hints for empty weeks (or all four when re-suggesting with confirm); (2) teacher reviews/edits all four weekly guidance fields; (3) **Generate** — only when every week has events filled. Optional **Week 1–4 guidance** (events + vocabulary per week) are brief hints, not full scripts; vocabulary may be suggested, reviewed, and adjusted before Generate. **Weeks are internal planning data — they must never appear in story text.** Post-generation validation enforces structure and week-language leak detection only (not strict keyword or vocabulary placement matching).
 
 Target Quality:
 

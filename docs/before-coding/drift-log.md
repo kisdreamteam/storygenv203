@@ -600,8 +600,33 @@ Status: Accepted
 
 ---
 
+Date: 2026-06-09
+
+Domain: Documentation / Product alignment
+
+Problem: Authority docs, changelog, and architecture map lagged behind shipped behavior (optional Learning Goal, complete-plan gate, character hints, suggest/re-suggest UX, relaxed validation, Phase 1 characters). Older drift-log and changelog entries still implied Topic + Learning Goal only, strict week keyword validation, or six official characters without Grandma.
+
+What changed:
+
+* **Current required gate for Generate:** Monthly Topic + complete four-week **events** plan (all four week event fields filled)
+* **Learning Goal:** optional — empty string allowed; AI infers focus when omitted
+* **Validation (runtime):** structural checks (12 pages, word bounds, scenes, vocabulary JSON) + week-**language** leak detection only; keyword/week vocabulary **placement** matching is **not** enforced (helpers remain in code for reference/tests only)
+* Supersedes conflicting wording in earlier topic-first drift entry (2026-06-09) where Generate could proceed with incomplete weekly guidance
+
+Why change is needed: Documentation audit after manual flow changes; align readers with implemented app without changing product scope.
+
+Documents affected: drift-log.md, source-of-truth.md, product-spec.md, phase-b-architecture-map.md, project-changelog.md, story-generation-flow.md (new)
+
+Decision: Accepted (documentation sync only)
+
+Status: Accepted
+
+---
+
 # 9. Current Open Decisions
 
 Use this section for unresolved items.
 
-(No open decisions at this time.)
+| Item | Status |
+|------|--------|
+| Store per-story cast lists in Series Memory `recent_stories` (e.g. `characters_used` from `character_hints`) | **Deferred** — not implemented; plot avoidance uses `key_events` and prompt guidance only |
